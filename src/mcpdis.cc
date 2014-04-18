@@ -1,7 +1,5 @@
 #include <mcpdis.hh>
 
-#include <vector>
-
 std::vector<instruction> pic12f675 = {
 
 	{ "00000000001000", "RETURN", 0 },
@@ -41,7 +39,7 @@ std::vector<instruction> pic12f675 = {
 
 };
 
-template<class T> bool instruction::match(const std::string s, T f) {
+template<class T> bool instruction::match(const std::string s, T f) const {
 	
 	if(s.length() != pattern.length())
 		return false;
@@ -58,16 +56,18 @@ template<class T> bool instruction::match(const std::string s, T f) {
 	return true;
 }
 
-template<> bool instruction::match(const std::string s, parameter_map& p) {
+template<> bool instruction::match(const std::string s, parameter_map& p) const {
 
 	p.clear();
 
 	return match(s, [&](int n) { p[pattern[n]].push_back(s[n]); });
 }
 
-bool instruction::match(const std::string s) {
+bool instruction::match(const std::string s) const {
 
 	return match(s, [](int){});
 }
 
-
+bool instruction::operator<(const instruction& x) const {
+	return pattern < x.pattern;
+}

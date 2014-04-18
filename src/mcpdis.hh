@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cstdint>
+
 #include <string>
+#include <vector>
 #include <map>
 
 // mcpdis.hh
@@ -31,6 +33,10 @@ struct instruction {
 
 	};
 
-	bool match(const std::string);
-	template<class T> bool match(const std::string, T);
+	bool match(const std::string) const;
+	template<class T> bool match(const std::string, T) const;
+
+	bool operator<(const instruction&) const;
 };
+
+extern std::vector<instruction> pic12f675;
