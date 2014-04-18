@@ -41,34 +41,33 @@ std::vector<instruction> pic12f675 = {
 
 };
 
-bool instruction::match(const std::string s) {
+template<class T> bool instruction::match(const std::string s, T f) {
 	
 	if(s.length() != pattern.length())
 		return false;
-
-	for(int n = 0; n < (int)s.length(); n++)
-		if(pattern[n] == '0' || pattern[n] == '1')
-			if(s[n] != pattern[n])
-				return false;
-
-	return true;
-}
-
-bool instruction::match(const std::string s, parameters& p) {
-	
-	if(s.length() != pattern.length())
-		return false;
-
-	p.clear();
 
 	for(int n = 0; n < (int)s.length(); n++) {
 		if(pattern[n] == '0' || pattern[n] == '1') {
 			if(s[n] != pattern[n])
 				return false;
 		} else {
-			p[pattern[n]].push_back(s[n]);
+			f(n);
 		}
 	}
 
 	return true;
 }
+
+template<> bool instruction::match(const std::string s, parameter_map& p) {
+
+	p.clear();
+
+	return match(s, [&](int n) { p[pattern[n]].push_back(s[n]); });
+}
+
+bool instruction::match(const std::string s) {
+
+	return match(s, [](int){});
+}
+
+

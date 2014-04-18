@@ -6,7 +6,7 @@
 
 // mcpdis.hh
 
-using parameters = std::map<char,std::string>;
+using parameter_map = std::map<char,std::string>;
 
 struct instruction {
 
@@ -32,5 +32,5 @@ struct instruction {
 	};
 
 	bool match(const std::string);
-	bool match(const std::string, parameters&);
+	template<class T> bool match(const std::string, T);
 };
