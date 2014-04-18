@@ -71,3 +71,48 @@ bool instruction::match(const std::string s) const {
 bool instruction::operator<(const instruction& x) const {
 	return pattern < x.pattern;
 }
+
+bitstream::bitstream() : bitstream(stdin) {
+}
+
+bitstream::bitstream(FILE *my_f) : f(my_f), buffer_size(0), buffer_pos(0) {
+}
+
+std::string bitstream::get(int n) {
+	
+	std::string s;
+
+	while((int)s.length() < n) {
+
+		if(left.empty()) {
+
+			if(buffer_pos >= buffer_size) {
+				buffer_pos = 0;
+				buffer_size = fread(buffer, 1, buffer_maxsize, f);
+			}
+
+			if(buffer_size == 0)
+				return s;
+
+			char ch = buffer[buffer_pos++];
+
+			for(int i = 0; i < 8; i++, ch >>= 1)
+				left.push_back('0' + (ch & 1));
+		}
+
+
+		s.push_back(left.back());
+		left.pop_back();
+	}
+
+	return s;
+}
+
+
+
+
+
+
+
+
+

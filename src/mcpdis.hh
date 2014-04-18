@@ -39,4 +39,23 @@ struct instruction {
 	bool operator<(const instruction&) const;
 };
 
+struct bitstream {
+
+	static const int buffer_maxsize = 512;
+
+	FILE *f;
+
+	char buffer[buffer_maxsize];
+
+	int buffer_size;
+	int buffer_pos;
+
+	std::string left;
+
+	std::string get(int);
+
+	bitstream();
+	bitstream(FILE *);
+};
+
 extern std::vector<instruction> pic12f675;

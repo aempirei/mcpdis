@@ -14,5 +14,15 @@ int main() {
 		std::cout << std::setfill('0') << std::setw(2) << std::right << std::hex << (int)x.status << 'h' << std::endl;
 	}
 
+	bitstream b;
+
+
+	for(;;) {
+		std::string str = b.get(30);
+		if(str.empty())
+			break;
+		std::cout << str << std::endl;
+	}
+
 	return 0;
 }
