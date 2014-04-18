@@ -1,8 +1,8 @@
 #include <mcpdis.hh>
 
-#include <list>
+#include <vector>
 
-std::list<instruction> pic12f675 = {
+std::vector<instruction> pic12f675 = {
 
 	{ "00000000001000", "RETURN", 0 },
 	{ "00000000001001", "RETFIE", 0 },
@@ -40,3 +40,35 @@ std::list<instruction> pic12f675 = {
 	{ "11111xkkkkkkkk", "ADDLW" , instruction::status_bit::arithmetic_bits }
 
 };
+
+bool instruction::match(const std::string s) {
+	
+	if(s.length() != pattern.length())
+		return false;
+
+	for(int n = 0; n < (int)s.length(); n++)
+		if(pattern[n] == '0' || pattern[n] == '1')
+			if(s[n] != pattern[n])
+				return false;
+
+	return true;
+}
+
+bool instruction::match(const std::string s, parameters& p) {
+	
+	if(s.length() != pattern.length())
+		return false;
+
+	p.clear();
+
+	for(int n = 0; n < (int)s.length(); n++) {
+		if(pattern[n] == '0' || pattern[n] == '1') {
+			if(s[n] != pattern[n])
+				return false;
+		} else {
+			p[pattern[n]].push_back(s[n]);
+		}
+	}
+
+	return true;
+}

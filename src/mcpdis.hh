@@ -2,8 +2,11 @@
 
 #include <cstdint>
 #include <string>
+#include <map>
 
 // mcpdis.hh
+
+using parameters = std::map<char,std::string>;
 
 struct instruction {
 
@@ -27,4 +30,7 @@ struct instruction {
 		power_bits = TO | PD
 
 	};
+
+	bool match(const std::string);
+	bool match(const std::string, parameters&);
 };
