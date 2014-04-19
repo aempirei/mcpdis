@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
+#include <cctype>
 
 int main() {
 
@@ -11,11 +12,16 @@ int main() {
 
 	bitstream b(stdin);
 
+	int pc = 0;
+
 	for(;;) {
+
 		std::string str = b.get(14);
 
 		if(str.empty())
 			break;
+
+		std::cout << std::right << std::hex << std::setw(3) << std::setfill('0') << pc << "h: ";
 
 		std::cout << str << ' ';
 
@@ -27,20 +33,31 @@ int main() {
 
 			op.match(str, &args);
 
-			std::cout << op.pattern << ' ' << std::setw(6) << std::left << std::setfill(' ') << op.name;
+			std::cout << op.pattern;
 
 			for(auto iter = args.begin(); iter != args.end(); iter++) {
-				unsigned long x = strtoul(iter->second.c_str(), NULL, 2);
+
 				std::cout << ' ' << iter->first << '=';
-				if(iter->second.length() <= 3) {
-					std::cout << std::dec << x;
+
+				if(!isalpha(iter->first)) {
+					std::cout << iter->second;
 				} else {
-					std::cout << std::hex << std::setw(2) << std::setfill('0') << x << 'h';
+
+					unsigned long x = strtoul(iter->second.c_str(), NULL, 2);
+
+					if(iter->second.length() <= 3) {
+						std::cout << std::dec << x;
+					} else {
+						std::cout << std::hex << std::setw(2) << std::setfill('0') << x << 'h';
+					}
 				}
 			}
 
-			std::cout << std::endl;
 		}
+
+		std::cout << std::endl;
+
+		pc++;
 	}
 
 	return 0;

@@ -14,7 +14,7 @@ clean:
 	rm -rf bin lib
 
 test: all
-	./bin/dis
+	dd if=/dev/urandom of=/dev/stdout bs=35 count=1 2>/dev/null | ./bin/dis
 
 src/mcpdis.o: src/mcpdis.cc src/mcpdis.hh
 
