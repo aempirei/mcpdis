@@ -58,4 +58,15 @@ struct bitstream {
 	bitstream(FILE *);
 };
 
-extern std::vector<instruction> pic12f675;
+using _instruction_set = std::vector<instruction>;
+
+struct instruction_set : _instruction_set {
+
+	using _instruction_set::_instruction_set;
+
+	instruction find(const std::string) const;
+
+	void sort();
+};
+
+extern instruction_set pic12f675;

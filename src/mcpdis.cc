@@ -1,6 +1,7 @@
 #include <mcpdis.hh>
+#include <algorithm>
 
-std::vector<instruction> pic12f675 = {
+instruction_set pic12f675 = {
 
 	{ "00000000001000", "RETURN", 0 },
 	{ "00000000001001", "RETFIE", 0 },
@@ -39,6 +40,10 @@ std::vector<instruction> pic12f675 = {
 
 };
 
+//
+// struct instruction
+//
+
 template<class T> bool instruction::match(const std::string s, T f) const {
 	
 	if(s.length() != pattern.length())
@@ -56,11 +61,11 @@ template<class T> bool instruction::match(const std::string s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const std::string s, parameter_map& p) const {
+template<> bool instruction::match(const std::string s, parameter_map *p) const {
 
-	p.clear();
+	p->clear();
 
-	return match(s, [&](int n) { p[pattern[n]].push_back(s[n]); });
+	return match(s, [&](int n) { p->operator[](pattern[n]).push_back(s[n]); });
 }
 
 bool instruction::match(const std::string s) const {
@@ -71,6 +76,27 @@ bool instruction::match(const std::string s) const {
 bool instruction::operator<(const instruction& x) const {
 	return pattern < x.pattern;
 }
+
+//
+// struct instruction_set
+//
+
+instruction instruction_set::find(const std::string s) const {
+
+	for(const auto& op : *this)
+		if(op.match(s))
+			return op;
+
+	return instruction();
+}
+
+void instruction_set::sort() {
+	std::sort(begin(), end());
+}
+
+//
+// struct bitstream
+//
 
 bitstream::bitstream() : bitstream(stdin) {
 }
@@ -100,19 +126,9 @@ std::string bitstream::get(int n) {
 				left.push_back('0' + (ch & 1));
 		}
 
-
 		s.push_back(left.back());
 		left.pop_back();
 	}
 
 	return s;
 }
-
-
-
-
-
-
-
-
-
