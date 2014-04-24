@@ -137,7 +137,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		else 
 			std::cout << '*';
 
-		std::cout << std::right << std::hex << std::setw(2) << std::setfill('0') << op.address << "h: " << op.s;
+		std::cout << std::right << std::hex << std::setw(3) << std::setfill('0') << op.address << "h: " << op.s;
 
 		if(!op.opcode.name.empty()) {
 
