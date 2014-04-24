@@ -8,6 +8,10 @@
 
 // mcpdis.hh
 
+struct instruction;
+struct operation;
+struct bitstream;
+
 using parameter_map = std::map<char,std::string>;
 
 struct instruction {
@@ -95,6 +99,13 @@ struct instruction_set : _instruction_set {
 	instruction find(const std::string) const;
 
 	void sort();
+};
+
+struct operation {
+	unsigned long address;
+	parameter_map args;
+	std::string s;
+	instruction opcode;
 };
 
 extern instruction_set pic12f675;

@@ -67,6 +67,7 @@ template<class T> bool instruction::match(const std::string s, T f) const {
 		return false;
 
 	for(int n = 0; n < (int)s.length(); n++) {
+
 		if(pattern[n] == '0' || pattern[n] == '1') {
 			if(s[n] != pattern[n])
 				return false;
@@ -82,14 +83,7 @@ template<> bool instruction::match(const std::string s, parameter_map *p) const 
 
 	p->clear();
 
-	if(match(s, [&](int n) { p->operator[](pattern[n]).push_back(s[n]); })) {
-
-		p->operator[]('$') = name;
-
-		return true;
-	}
-
-	return false;
+	return match(s, [&](int n) { p->operator[](pattern[n]).push_back(s[n]); });
 }
 
 bool instruction::match(const std::string s) const {
