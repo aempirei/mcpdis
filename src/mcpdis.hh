@@ -17,14 +17,16 @@ struct instruction {
 
 	std::string symbol;
 
-	enum algebraic_property : uint8_t {
-		commutative = 1,
-		associative = 2
+	enum property : uint8_t {
+		commutative = 1 << 0,
+		associative = 1 << 1,
+		skip        = 1 << 2,
+		jump        = 1 << 3
 	};
 
-	uint8_t algebra;
+	uint8_t property_bits;
 
-	enum status_bit : uint8_t {
+	enum status : uint8_t {
 
 		C   = 1 << 0,
 		DC  = 1 << 1,
@@ -40,7 +42,7 @@ struct instruction {
 
 	};
 
-	uint8_t status;
+	uint8_t status_bits;
 
 	enum file_register : uint8_t {
 		

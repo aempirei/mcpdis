@@ -1,4 +1,5 @@
 #include <mcpdis.hh>
+#include <set>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -21,6 +22,8 @@ int main() {
 void swapped16() {
 
 	bitstream b(stdin);
+
+	std::set<unsigned long> labels = { 0x00, 0x04 };
 
 	int pc = 0;
 
@@ -70,19 +73,30 @@ void swapped16() {
 				}
 			}
 
+			if(args['$'] == "GOTO")
+				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
 		}
 
 		std::cout << std::endl;
 
 		pc++;
 	}
+
+	std::cout << "labels: ";
+	
+	for(auto n : labels)
+		std::cout << ' ' << std::hex << std::setfill('0') << std::setw(2) << n << 'h';
+
+	std::cout << std::endl;
 }
 
 void packed14() {
 
 	bitstream b(stdin);
 
-	int pc = 0;
+	std::set<unsigned long> labels = { 0x00, 0x04 };
+
+	unsigned long pc = 0;
 
 	for(;;) {
 
@@ -123,10 +137,19 @@ void packed14() {
 				}
 			}
 
+			if(args['$'] == "GOTO")
+				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
 		}
 
 		std::cout << std::endl;
 
 		pc++;
 	}
+
+	std::cout << "labels: ";
+	
+	for(auto n : labels)
+		std::cout << ' ' << std::hex << std::setfill('0') << std::setw(2) << n << 'h';
+
+	std::cout << std::endl;
 }
