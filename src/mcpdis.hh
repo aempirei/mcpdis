@@ -42,6 +42,26 @@ struct instruction {
 
 	uint8_t status;
 
+	enum file_register : uint8_t {
+		
+		INDF   = 0x00,
+		TMR0   = 0x01,
+		PCL    = 0x02,
+		STATUS = 0x03,
+		FSR    = 0x04,
+		GPIO   = 0x05,
+		PCLATH = 0x0a,
+		INTCON = 0x0b,
+		PIR1   = 0x0c,
+		TMR1L  = 0x0e,
+		TMR1H  = 0x0f,
+		T1CON  = 0x10,
+		CMCON  = 0x19,
+		ADRESH = 0x1e,
+		ADCON0 = 0x1f,
+		
+	};
+
 	bool match(const std::string) const;
 	template<class T> bool match(const std::string, T) const;
 
