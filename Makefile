@@ -11,10 +11,13 @@ all: $(TARGETS)
 
 clean:
 	rm -f src/*~ src/*.o $(TARGETS)
+	rm -f test.dis
 	rm -rf bin lib
 
 test: all
-	dd if=/dev/urandom of=/dev/stdout bs=35 count=1 2>/dev/null | ./bin/dis
+	./bin/dis < test.bin > test.dis
+	cat test.dis
+	md5sum test.dis
 
 src/mcpdis.o: src/mcpdis.cc src/mcpdis.hh
 
