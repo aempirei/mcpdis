@@ -73,8 +73,24 @@ void swapped16() {
 				}
 			}
 
-			if(args['$'] == "GOTO")
+			if(op.property_bits == instruction::property::normal) {
+
+				// do nothing
+
+			} else if(op.property_bits == instruction::property::skip) {
+
+				labels.insert(pc + 1);
+				labels.insert(pc + 2);
+
+			} else if(op.property_bits == instruction::property::jump) {
+
 				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
+
+			} else if(op.property_bits == instruction::property::call) {
+
+				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
+				labels.insert(pc + 1);
+			}
 		}
 
 		std::cout << std::endl;
@@ -137,8 +153,24 @@ void packed14() {
 				}
 			}
 
-			if(args['$'] == "GOTO")
+			if(op.property_bits == instruction::property::normal) {
+
+				// do nothing
+
+			} else if(op.property_bits == instruction::property::skip) {
+
+				labels.insert(pc + 1);
+				labels.insert(pc + 2);
+
+			} else if(op.property_bits == instruction::property::jump) {
+
 				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
+
+			} else if(op.property_bits == instruction::property::call) {
+
+				labels.insert(strtoul(args['k'].c_str(), NULL, 2));
+				labels.insert(pc + 1);
+			}
 		}
 
 		std::cout << std::endl;

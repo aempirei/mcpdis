@@ -34,16 +34,16 @@ instruction_set pic12f675 = {
 
 	{ "001110dfffffff", "SWAPF" , "><", 0, 0 },
 
+	{ "0100bbbfffffff", "BCF"   , "", 0, 0 },
+	{ "0101bbbfffffff", "BSF"   , "", 0, 0 },
+
 	{ "001011dfffffff", "DECFSZ", "", instruction::property::skip, 0 },
 	{ "001111dfffffff", "INCFSZ", "", instruction::property::skip, 0 },
-
-	{ "0100bbbfffffff", "BCF"   , "", instruction::property::skip, 0 },
-	{ "0101bbbfffffff", "BSF"   , "", instruction::property::skip, 0 },
 
 	{ "0110bbbfffffff", "BTFSC" , "", instruction::property::skip, 0 },
 	{ "0111bbbfffffff", "BTFSS" , "", instruction::property::skip, 0 },
 
-	{ "100kkkkkkkkkkk", "CALL"  , "", instruction::property::jump, 0 },
+	{ "100kkkkkkkkkkk", "CALL"  , "", instruction::property::call, 0 },
 	{ "101kkkkkkkkkkk", "GOTO"  , "", instruction::property::jump, 0 },
 
 	{ "1100xxkkkkkkkk", "MOVLW" , "=", 0, 0 },

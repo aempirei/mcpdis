@@ -17,14 +17,11 @@ struct instruction {
 
 	std::string symbol;
 
-	enum property : uint8_t {
-		commutative = 1 << 0,
-		associative = 1 << 1,
-		skip        = 1 << 2,
-		jump        = 1 << 3
+	enum property : int {
+		normal = 0, skip, jump, call
 	};
 
-	uint8_t property_bits;
+	int property_bits;
 
 	enum status : uint8_t {
 
