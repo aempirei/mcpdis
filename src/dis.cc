@@ -101,7 +101,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		operation op;
 
 		op.s = str;
-		op.address = pc;
+		op.address = pc++;
 		op.opcode = cpu.find(op.s);
 
 		op.opcode.match(op.s, &op.args);
@@ -114,8 +114,8 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 		} else if(op.opcode.property_bits == instruction::property::skip) {
 
-			labels.insert(pc + 1);
-			labels.insert(pc + 2);
+			labels.insert(op.address + 1);
+			labels.insert(op.address + 2);
 
 		} else if(op.opcode.property_bits == instruction::property::jump) {
 
@@ -124,10 +124,8 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		} else if(op.opcode.property_bits == instruction::property::call) {
 
 			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
-			labels.insert(pc + 1);
+			labels.insert(op.address + 1);
 		}
-
-		pc++;
 	}
 
 	for(auto op : code) {
