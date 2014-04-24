@@ -108,11 +108,40 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 		code.push_back(op);
 
-		std::cout << std::right << std::hex << std::setw(3) << std::setfill('0') << pc << "h:";
+		if(op.opcode.property_bits == instruction::property::normal) {
+
+			// do nothing
+
+		} else if(op.opcode.property_bits == instruction::property::skip) {
+
+			labels.insert(pc + 1);
+			labels.insert(pc + 2);
+
+		} else if(op.opcode.property_bits == instruction::property::jump) {
+
+			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
+
+		} else if(op.opcode.property_bits == instruction::property::call) {
+
+			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
+			labels.insert(pc + 1);
+		}
+
+		pc++;
+	}
+
+	for(auto op : code) {
+
+		if(labels.find(op.address) == labels.end())
+			std::cout << ' ';
+		else 
+			std::cout << '*';
+
+		std::cout << std::right << std::hex << std::setw(2) << std::setfill('0') << op.address << "h: " << op.s;
 
 		if(!op.opcode.name.empty()) {
 
-			std::cout << ' ' << op.s << ' ' << op.opcode.pattern << ' ' << op.opcode.name;
+			std::cout << ' ' << op.opcode.pattern << ' ' << op.opcode.name;
 
 			for(auto iter = op.args.begin(); iter != op.args.end(); iter++) {
 
@@ -136,36 +165,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 			}
 		}
 
-		if(op.opcode.property_bits == instruction::property::normal) {
-
-			// do nothing
-
-		} else if(op.opcode.property_bits == instruction::property::skip) {
-
-			labels.insert(pc + 1);
-			labels.insert(pc + 2);
-
-		} else if(op.opcode.property_bits == instruction::property::jump) {
-
-			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
-
-		} else if(op.opcode.property_bits == instruction::property::call) {
-
-			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
-			labels.insert(pc + 1);
-		}
-
 		std::cout << std::endl;
-
-		pc++;
 	}
-
-	std::cout << "labels: ";
-
-	for(auto n : labels)
-		std::cout << ' ' << std::hex << std::setfill('0') << std::setw(2) << n << 'h';
-
-	std::cout << std::endl;
-
 }
 
