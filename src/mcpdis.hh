@@ -26,14 +26,14 @@ struct instruction {
 
 	enum status_bit : uint8_t {
 
-		C   =   1,
-		DC  =   2,
-		Z   =   4,
-		PD  =   8,
-		TO  =  16,
-		RP0 =  32,
-		RP1 =  64,
-		IRP = 128,
+		C   = 1 << 0,
+		DC  = 1 << 1,
+		Z   = 1 << 2,
+		PD  = 1 << 3,
+		TO  = 1 << 4,
+		RP0 = 1 << 5,
+		RP1 = 1 << 6,
+		IRP = 1 << 7,
 
 		arithmetic_bits = C | DC | Z,
 		power_bits = TO | PD
