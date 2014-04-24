@@ -92,16 +92,17 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 	}
 
 	for(;;) {
-		
-		operation op;
 
-		op.s = f(b);
+		std::string str = f(b);
 
-		if(op.s.empty())
+		if(str.empty())
 			break;
 
-		op.opcode = cpu.find(op.s);
+		operation op;
+
+		op.s = str;
 		op.address = pc;
+		op.opcode = cpu.find(op.s);
 
 		op.opcode.match(op.s, &op.args);
 
