@@ -15,7 +15,14 @@ struct instruction {
 	std::string pattern;
 	std::string name;
 
-	uint8_t status;
+	std::string symbol;
+
+	enum algebraic_property : uint8_t {
+		commutative = 1,
+		associative = 2
+	};
+
+	uint8_t algebra;
 
 	enum status_bit : uint8_t {
 
@@ -32,6 +39,8 @@ struct instruction {
 		power_bits = TO | PD
 
 	};
+
+	uint8_t status;
 
 	bool match(const std::string) const;
 	template<class T> bool match(const std::string, T) const;
