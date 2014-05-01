@@ -190,12 +190,8 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 			}
 
 			std::cout << std::endl;
-
 		}
-
-
 	}
-
 }
 
 void handler(const configuration& config, bitstream& b, const instruction_set& cpu, stream_processor_fn *f) {
@@ -241,5 +237,15 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 	}
 
 	print_code(config, code, labels);
-}
 
+	for(auto iter = code.begin(); iter != code.end(); iter++) {
+		
+		if(labels.find(iter->address) != labels.end()) {
+
+			for(auto jter = iter; jter != code.end(); jter++) {
+
+				// other condition is stop at label or branch or modification of pcl
+			}
+		}
+	}
+}
