@@ -20,7 +20,7 @@ typedef std::string stream_processor_fn(bitstream&);
 stream_processor_fn be14;
 stream_processor_fn le16;
 
-template<class F> void handler(const configuration&, bitstream&, const instruction_set&, F);
+void handler(const configuration&, bitstream&, const instruction_set&, stream_processor_fn*);
 
 struct configuration {
 	bool verbose = false;
@@ -115,7 +115,7 @@ std::string be14(bitstream& b) {
 	return b.get(14);
 }
 
-template<class F> void handler(const configuration& config, bitstream& b, const instruction_set& cpu, F f) {
+void handler(const configuration& config, bitstream& b, const instruction_set& cpu, stream_processor_fn *f) {
 
 	std::set<unsigned long> labels = { 0x00, 0x04 };
 	std::list<operation> code;
