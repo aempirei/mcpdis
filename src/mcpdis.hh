@@ -39,6 +39,7 @@ using _dictionary = std::map<std::string,expression>;
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
 	bool has_key(const std::string&) const;
+	void touch(const std::string&);
 };
 
 //

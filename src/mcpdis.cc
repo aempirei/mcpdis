@@ -268,6 +268,11 @@ bool dictionary::has_key(const std::string& s) const {
 	return (find(s) != end());
 }
 
+void dictionary::touch(const std::string& s) {
+	if(!has_key(s))
+		operator[](s) = { s };
+}
+
 //
 // struct operation
 //

@@ -250,6 +250,8 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 			for(auto jter = iter; jter != code.end(); jter++) {
 
 				// other condition is stop at label or branch or modification of pcl
+
+				iter->opcode.fn(*iter, d);
 			}
 		}
 	}
