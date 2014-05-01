@@ -4,13 +4,41 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 
 // mcpdis.hh
 
+struct instruction_set;
 struct instruction;
 struct operation;
+struct arguments;
 struct bitstream;
+struct expression;
+struct dictionary;
+
+using accumulation_function = void (operation&, dictionary&);
+
+//
+// expression
+
+using _expression = std::list<std::string>;
+
+struct expression : _expression {
+	using _expression::_expression;
+};
+
+//
+// dictionary
+
+using _dictionary = std::map<std::string,expression>;
+
+struct dictionary : _dictionary {
+	using _dictionary::_dictionary;
+};
+
+//
+// arguments
 
 using _arguments = std::map<char,std::string>;
 
@@ -20,6 +48,9 @@ struct arguments : _arguments {
 	bool has_arg(char);
 	bool has_args(const char *);
 };
+
+//
+// bitstream
 
 struct bitstream {
 
@@ -40,7 +71,12 @@ struct bitstream {
 	bitstream(FILE *);
 };
 
+//
+// instruction
+
 struct instruction {
+
+	// types
 
 	enum file_register : uint8_t {
 
@@ -84,20 +120,28 @@ struct instruction {
 		normal, skip, jump, call
 	};
 
+	// variables
+
 	std::string pattern;
 	std::string name;
 
-	std::string symbol;
+	accumulation_function *fn;
 
 	pcl_types pcl_type;
 
 	uint8_t status;
+
+
+	// methods
 
 	bool match(const std::string) const;
 	template<class T> bool match(const std::string, T) const;
 
 	bool operator<(const instruction&) const;
 };
+
+//
+// instruction_set
 
 using _instruction_set = std::vector<instruction>;
 
@@ -109,6 +153,9 @@ struct instruction_set : _instruction_set {
 
 	void sort();
 };
+
+//
+// operation
 
 struct operation {
 
