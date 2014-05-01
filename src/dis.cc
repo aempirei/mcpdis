@@ -85,7 +85,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 	std::set<unsigned long> labels = { 0x00, 0x04 };
 	std::list<operation> code;
 
-	int pc = 0;
+	unsigned long pc = 0;
 
 	//
 	// parse bit stream
@@ -98,15 +98,9 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		if(str.empty())
 			break;
 
-		operation op;
+		code.push_back(operation(str, pc++, cpu));
 
-		op.s = str;
-		op.address = pc++;
-		op.opcode = cpu.find(op.s);
-
-		op.opcode.match(op.s, &op.args);
-
-		code.push_back(op);
+		operation& op = code.back();
 
 		if(op.opcode.property_bits == instruction::property::normal) {
 
@@ -119,11 +113,11 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 		} else if(op.opcode.property_bits == instruction::property::jump) {
 
-			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
+			labels.insert(op.args.value('k'));
 
 		} else if(op.opcode.property_bits == instruction::property::call) {
 
-			labels.insert(strtoul(op.args['k'].c_str(), NULL, 2));
+			labels.insert(op.args.value('k'));
 			labels.insert(op.address + 1);
 		}
 	}
@@ -132,7 +126,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 	// print code
 	//
 
-	for(auto op : code) {
+	for(auto& op : code) {
 
 		if(config.verbose) {
 
@@ -171,7 +165,6 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		} else {
 
 #define FIND(a,b) ((a).find(b) != (a).end())
-#define BINARY(a) strtoul(a.c_str(), NULL, 2)
 
 			if(FIND(labels, op.address))
 				std::cout << address_string(op.address) << ':';

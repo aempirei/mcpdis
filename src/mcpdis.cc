@@ -204,3 +204,16 @@ bool arguments::has_args(const char *s) {
 
 	return true;
 }
+
+//
+// struct operation
+//
+
+operation::operation() {
+}
+
+operation::operation(std::string my_s, unsigned long my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
+	opcode = cpu.find(s);
+	opcode.match(s, &args);
+}
+

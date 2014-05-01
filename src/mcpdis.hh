@@ -109,10 +109,17 @@ struct instruction_set : _instruction_set {
 };
 
 struct operation {
-	unsigned long address;
-	arguments args;
+
 	std::string s;
+
+	unsigned long address;
+
 	instruction opcode;
+
+	arguments args;
+
+	operation();
+	operation(std::string, unsigned long, const instruction_set&);
 };
 
 extern instruction_set pic12f675;
