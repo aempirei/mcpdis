@@ -132,7 +132,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 			if(labels.find(op.address) == labels.end())
 				std::cout << ' ';
-			else 
+			else
 				std::cout << '*';
 
 			std::cout << address_string(op.address) << ": " << op.s;
