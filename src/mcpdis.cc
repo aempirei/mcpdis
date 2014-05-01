@@ -264,13 +264,19 @@ expression expression::expand(const std::string& s, const dictionary& d) const {
 // struct dictionary
 //
 
-bool dictionary::has_key(const std::string& s) const {
+bool dictionary::has_key(const key_type& s) const {
 	return (find(s) != end());
 }
 
-void dictionary::touch(const std::string& s) {
+void dictionary::touch(const key_type& s) {
 	if(!has_key(s))
 		operator[](s) = { s };
+}
+
+void dictionary::parens(const key_type& s) {
+	auto& x = at(s);
+	x.push_front("(");
+	x.push_back(")");
 }
 
 //
