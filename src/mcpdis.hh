@@ -19,6 +19,8 @@ struct dictionary;
 
 using accumulation_function = void (operation&, dictionary&);
 
+using sourcecode = std::list<operation>;
+
 //
 // expression
 

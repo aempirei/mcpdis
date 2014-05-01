@@ -115,47 +115,7 @@ std::string be14(bitstream& b) {
 	return b.get(14);
 }
 
-void handler(const configuration& config, bitstream& b, const instruction_set& cpu, stream_processor_fn *f) {
-
-	std::set<unsigned long> labels = { 0x00, 0x04 };
-	std::list<operation> code;
-
-	unsigned long pc = 0;
-
-	//
-	// parse bit stream
-	//
-
-	for(;;) {
-
-		std::string str = f(b);
-
-		if(str.empty())
-			break;
-
-		code.push_back(operation(str, pc++, cpu));
-
-		operation& op = code.back();
-
-		if(op.opcode.pcl_type == instruction::pcl_types::normal) {
-
-			// do nothing
-
-		} else if(op.opcode.pcl_type == instruction::pcl_types::skip) {
-
-			labels.insert(op.address + 1);
-			labels.insert(op.address + 2);
-
-		} else if(op.opcode.pcl_type == instruction::pcl_types::jump) {
-
-			labels.insert(op.args.value('k'));
-
-		} else if(op.opcode.pcl_type == instruction::pcl_types::call) {
-
-			labels.insert(op.args.value('k'));
-			labels.insert(op.address + 1);
-		}
-	}
+void print_code(const configuration& config, const sourcecode& code, const std::set<unsigned long>& labels) {
 
 	//
 	// print code
@@ -199,9 +159,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 		} else {
 
-#define FIND(a,b) ((a).find(b) != (a).end())
-
-			if(FIND(labels, op.address))
+			if(labels.find(op.address) != labels.end()) 
 				std::cout << address_string(op.address) << ':';
 			else
 				std::cout << "     ";
@@ -237,5 +195,51 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 
 	}
+
+}
+
+void handler(const configuration& config, bitstream& b, const instruction_set& cpu, stream_processor_fn *f) {
+
+	std::set<unsigned long> labels = { 0x00, 0x04 };
+	sourcecode code;
+
+	unsigned long pc = 0;
+
+	//
+	// parse bit stream
+	//
+
+	for(;;) {
+
+		std::string str = f(b);
+
+		if(str.empty())
+			break;
+
+		code.push_back(operation(str, pc++, cpu));
+
+		operation& op = code.back();
+
+		if(op.opcode.pcl_type == instruction::pcl_types::normal) {
+
+			// do nothing
+
+		} else if(op.opcode.pcl_type == instruction::pcl_types::skip) {
+
+			labels.insert(op.address + 1);
+			labels.insert(op.address + 2);
+
+		} else if(op.opcode.pcl_type == instruction::pcl_types::jump) {
+
+			labels.insert(op.args.value('k'));
+
+		} else if(op.opcode.pcl_type == instruction::pcl_types::call) {
+
+			labels.insert(op.args.value('k'));
+			labels.insert(op.address + 1);
+		}
+	}
+
+	print_code(config, code, labels);
 }
 
