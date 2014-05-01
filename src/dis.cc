@@ -241,18 +241,24 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 	//
 	// expression accumulator
 
+	int n = 1;
+
 	for(auto iter = code.begin(); iter != code.end(); iter++) {
 		
 		if(labels.find(iter->address) != labels.end()) {
 
 			dictionary d;
 
-			for(auto jter = iter; jter != code.end(); jter++) {
-			
-				// other condition is stop at label or branch or modification of pcl
+			std::cout << "vector_" << std::setw(2) << std::right << std::setfill('0') << n++ << " :";
+
+			for(auto jter = iter; jter != code.end() && jter->opcode.pcl_type == instruction::pcl_types::normal; jter++) {
 
 				jter->opcode.fn(*iter, d);
+
+				std::cout << ' ' << address_string(jter->address);
 			}
+
+			std::cout << std::endl;
 		}
 	}
 }
