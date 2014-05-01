@@ -50,9 +50,9 @@ using _arguments = std::map<char,std::string>;
 
 struct arguments : _arguments {
 	using _arguments::_arguments;
-	unsigned long value(char) const;
-	bool has_arg(char) const;
-	bool has_args(const char *) const;
+	unsigned long value(key_type) const;
+	bool has_arg(key_type) const;
+	bool has_args(const key_type *) const;
 };
 
 //

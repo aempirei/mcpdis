@@ -189,6 +189,10 @@ std::string bitstream::get(int n) {
 	return s;
 }
 
+//
+// global
+//
+
 std::string register_string(unsigned long x) {
 	std::stringstream ss;
 	ss << 'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill('0') << x;
@@ -223,15 +227,19 @@ std::string register_name(uint8_t x) {
 	return register_string(x);
 }
 
-unsigned long arguments::value(char ch) const {
+//
+// struct arguments
+//
+
+unsigned long arguments::value(key_type ch) const {
 	return strtoul(at(ch).c_str(), NULL, 2);
 }
 
-bool arguments::has_arg(char ch) const {
+bool arguments::has_arg(key_type ch) const {
 	return (find(ch) != end());
 }
 
-bool arguments::has_args(const char *s) const {
+bool arguments::has_args(const key_type *s) const {
 
 	while(*s)
 		if(!has_arg(*s++))
