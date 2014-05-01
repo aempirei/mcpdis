@@ -28,7 +28,7 @@ using _expression = std::list<std::string>;
 
 struct expression : _expression {
 	using _expression::_expression;
-	expression expand(const std::string&,const dictionary&) const;
+	expression expand(const value_type&,const dictionary&) const;
 };
 
 //
@@ -155,7 +155,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	instruction find(const std::string&) const;
+	value_type find(const std::string&) const;
 
 	void sort();
 };

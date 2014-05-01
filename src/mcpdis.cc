@@ -137,13 +137,13 @@ bool instruction::operator<(const instruction& x) const {
 // struct instruction_set
 //
 
-instruction instruction_set::find(const std::string& s) const {
+instruction_set::value_type instruction_set::find(const std::string& s) const {
 
 	for(const auto& op : *this)
 		if(op.match(s))
 			return op;
 
-	return instruction();
+	return instruction_set::value_type();
 }
 
 void instruction_set::sort() {
@@ -252,7 +252,7 @@ bool arguments::has_args(const key_type *s) const {
 // struct expression
 //
 
-expression expression::expand(const std::string& s, const dictionary& d) const {
+expression expression::expand(const value_type& s, const dictionary& d) const {
 
 	expression e;
 
