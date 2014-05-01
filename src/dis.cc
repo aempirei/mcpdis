@@ -46,7 +46,7 @@ void usage(const char *arg0) {
 
 	std::cerr << arg_string('h', "show help");
 	std::cerr << arg_string('v', "verbose");
-	std::cerr << arg_string('x', "format", "stream type");
+	std::cerr << arg_string('x', "format", "stream type (default: be14)");
 
 	std::cerr << std::endl;
 }
