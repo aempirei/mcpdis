@@ -8,6 +8,7 @@
 #define G(a) void a(operation&o, dictionary&d)
 
 namespace pic12f {
+
 	F(RETURN) { }
 	F(RETFIE) { }
 	F(SLEEP) { }
