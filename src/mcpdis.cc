@@ -3,58 +3,58 @@
 
 instruction_set pic12f675 = {
 
-	{ "00000000001000", "RETURN", "", 0, 0 },
-	{ "00000000001001", "RETFIE", "", 0, 0 },
+	{ "00000000001000", "RETURN", ""  , 0, 0 },
+	{ "00000000001001", "RETFIE", ""  , 0, 0 },
 
-	{ "00000001100011", "SLEEP" , "", 0, instruction::status::power_bits },
-	{ "00000001100100", "CLRWDT", "", 0, instruction::status::power_bits },
+	{ "00000001100011", "SLEEP" , ""  , 0, instruction::status::power_bits },
+	{ "00000001100100", "CLRWDT", ""  , 0, instruction::status::power_bits },
 
-	{ "0000000xx00000", "NOP"   , "", 0, 0 },
+	{ "0000000xx00000", "NOP"   , ""  , 0, 0 },
 
-	{ "000001dfffffff", "CLR"   , "", 0, instruction::status::Z },
+	{ "000001dfffffff", "CLR"   , ""  , 0, instruction::status::Z },
 
-	{ "0000001fffffff", "MOVWF" , "=", 0, 0 },
+	{ "0000001fffffff", "MOVWF" , "=" , 0, 0 },
 
-	{ "000100dfffffff", "IORWF" , "|", 0, instruction::status::Z },
-	{ "000101dfffffff", "ANDWF" , "&", 0, instruction::status::Z },
-	{ "000110dfffffff", "XORWF" , "^", 0, instruction::status::Z },
+	{ "000100dfffffff", "IORWF" , "|" , 0, instruction::status::Z },
+	{ "000101dfffffff", "ANDWF" , "&" , 0, instruction::status::Z },
+	{ "000110dfffffff", "XORWF" , "^" , 0, instruction::status::Z },
 
-	{ "000010dfffffff", "SUBWF" , "-", 0, instruction::status::arithmetic_bits },
-	{ "000111dfffffff", "ADDWF" , "+", 0, instruction::status::arithmetic_bits },
+	{ "000010dfffffff", "SUBWF" , "-" , 0, instruction::status::arithmetic_bits },
+	{ "000111dfffffff", "ADDWF" , "+" , 0, instruction::status::arithmetic_bits },
 
-	{ "001000dfffffff", "MOVF"  , "=", 0, instruction::status::Z },
+	{ "001000dfffffff", "MOVF"  , "=" , 0, instruction::status::Z },
 
-	{ "001001dfffffff", "COMF"  , "~", 0, instruction::status::Z },
+	{ "001001dfffffff", "COMF"  , "~" , 0, instruction::status::Z },
 
 	{ "000011dfffffff", "DECF"  , "--", 0, instruction::status::Z },
 	{ "001010dfffffff", "INCF"  , "++", 0, instruction::status::Z },
 
-	{ "001100dfffffff", "RRF"   , ">>>", 0, instruction::status::C },
-	{ "001101dfffffff", "RLF"   , "<<<", 0, instruction::status::C },
+	{ "001100dfffffff", "RRF"   , "#>", 0, instruction::status::C },
+	{ "001101dfffffff", "RLF"   , "<#", 0, instruction::status::C },
 
 	{ "001110dfffffff", "SWAPF" , "><", 0, 0 },
 
-	{ "0100bbbfffffff", "BCF"   , "", 0, 0 },
-	{ "0101bbbfffffff", "BSF"   , "", 0, 0 },
+	{ "0100bbbfffffff", "BCF"   , ""  , 0, 0 },
+	{ "0101bbbfffffff", "BSF"   , ""  , 0, 0 },
 
-	{ "001011dfffffff", "DECFSZ", "", instruction::property::skip, 0 },
-	{ "001111dfffffff", "INCFSZ", "", instruction::property::skip, 0 },
+	{ "001011dfffffff", "DECFSZ", ""  , instruction::property::skip, 0 },
+	{ "001111dfffffff", "INCFSZ", ""  , instruction::property::skip, 0 },
 
-	{ "0110bbbfffffff", "BTFSC" , "", instruction::property::skip, 0 },
-	{ "0111bbbfffffff", "BTFSS" , "", instruction::property::skip, 0 },
+	{ "0110bbbfffffff", "BTFSC" , ""  , instruction::property::skip, 0 },
+	{ "0111bbbfffffff", "BTFSS" , ""  , instruction::property::skip, 0 },
 
-	{ "100kkkkkkkkkkk", "CALL"  , "", instruction::property::call, 0 },
-	{ "101kkkkkkkkkkk", "GOTO"  , "", instruction::property::jump, 0 },
+	{ "100kkkkkkkkkkk", "CALL"  , ""  , instruction::property::call, 0 },
+	{ "101kkkkkkkkkkk", "GOTO"  , ""  , instruction::property::jump, 0 },
 
-	{ "1100xxkkkkkkkk", "MOVLW" , "=", 0, 0 },
-	{ "1101xxkkkkkkkk", "RETLW" , "", 0, 0 },
+	{ "1100xxkkkkkkkk", "MOVLW" , "=" , 0, 0 },
+	{ "1101xxkkkkkkkk", "RETLW" , ""  , 0, 0 },
 
 	{ "111000kkkkkkkk", "IORLW" , "|=", 0, instruction::status::Z },
 	{ "111001kkkkkkkk", "ANDLW" , "&=", 0, instruction::status::Z },
 	{ "111010kkkkkkkk", "XORLW" , "^=", 0, instruction::status::Z },
 
-	{ "11110xkkkkkkkk", "SUBLW" , "-", 0, instruction::status::arithmetic_bits },
-	{ "11111xkkkkkkkk", "ADDLW" , "+", 0, instruction::status::arithmetic_bits }
+	{ "11110xkkkkkkkk", "SUBLW" , "-" , 0, instruction::status::arithmetic_bits },
+	{ "11111xkkkkkkkk", "ADDLW" , "+" , 0, instruction::status::arithmetic_bits }
 };
 
 //

@@ -14,6 +14,25 @@ struct bitstream;
 
 using parameter_map = std::map<char,std::string>;
 
+struct bitstream {
+
+	static const int buffer_maxsize = 512;
+
+	FILE *f;
+
+	char buffer[buffer_maxsize];
+
+	int buffer_size;
+	int buffer_pos;
+
+	std::string left;
+
+	std::string get(int);
+
+	bitstream();
+	bitstream(FILE *);
+};
+
 struct instruction {
 
 	std::string pattern;
@@ -69,25 +88,6 @@ struct instruction {
 	template<class T> bool match(const std::string, T) const;
 
 	bool operator<(const instruction&) const;
-};
-
-struct bitstream {
-
-	static const int buffer_maxsize = 512;
-
-	FILE *f;
-
-	char buffer[buffer_maxsize];
-
-	int buffer_size;
-	int buffer_pos;
-
-	std::string left;
-
-	std::string get(int);
-
-	bitstream();
-	bitstream(FILE *);
 };
 
 using _instruction_set = std::vector<instruction>;
