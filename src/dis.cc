@@ -238,9 +238,14 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 	print_code(config, code, labels);
 
+	//
+	// expression accumulator
+
 	for(auto iter = code.begin(); iter != code.end(); iter++) {
 		
 		if(labels.find(iter->address) != labels.end()) {
+
+			dictionary d;
 
 			for(auto jter = iter; jter != code.end(); jter++) {
 
