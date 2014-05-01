@@ -141,7 +141,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 			else 
 				std::cout << '*';
 
-			std::cout << std::right << std::hex << std::setw(3) << std::setfill('0') << op.address << "h: " << op.s;
+			std::cout << address_string(op.address) << ": " << op.s;
 
 			if(!op.opcode.name.empty()) {
 
@@ -155,10 +155,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 						unsigned long x = strtoul(iter->second.c_str(), NULL, 2);
 
-						if(iter->second.length() <= 3)
-							std::cout << std::dec << x;
-						else 
-							std::cout << std::hex << std::setw(2) << std::setfill('0') << x << 'h';
+						std::cout << std::dec << x;
 
 					} else {
 
@@ -174,9 +171,10 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 		} else {
 
 #define FIND(a,b) ((a).find(b) != (a).end())
+#define BINARY(a) strtoul(a.c_str(), NULL, 2)
 
 			if(FIND(labels, op.address))
-				std::cout << std::right << std::hex << std::setw(3) << std::setfill('0') << op.address << "h:";
+				std::cout << address_string(op.address) << ':';
 			else
 				std::cout << "     ";
 
@@ -186,31 +184,31 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 				if(FIND(op.args,'d') && FIND(op.args,'f')) {
 
-					unsigned long d = strtoul(op.args['d'].c_str(), NULL, 2);
-					unsigned long f = strtoul(op.args['f'].c_str(), NULL, 2);
+					unsigned long d = BINARY(op.args['d']);
+					unsigned long f = BINARY(op.args['f']);
 
 					if(d == 0)
 						std::cout << "W, ";
 
-					std::cout << 'r' << std::dec << f;
+					std::cout << register_name(f);
 
 				} else if(FIND(op.args,'b') && FIND(op.args,'f')) {
 
-					unsigned long b = strtoul(op.args['b'].c_str(), NULL, 2);
-					unsigned long f = strtoul(op.args['f'].c_str(), NULL, 2);
+					unsigned long b = BINARY(op.args['b']);
+					unsigned long f = BINARY(op.args['f']);
 
-					std::cout << 'r' << std::dec << f << '<' << b << '>';
+					std::cout << register_name(f) << '<' << b << '>';
 
 
 				} else if(FIND(op.args,'f')) {
 
-					unsigned long f = strtoul(op.args['f'].c_str(), NULL, 2);
-					std::cout << 'r' << std::dec << f;
+					unsigned long f = BINARY(op.args['f']);
+					std::cout << register_name(f);
 
 				} else if(FIND(op.args,'k')) {
 
-					unsigned long k = strtoul(op.args['k'].c_str(), NULL, 2);
-					std::cout << std::hex << std::setw(3) << std::setfill('0') << std::hex << k << 'h';
+					unsigned long k = BINARY(op.args['k']);
+					std::cout << address_string(k);
 				}
 			}
 

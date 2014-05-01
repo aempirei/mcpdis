@@ -1,5 +1,8 @@
 #include <mcpdis.hh>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <cstdlib>
 
 instruction_set pic12f675 = {
 
@@ -149,4 +152,38 @@ std::string bitstream::get(int n) {
 	}
 
 	return s;
+}
+
+std::string register_string(unsigned long x) {
+	std::stringstream ss;
+	ss << 'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill('0') << x;
+	return ss.str();
+}
+
+std::string address_string(unsigned long x) {
+	std::stringstream ss;
+	ss << std::uppercase << std::right << std::hex << std::setw(3) << std::setfill('0') << x << 'h';
+	return ss.str();
+}
+
+std::string register_name(uint8_t x) {
+
+	switch(x) {
+		case 0x00: return "INDF";
+		case 0x01: return "TMR0";
+		case 0x02: return "PCL";
+		case 0x03: return "STATUS";
+		case 0x04: return "FSR";
+		case 0x05: return "GPIO";
+		case 0x0a: return "PCLATH";
+		case 0x0b: return "INTCON";
+		case 0x0c: return "PIR1";
+		case 0x0e: return "TMR1L";
+		case 0x0f: return "TMR1H";
+		case 0x10: return "T1CON";
+		case 0x19: return "CMCON";
+		case 0x1e: return "ADRESH";
+		case 0x1f: return "ADCON0";
+	}
+	return register_string(x);
 }
