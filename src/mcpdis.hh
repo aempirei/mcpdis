@@ -42,37 +42,8 @@ struct bitstream {
 
 struct instruction {
 
-	std::string pattern;
-	std::string name;
-
-	std::string symbol;
-
-	enum property : int {
-		normal = 0, skip, jump, call
-	};
-
-	int property_bits;
-
-	enum status : uint8_t {
-
-		C   = 1 << 0,
-		DC  = 1 << 1,
-		Z   = 1 << 2,
-		PD  = 1 << 3,
-		TO  = 1 << 4,
-		RP0 = 1 << 5,
-		RP1 = 1 << 6,
-		IRP = 1 << 7,
-
-		arithmetic_bits = C | DC | Z,
-		power_bits = TO | PD
-
-	};
-
-	uint8_t status_bits;
-
 	enum file_register : uint8_t {
-		
+
 		INDF   = 0x00,
 		TMR0   = 0x01,
 		PCL    = 0x02,
@@ -88,8 +59,37 @@ struct instruction {
 		CMCON  = 0x19,
 		ADRESH = 0x1e,
 		ADCON0 = 0x1f,
-		
+
 	};
+
+	enum flags : uint8_t {
+
+		C   = 1 << 0,
+		DC  = 1 << 1,
+		Z   = 1 << 2,
+		PD  = 1 << 3,
+		TO  = 1 << 4,
+		RP0 = 1 << 5,
+		RP1 = 1 << 6,
+		IRP = 1 << 7,
+
+		arithmetic_flags = C | DC | Z,
+		power_flags = TO | PD
+
+	};
+
+	enum class pcl_types {
+		normal, skip, jump, call
+	};
+
+	std::string pattern;
+	std::string name;
+
+	std::string symbol;
+
+	pcl_types pcl_type;
+
+	uint8_t status;
 
 	bool match(const std::string) const;
 	template<class T> bool match(const std::string, T) const;

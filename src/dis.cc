@@ -102,20 +102,20 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 		operation& op = code.back();
 
-		if(op.opcode.property_bits == instruction::property::normal) {
+		if(op.opcode.pcl_type == instruction::pcl_types::normal) {
 
 			// do nothing
 
-		} else if(op.opcode.property_bits == instruction::property::skip) {
+		} else if(op.opcode.pcl_type == instruction::pcl_types::skip) {
 
 			labels.insert(op.address + 1);
 			labels.insert(op.address + 2);
 
-		} else if(op.opcode.property_bits == instruction::property::jump) {
+		} else if(op.opcode.pcl_type == instruction::pcl_types::jump) {
 
 			labels.insert(op.args.value('k'));
 
-		} else if(op.opcode.property_bits == instruction::property::call) {
+		} else if(op.opcode.pcl_type == instruction::pcl_types::call) {
 
 			labels.insert(op.args.value('k'));
 			labels.insert(op.address + 1);
