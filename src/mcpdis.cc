@@ -42,6 +42,16 @@ namespace pic12f {
 	F(XORLW) { }
 	F(SUBLW) { }
 	F(ADDLW) { }
+
+	F(Z) {}
+	F(C) {}
+	F(DC) {}
+
+	F(PD) {}
+	F(TO) {}
+
+	F(PC) {}
+
 }
 #undef F
 #undef G
