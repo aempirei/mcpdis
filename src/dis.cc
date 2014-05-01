@@ -248,10 +248,10 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 			dictionary d;
 
 			for(auto jter = iter; jter != code.end(); jter++) {
-
+			
 				// other condition is stop at label or branch or modification of pcl
 
-				iter->opcode.fn(*iter, d);
+				jter->opcode.fn(*iter, d);
 			}
 		}
 	}
