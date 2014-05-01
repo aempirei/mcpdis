@@ -15,7 +15,7 @@ clean:
 	rm -rf bin lib
 
 test: all
-	./bin/dis -x < test.bin > test.dis
+	./bin/dis -x le16 < test.bin > test.dis
 	cat test.dis
 	md5sum test.dis
 

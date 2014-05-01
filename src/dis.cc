@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <cctype>
+#include <cstring>
 
 #include <unistd.h>
 
@@ -14,18 +15,40 @@
 
 struct configuration;
 
-std::string be14(bitstream&);
-std::string le16(bitstream&);
+typedef std::string stream_processor_fn(bitstream&);
+
+stream_processor_fn be14;
+stream_processor_fn le16;
 
 template<class F> void handler(const configuration&, bitstream&, const instruction_set&, F);
 
 struct configuration {
 	bool verbose = false;
-	bool packed = true;
+	stream_processor_fn *stream_processor = be14;
 };
 
+std::string arg_string(char, std::string);
+std::string arg_string(char, std::string, std::string);
+
+std::string arg_string(char ch, std::string parameter, std::string message) {
+	std::stringstream ss;
+	ss << '\t' << '-' << ch << ' ' << std::setw(7) << std::left << parameter << ' ' << message << std::endl;
+	return ss.str();
+}
+
+std::string arg_string(char ch, std::string message) {
+	return arg_string(ch, "", message);
+}
+
 void usage(const char *arg0) {
-	std::cerr << std::endl << "usage: " << arg0 << " [-{hvx}]" << std::endl << std::endl;
+
+	std::cerr << std::endl << "usage: " << arg0 << " [-{hv}] [-x {le16|be14}]" << std::endl << std::endl;
+
+	std::cerr << arg_string('h', "show help");
+	std::cerr << arg_string('v', "verbose");
+	std::cerr << arg_string('x', "format", "stream type");
+
+	std::cerr << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -34,7 +57,7 @@ int main(int argc, char **argv) {
 	bitstream b(stdin);
 	int opt;
 
-	while ((opt = getopt(argc, argv, "hvx")) != -1) {
+	while ((opt = getopt(argc, argv, "hvx:")) != -1) {
 		switch (opt) {
 
 			case 'v':
@@ -44,7 +67,19 @@ int main(int argc, char **argv) {
 
 			case 'x':
 
-				config.packed = false;
+				if(strcmp(optarg, "le16") == 0) {
+
+					config.stream_processor = le16;
+
+				} else if(strcmp(optarg, "be14") == 0) {
+
+					config.stream_processor = be14;
+
+				} else {
+
+					throw std::runtime_error(std::string("unknown stream type ") + optarg);
+				}
+
 				break;
 
 			case 'h':
@@ -57,7 +92,7 @@ int main(int argc, char **argv) {
 
 	pic12f675.sort();
 
-	handler(config, b, pic12f675, config.packed ? be14 : le16);
+	handler(config, b, pic12f675, config.stream_processor);
 
 	return 0;
 }
