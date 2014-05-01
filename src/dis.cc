@@ -184,30 +184,22 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 				if(op.args.has_args("df")) {
 
-					unsigned long d = BINARY(op.args['d']);
-					unsigned long f = BINARY(op.args['f']);
-
-					if(d == 0)
+					if(op.args.value('d') == 0)
 						std::cout << "W, ";
 
-					std::cout << register_name(f);
+					std::cout << register_name(op.args.value('f'));
 
 				} else if(op.args.has_args("bf")) {
 
-					unsigned long b = BINARY(op.args['b']);
-					unsigned long f = BINARY(op.args['f']);
-
-					std::cout << register_name(f) << '<' << b << '>';
+					std::cout << register_name(op.args.value('f')) << '<' << op.args.value('b') << '>';
 
 				} else if(op.args.has_arg('f')) {
 
-					unsigned long f = BINARY(op.args['f']);
-					std::cout << register_name(f);
+					std::cout << register_name(op.args.value('f'));
 
 				} else if(op.args.has_arg('k')) {
 
-					unsigned long k = BINARY(op.args['k']);
-					std::cout << address_string(k);
+					std::cout << address_string(op.args.value('k'));
 				}
 			}
 
