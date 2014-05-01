@@ -26,7 +26,7 @@ using _expression = std::list<std::string>;
 
 struct expression : _expression {
 	using _expression::_expression;
-	expression expand(const dictionary&) const;
+	expression expand(const std::string&,const dictionary&) const;
 };
 
 //
@@ -36,7 +36,7 @@ using _dictionary = std::map<std::string,expression>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
-	bool has_key(std::string) const;
+	bool has_key(const std::string&) const;
 };
 
 //
@@ -136,8 +136,8 @@ struct instruction {
 
 	// methods
 
-	bool match(const std::string) const;
-	template<class T> bool match(const std::string, T) const;
+	bool match(const std::string&) const;
+	template<class T> bool match(const std::string&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -151,7 +151,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	instruction find(const std::string) const;
+	instruction find(const std::string&) const;
 
 	void sort();
 };
@@ -170,7 +170,7 @@ struct operation {
 	arguments args;
 
 	operation();
-	operation(std::string, unsigned long, const instruction_set&);
+	operation(const std::string&, unsigned long, const instruction_set&);
 };
 
 extern instruction_set pic12f675;

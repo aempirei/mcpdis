@@ -88,7 +88,7 @@ instruction_set pic12f675 = {
 // struct instruction
 //
 
-template<class T> bool instruction::match(const std::string s, T f) const {
+template<class T> bool instruction::match(const std::string& s, T f) const {
 	
 	if(s.length() != pattern.length())
 		return false;
@@ -106,14 +106,14 @@ template<class T> bool instruction::match(const std::string s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const std::string s, arguments *p) const {
+template<> bool instruction::match(const std::string& s, arguments *p) const {
 
 	p->clear();
 
 	return match(s, [&](int n) { p->operator[](pattern[n]).push_back(s[n]); });
 }
 
-bool instruction::match(const std::string s) const {
+bool instruction::match(const std::string& s) const {
 
 	return match(s, [](int){});
 }
@@ -126,7 +126,7 @@ bool instruction::operator<(const instruction& x) const {
 // struct instruction_set
 //
 
-instruction instruction_set::find(const std::string s) const {
+instruction instruction_set::find(const std::string& s) const {
 
 	for(const auto& op : *this)
 		if(op.match(s))
@@ -233,11 +233,27 @@ bool arguments::has_args(const char *s) const {
 // struct expression
 //
 
+expression expression::expand(const std::string& s, const dictionary& d) const {
+
+	expression e;
+
+	expression sub = d.at(s);
+
+	for(auto iter = begin(); iter != end(); iter++) {
+		if(s == *iter)
+			e.insert(e.end(), sub.begin(), sub.end());
+		else
+			e.push_back(*iter);
+	}
+
+	return e;
+}
+
 //
 // struct dictionary
 //
 
-bool dictionary::has_key(std::string s) const {
+bool dictionary::has_key(const std::string& s) const {
 	return (find(s) != end());
 }
 
@@ -248,7 +264,7 @@ bool dictionary::has_key(std::string s) const {
 operation::operation() {
 }
 
-operation::operation(std::string my_s, unsigned long my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
+operation::operation(const std::string& my_s, unsigned long my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
 	opcode = cpu.find(s);
 	opcode.match(s, &args);
 }
