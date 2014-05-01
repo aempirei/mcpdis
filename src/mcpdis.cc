@@ -6,24 +6,24 @@
 
 instruction_set pic12f675 = {
 
-	{ "00000000001000", "RETURN", ""  , instruction::pcl_types::normal, 0 },
-	{ "00000000001001", "RETFIE", ""  , instruction::pcl_types::normal, 0 },
+	{ "00000000001000", "RETURN", ""  , instruction::pcl_types::normal, instruction::flags::none },
+	{ "00000000001001", "RETFIE", ""  , instruction::pcl_types::normal, instruction::flags::none },
 
-	{ "00000001100011", "SLEEP" , ""  , instruction::pcl_types::normal, instruction::flags::power_flags },
-	{ "00000001100100", "CLRWDT", ""  , instruction::pcl_types::normal, instruction::flags::power_flags },
+	{ "00000001100011", "SLEEP" , ""  , instruction::pcl_types::normal, instruction::flags::power },
+	{ "00000001100100", "CLRWDT", ""  , instruction::pcl_types::normal, instruction::flags::power },
 
-	{ "0000000xx00000", "NOP"   , ""  , instruction::pcl_types::normal, 0 },
+	{ "0000000xx00000", "NOP"   , ""  , instruction::pcl_types::normal, instruction::flags::none },
 
 	{ "000001dfffffff", "CLR"   , ""  , instruction::pcl_types::normal, instruction::flags::Z },
 
-	{ "0000001fffffff", "MOVWF" , "=" , instruction::pcl_types::normal, 0 },
+	{ "0000001fffffff", "MOVWF" , "=" , instruction::pcl_types::normal, instruction::flags::none },
 
 	{ "000100dfffffff", "IORWF" , "|" , instruction::pcl_types::normal, instruction::flags::Z },
 	{ "000101dfffffff", "ANDWF" , "&" , instruction::pcl_types::normal, instruction::flags::Z },
 	{ "000110dfffffff", "XORWF" , "^" , instruction::pcl_types::normal, instruction::flags::Z },
 
-	{ "000010dfffffff", "SUBWF" , "-" , instruction::pcl_types::normal, instruction::flags::arithmetic_flags },
-	{ "000111dfffffff", "ADDWF" , "+" , instruction::pcl_types::normal, instruction::flags::arithmetic_flags },
+	{ "000010dfffffff", "SUBWF" , "-" , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	{ "000111dfffffff", "ADDWF" , "+" , instruction::pcl_types::normal, instruction::flags::arithmetic },
 
 	{ "001000dfffffff", "MOVF"  , "=" , instruction::pcl_types::normal, instruction::flags::Z },
 
@@ -35,29 +35,29 @@ instruction_set pic12f675 = {
 	{ "001100dfffffff", "RRF"   , "#>", instruction::pcl_types::normal, instruction::flags::C },
 	{ "001101dfffffff", "RLF"   , "<#", instruction::pcl_types::normal, instruction::flags::C },
 
-	{ "001110dfffffff", "SWAPF" , "><", instruction::pcl_types::normal, 0 },
+	{ "001110dfffffff", "SWAPF" , "><", instruction::pcl_types::normal, instruction::flags::none },
 
-	{ "0100bbbfffffff", "BCF"   , ""  , instruction::pcl_types::normal, 0 },
-	{ "0101bbbfffffff", "BSF"   , ""  , instruction::pcl_types::normal, 0 },
+	{ "0100bbbfffffff", "BCF"   , ""  , instruction::pcl_types::normal, instruction::flags::none },
+	{ "0101bbbfffffff", "BSF"   , ""  , instruction::pcl_types::normal, instruction::flags::none },
 
-	{ "001011dfffffff", "DECFSZ", ""  , instruction::pcl_types::skip, 0 },
-	{ "001111dfffffff", "INCFSZ", ""  , instruction::pcl_types::skip, 0 },
+	{ "001011dfffffff", "DECFSZ", ""  , instruction::pcl_types::skip, instruction::flags::none },
+	{ "001111dfffffff", "INCFSZ", ""  , instruction::pcl_types::skip, instruction::flags::none },
 
-	{ "0110bbbfffffff", "BTFSC" , ""  , instruction::pcl_types::skip, 0 },
-	{ "0111bbbfffffff", "BTFSS" , ""  , instruction::pcl_types::skip, 0 },
+	{ "0110bbbfffffff", "BTFSC" , ""  , instruction::pcl_types::skip, instruction::flags::none },
+	{ "0111bbbfffffff", "BTFSS" , ""  , instruction::pcl_types::skip, instruction::flags::none },
 
-	{ "100kkkkkkkkkkk", "CALL"  , ""  , instruction::pcl_types::call, 0 },
-	{ "101kkkkkkkkkkk", "GOTO"  , ""  , instruction::pcl_types::jump, 0 },
+	{ "100kkkkkkkkkkk", "CALL"  , ""  , instruction::pcl_types::call, instruction::flags::none },
+	{ "101kkkkkkkkkkk", "GOTO"  , ""  , instruction::pcl_types::jump, instruction::flags::none },
 
-	{ "1100xxkkkkkkkk", "MOVLW" , "=" , instruction::pcl_types::normal, 0 },
-	{ "1101xxkkkkkkkk", "RETLW" , ""  , instruction::pcl_types::normal, 0 },
+	{ "1100xxkkkkkkkk", "MOVLW" , "=" , instruction::pcl_types::normal, instruction::flags::none },
+	{ "1101xxkkkkkkkk", "RETLW" , ""  , instruction::pcl_types::normal, instruction::flags::none },
 
 	{ "111000kkkkkkkk", "IORLW" , "|=", instruction::pcl_types::normal, instruction::flags::Z },
 	{ "111001kkkkkkkk", "ANDLW" , "&=", instruction::pcl_types::normal, instruction::flags::Z },
 	{ "111010kkkkkkkk", "XORLW" , "^=", instruction::pcl_types::normal, instruction::flags::Z },
 
-	{ "11110xkkkkkkkk", "SUBLW" , "-" , instruction::pcl_types::normal, instruction::flags::arithmetic_flags },
-	{ "11111xkkkkkkkk", "ADDLW" , "+" , instruction::pcl_types::normal, instruction::flags::arithmetic_flags }
+	{ "11110xkkkkkkkk", "SUBLW" , "-" , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	{ "11111xkkkkkkkk", "ADDLW" , "+" , instruction::pcl_types::normal, instruction::flags::arithmetic }
 };
 
 //

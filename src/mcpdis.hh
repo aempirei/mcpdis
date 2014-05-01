@@ -64,6 +64,8 @@ struct instruction {
 
 	enum flags : uint8_t {
 
+		none = 0,
+
 		C   = 1 << 0,
 		DC  = 1 << 1,
 		Z   = 1 << 2,
@@ -73,8 +75,8 @@ struct instruction {
 		RP1 = 1 << 6,
 		IRP = 1 << 7,
 
-		arithmetic_flags = C | DC | Z,
-		power_flags = TO | PD
+		arithmetic = C | DC | Z,
+		power = TO | PD
 
 	};
 
