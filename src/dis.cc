@@ -182,7 +182,7 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 				std::cout << ' ' << std::setw(6) << std::setfill(' ') << std::left << op.opcode.name << ' ';
 
-				if(FIND(op.args,'d') && FIND(op.args,'f')) {
+				if(op.args.has_args("df")) {
 
 					unsigned long d = BINARY(op.args['d']);
 					unsigned long f = BINARY(op.args['f']);
@@ -192,20 +192,19 @@ template<class F> void handler(const configuration& config, bitstream& b, const 
 
 					std::cout << register_name(f);
 
-				} else if(FIND(op.args,'b') && FIND(op.args,'f')) {
+				} else if(op.args.has_args("bf")) {
 
 					unsigned long b = BINARY(op.args['b']);
 					unsigned long f = BINARY(op.args['f']);
 
 					std::cout << register_name(f) << '<' << b << '>';
 
-
-				} else if(FIND(op.args,'f')) {
+				} else if(op.args.has_arg('f')) {
 
 					unsigned long f = BINARY(op.args['f']);
 					std::cout << register_name(f);
 
-				} else if(FIND(op.args,'k')) {
+				} else if(op.args.has_arg('k')) {
 
 					unsigned long k = BINARY(op.args['k']);
 					std::cout << address_string(k);

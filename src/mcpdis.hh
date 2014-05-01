@@ -12,7 +12,14 @@ struct instruction;
 struct operation;
 struct bitstream;
 
-using parameter_map = std::map<char,std::string>;
+using _arguments = std::map<char,std::string>;
+
+struct arguments : _arguments {
+	using _arguments::_arguments;
+	unsigned long value(char);
+	bool has_arg(char);
+	bool has_args(const char *);
+};
 
 struct bitstream {
 
@@ -103,7 +110,7 @@ struct instruction_set : _instruction_set {
 
 struct operation {
 	unsigned long address;
-	parameter_map args;
+	arguments args;
 	std::string s;
 	instruction opcode;
 };

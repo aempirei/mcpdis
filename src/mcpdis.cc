@@ -82,7 +82,7 @@ template<class T> bool instruction::match(const std::string s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const std::string s, parameter_map *p) const {
+template<> bool instruction::match(const std::string s, arguments *p) const {
 
 	p->clear();
 
@@ -186,4 +186,21 @@ std::string register_name(uint8_t x) {
 		case 0x1f: return "ADCON0";
 	}
 	return register_string(x);
+}
+
+unsigned long arguments::value(char ch) {
+	return strtoul(at(ch).c_str(), NULL, 2);
+}
+
+bool arguments::has_arg(char ch) {
+	return (find(ch) != end());
+}
+
+bool arguments::has_args(const char *s) {
+
+	while(*s)
+		if(!has_arg(*s++))
+			return false;
+
+	return true;
 }
