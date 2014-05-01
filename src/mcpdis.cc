@@ -5,6 +5,8 @@
 #include <cstdlib>
 
 #define F(a) void a(operation&, dictionary&)
+#define G(a) void a(operation&o, dictionary&d)
+
 namespace pic12f {
 	F(RETURN) { }
 	F(RETFIE) { }
@@ -42,6 +44,7 @@ namespace pic12f {
 	F(ADDLW) { }
 }
 #undef F
+#undef G
 
 instruction_set pic12f675 = {
 
@@ -209,21 +212,33 @@ std::string register_name(uint8_t x) {
 	return register_string(x);
 }
 
-unsigned long arguments::value(char ch) {
+unsigned long arguments::value(char ch) const {
 	return strtoul(at(ch).c_str(), NULL, 2);
 }
 
-bool arguments::has_arg(char ch) {
+bool arguments::has_arg(char ch) const {
 	return (find(ch) != end());
 }
 
-bool arguments::has_args(const char *s) {
+bool arguments::has_args(const char *s) const {
 
 	while(*s)
 		if(!has_arg(*s++))
 			return false;
 
 	return true;
+}
+
+//
+// struct expression
+//
+
+//
+// struct dictionary
+//
+
+bool dictionary::has_key(std::string s) const {
+	return (find(s) != end());
 }
 
 //

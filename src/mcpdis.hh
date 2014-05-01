@@ -26,6 +26,7 @@ using _expression = std::list<std::string>;
 
 struct expression : _expression {
 	using _expression::_expression;
+	expression expand(const dictionary&) const;
 };
 
 //
@@ -35,6 +36,7 @@ using _dictionary = std::map<std::string,expression>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
+	bool has_key(std::string) const;
 };
 
 //
@@ -44,9 +46,9 @@ using _arguments = std::map<char,std::string>;
 
 struct arguments : _arguments {
 	using _arguments::_arguments;
-	unsigned long value(char);
-	bool has_arg(char);
-	bool has_args(const char *);
+	unsigned long value(char) const;
+	bool has_arg(char) const;
+	bool has_args(const char *) const;
 };
 
 //
