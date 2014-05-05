@@ -63,9 +63,18 @@ namespace pic12f {
 
 	F(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
 	F(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
-	F(SLEEP) { }
-	F(CLRWDT) { }
-	F(NOP) { /* no operation */ }
+
+	F(SLEEP) {
+		// FIXME: put microcontroller to sleep
+	}
+
+	F(CLRWDT) {
+		// FIXME: clear watchdog timer
+	}
+
+	F(NOP) {
+		/* no operation */
+	}
 
 	G(CLR) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
@@ -115,7 +124,14 @@ namespace pic12f {
 		c["W"] = { k };
 	}
 
-	F(RETLW) { }
+	G(RETLW) {
+
+		MOVLW(o, c);
+
+		// FIXME: add program counter PCL/ATH adjustment
+
+		throw std::runtime_error("RETLW incomplete");
+	}
 
 	G(IORLW) { lw_function("IOR", o, c); }
 	G(ANDLW) { lw_function("AND", o, c); }
