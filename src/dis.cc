@@ -253,7 +253,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(auto jter = iter; jter != code.end() && jter->opcode.pcl_type == instruction::pcl_types::normal; jter++) {
 
-				jter->opcode.fn(*iter, d);
+				jter->execute(d);
 
 				std::cout << ' ' << address_string(jter->address);
 			}

@@ -3,9 +3,10 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
+#include <iostream>
 
 #define F(a) void a(operation&, dictionary&)
-#define G(a) void a(operation&o, dictionary&d)
+#define G(a) void a(operation&o, dictionary&c)
 
 namespace pic12f {
 
@@ -13,12 +14,16 @@ namespace pic12f {
 	F(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
 	F(SLEEP) { }
 	F(CLRWDT) { }
-	F(NOP) { }
-	F(CLR) { }
+	F(NOP) {
+	}
+	G(CLR) {
+		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
+		c[d] = { "0" };
+	}
 	G(MOVWF) {
-		std::string f = register_name(o.args.value('f'));
-		d.touch("W");
-		d[f] = d["W"];
+		std::string f = register_string(o.args.value('f'));
+		c.touch("W");
+		c[f] = c["W"];
 	}
 	F(IORWF) { }
 	F(ANDWF) { }
@@ -209,6 +214,10 @@ std::string address_string(unsigned long x) {
 	return ss.str();
 }
 
+std::string dest_string(bool f,unsigned long x) {
+	return f ? register_string(x) : "W";
+}
+
 std::string register_name(uint8_t x) {
 
 	switch(x) {
@@ -317,3 +326,6 @@ operation::operation(const std::string& my_s, unsigned long my_address, const in
 	opcode.match(s, &args);
 }
 
+void operation::execute(dictionary& d) {
+	opcode.fn(*this, d);
+}

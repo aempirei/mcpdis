@@ -176,6 +176,8 @@ struct operation {
 
 	operation();
 	operation(const std::string&, unsigned long, const instruction_set&);
+
+	void execute(dictionary&);
 };
 
 extern instruction_set pic12f675;
@@ -183,3 +185,4 @@ extern instruction_set pic12f675;
 std::string address_string(unsigned long);
 std::string register_string(unsigned long);
 std::string register_name(uint8_t);
+std::string dest_string(bool,unsigned long);
