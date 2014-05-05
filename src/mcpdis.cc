@@ -149,11 +149,8 @@ namespace pic12f {
 	}
 
 	G(RETLW) {
-
 		MOVLW(o, c);
-
 		// FIXME: add program counter PCL/ATH adjustment
-
 		throw std::runtime_error("RETLW overwrites program counter");
 	}
 
