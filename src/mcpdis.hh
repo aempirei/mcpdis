@@ -30,6 +30,8 @@ struct expression : _expression {
 	using _expression::_expression;
 	expression expand(const value_type&,const dictionary&) const;
 	std::string str() const;
+	void parens();
+	void append(const expression&);
 };
 
 //
@@ -41,7 +43,6 @@ struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
 	bool has_key(const key_type&) const;
 	void touch(const key_type&);
-	void parens(const key_type&);
 };
 
 //
