@@ -12,7 +12,7 @@ namespace pic12f {
 
 	void wf_function(std::string name, operation& o, dictionary& c) {
 
-		std::string f = register_string(o.args.value('f'));
+		std::string f = register_name(o.args.value('f'));
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 
 		c.touch("W");
@@ -33,7 +33,7 @@ namespace pic12f {
 	void f_function(std::string name, operation& o, dictionary& c) {
 
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		std::string f = register_string(o.args.value('f'));
+		std::string f = register_name(o.args.value('f'));
 
 		c.touch(f);
 
@@ -46,11 +46,7 @@ namespace pic12f {
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
 
-		std::stringstream ss;
-		std::string k;
-
-		ss << o.args.value('k');
-		k = ss.str();
+		std::string k = std::to_string(o.args.value('k'));
 
 		c.touch("W");
 
@@ -89,7 +85,7 @@ namespace pic12f {
 	}
 
 	G(MOVWF) {
-		std::string f = register_string(o.args.value('f'));
+		std::string f = register_name(o.args.value('f'));
 		c.touch("W");
 		c[f] = c.at("W");
 	}
@@ -102,7 +98,7 @@ namespace pic12f {
 
 	G(MOVF) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		std::string f = register_string(o.args.value('f'));
+		std::string f = register_name(o.args.value('f'));
 		c.touch(f);
 		c[d] = c.at(f);
 	}
@@ -114,12 +110,28 @@ namespace pic12f {
 	G(RLF)   { f_function("<!", o, c); }
 	G(SWAPF) { f_function("><", o, c); }
 
-	F(BCF)   {
-		// clear register bit
+	void bxf_function(std::string name, uint8_t k, operation& o, dictionary& c) {
+
+		std::string f = register_name(o.args.value('f'));
+
+		c.touch(f);
+
+		expression& e = c[f];
+
+		e.push_front(std::to_string(k));
+		e.push_front(name);
+		e.parens();
 	}
 
-	F(BSF) {
-		// set register bit
+
+	G(BCF)   {
+		uint8_t k = ~(1 << o.args.value('b'));
+		bxf_function("&", k, o, c);
+	}
+
+	G(BSF) {
+		uint8_t k = 1 << o.args.value('b');
+		bxf_function("|", k, o, c);
 	}
 
 	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
@@ -132,9 +144,7 @@ namespace pic12f {
 	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
 	G(MOVLW) {
-		std::stringstream ss;
-		ss << o.args.value('k');
-		std::string k = ss.str();
+		std::string k = std::to_string(o.args.value('k'));
 		c["W"] = { k };
 	}
 
@@ -325,7 +335,7 @@ std::string address_string(unsigned long x) {
 }
 
 std::string dest_string(bool f,unsigned long x) {
-	return f ? register_string(x) : "W";
+	return f ? register_name(x) : "W";
 }
 
 std::string register_name(uint8_t x) {
