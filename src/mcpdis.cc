@@ -151,14 +151,24 @@ namespace pic12f {
 	G(SUBLW) { lw_function("SUB", o, c); }
 	G(ADDLW) { lw_function("ADD", o, c); }
 
-	F(Z) {}
-	F(C) {}
-	F(DC) {}
-
-	F(PD) {}
-	F(TO) {}
-
-	F(PC) {}
+	F(Z) {
+		throw std::runtime_error("STATUS<Z> zero flag unimplemented");
+	}
+	F(C) {
+		throw std::runtime_error("STATUS<C> carry flag unimplemented");
+	}
+	F(DC) {
+		throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented");
+	}
+	F(PD) {
+		throw std::runtime_error("STATUS<PD> power down flag unimplemented");
+	}
+	F(TO) {
+		throw std::runtime_error("STATUS<TO> time-out flag unimplemented");
+	}
+	F(PC) {
+		throw std::runtime_error("PC program counter unimplemented");
+	}
 
 }
 #undef F
