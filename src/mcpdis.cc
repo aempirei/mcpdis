@@ -61,19 +61,26 @@ namespace pic12f {
 		e.parens();
 	}
 
-	F(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
-	F(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
+	F(RETURN) {
+		// implement call return
+		throw std::runtime_error(std::string("RETURN overwrites program counter"));
+	}
+
+	F(RETFIE) {
+		// implement return from interrupt
+		throw std::runtime_error(std::string("RETFIE overwrites program counter"));
+	}
 
 	F(SLEEP) {
-		// FIXME: put microcontroller to sleep
+		// put microcontroller to sleep
 	}
 
 	F(CLRWDT) {
-		// FIXME: clear watchdog timer
+		// clear watchdog timer
 	}
 
 	F(NOP) {
-		/* no operation */
+		// no operation
 	}
 
 	G(CLR) {
@@ -107,8 +114,13 @@ namespace pic12f {
 	G(RLF)   { f_function("<!", o, c); }
 	G(SWAPF) { f_function("><", o, c); }
 
-	F(BCF)   { }
-	F(BSF)   { }
+	F(BCF)   {
+		// clear register bit
+	}
+
+	F(BSF) {
+		// set register bit
+	}
 
 	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	F(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
@@ -130,7 +142,7 @@ namespace pic12f {
 
 		// FIXME: add program counter PCL/ATH adjustment
 
-		throw std::runtime_error("RETLW incomplete");
+		throw std::runtime_error("RETLW overwrites program counter");
 	}
 
 	G(IORLW) { lw_function("IOR", o, c); }
