@@ -31,10 +31,14 @@ namespace pic12f {
 	}
 
 	void f_function(std::string name, operation& o, dictionary& c) {
+
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_string(o.args.value('f'));
+
 		c.touch(f);
+
 		expression& D = c[d];
+
 		D = c.at(f);
 		D.push_front(name);
 		D.parens();
@@ -76,8 +80,9 @@ namespace pic12f {
 	G(RRF)   { f_function("RR"  , o, c); }
 	G(RLF)   { f_function("RL"  , o, c); }
 	G(SWAPF) { f_function("SWAP", o, c); }
-	G(BCF)   { f_function("BC"  , o, c); }
-	G(BSF)   { f_function("BS"  , o, c); }
+
+	F(BCF)   { }
+	F(BSF)   { }
 
 	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	F(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
