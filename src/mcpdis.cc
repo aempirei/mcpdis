@@ -167,7 +167,7 @@ namespace pic12f {
 		throw std::runtime_error("STATUS<TO> time-out flag unimplemented");
 	}
 	F(PC) {
-		throw std::runtime_error("PC program counter unimplemented");
+		throw std::runtime_error("PCL/PCLATH (PC) program counter unimplemented");
 	}
 
 }
