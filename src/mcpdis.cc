@@ -21,13 +21,13 @@ namespace pic12f {
 		const auto& W = c.at("W");
 		const auto& F = c.at(f);
 
-		expression D = { name };
+		expression e = { name };
 
-		D.append(F);
-		D.append(W);
-		D.parens();
+		e.append(F);
+		e.append(W);
+		e.parens();
 
-		c[d] = D;
+		c[d] = e;
 	}
 
 	void f_function(std::string name, operation& o, dictionary& c) {
@@ -37,11 +37,28 @@ namespace pic12f {
 
 		c.touch(f);
 
-		expression& D = c[d];
+		expression& e = c[d];
 
-		D = c.at(f);
-		D.push_front(name);
-		D.parens();
+		e = c.at(f);
+		e.push_front(name);
+		e.parens();
+	}
+
+	void lw_function(std::string name, operation& o, dictionary& c) {
+
+		std::stringstream ss;
+		std::string k;
+
+		ss << o.args.value('k');
+		k = ss.str();
+
+		c.touch("W");
+
+		expression& e = c["W"];
+
+		e.push_front(k);
+		e.push_front(name);
+		e.parens();
 	}
 
 	F(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
@@ -61,11 +78,11 @@ namespace pic12f {
 		c[f] = c.at("W");
 	}
 
-	G(IORWF) { wf_function("IOR", o, c); }
-	G(ANDWF) { wf_function("AND", o, c); }
-	G(XORWF) { wf_function("XOR", o, c); }
-	G(SUBWF) { wf_function("SUB", o, c); }
-	G(ADDWF) { wf_function("ADD", o, c); }
+	G(IORWF) { wf_function("|", o, c); }
+	G(ANDWF) { wf_function("&", o, c); }
+	G(XORWF) { wf_function("^", o, c); }
+	G(SUBWF) { wf_function("-", o, c); }
+	G(ADDWF) { wf_function("+", o, c); }
 
 	G(MOVF) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
@@ -74,12 +91,12 @@ namespace pic12f {
 		c[d] = c.at(f);
 	}
 
-	G(COMF)  { f_function("COM" , o, c); }
-	G(DECF)  { f_function("DEC" , o, c); }
-	G(INCF)  { f_function("INC" , o, c); }
-	G(RRF)   { f_function("RR"  , o, c); }
-	G(RLF)   { f_function("RL"  , o, c); }
-	G(SWAPF) { f_function("SWAP", o, c); }
+	G(COMF)  { f_function("~" , o, c); }
+	G(DECF)  { f_function("--", o, c); }
+	G(INCF)  { f_function("++", o, c); }
+	G(RRF)   { f_function("!>", o, c); }
+	G(RLF)   { f_function("<!", o, c); }
+	G(SWAPF) { f_function("><", o, c); }
 
 	F(BCF)   { }
 	F(BSF)   { }
@@ -91,13 +108,20 @@ namespace pic12f {
 	F(CALL) { throw std::runtime_error(std::string("CALL overwrites program counter")); }
 	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
-	F(MOVLW) { }
+	G(MOVLW) {
+		std::stringstream ss;
+		ss << o.args.value('k');
+		std::string k = ss.str();
+		c["W"] = { k };
+	}
+
 	F(RETLW) { }
-	F(IORLW) { }
-	F(ANDLW) { }
-	F(XORLW) { }
-	F(SUBLW) { }
-	F(ADDLW) { }
+
+	G(IORLW) { lw_function("IOR", o, c); }
+	G(ANDLW) { lw_function("AND", o, c); }
+	G(XORLW) { lw_function("XOR", o, c); }
+	G(SUBLW) { lw_function("SUB", o, c); }
+	G(ADDLW) { lw_function("ADD", o, c); }
 
 	F(Z) {}
 	F(C) {}
