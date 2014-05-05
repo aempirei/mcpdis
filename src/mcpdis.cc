@@ -9,8 +9,8 @@
 
 namespace pic12f {
 
-	F(RETURN) { }
-	F(RETFIE) { }
+	F(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
+	F(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
 	F(SLEEP) { }
 	F(CLRWDT) { }
 	F(NOP) { }
@@ -30,12 +30,12 @@ namespace pic12f {
 	F(SWAPF) { }
 	F(BCF) { }
 	F(BSF) { }
-	F(DECFSZ) { }
-	F(INCFSZ) { }
-	F(BTFSC) { }
-	F(BTFSS) { }
-	F(CALL) { }
-	F(GOTO) { }
+	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
+	F(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
+	F(BTFSC) { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification")); }
+	F(BTFSS) { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification")); }
+	F(CALL) { throw std::runtime_error(std::string("CALL overwrites program counter")); }
+	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 	F(MOVLW) { }
 	F(RETLW) { }
 	F(IORLW) { }
@@ -59,8 +59,8 @@ namespace pic12f {
 
 instruction_set pic12f675 = {
 
-	{ "00000000001000", "RETURN", pic12f::RETURN, instruction::pcl_types::normal, instruction::flags::none       },
-	{ "00000000001001", "RETFIE", pic12f::RETFIE, instruction::pcl_types::normal, instruction::flags::none       },
+	{ "00000000001000", "RETURN", pic12f::RETURN, instruction::pcl_types::ret   , instruction::flags::none       },
+	{ "00000000001001", "RETFIE", pic12f::RETFIE, instruction::pcl_types::ret   , instruction::flags::none       },
 	{ "00000001100011", "SLEEP" , pic12f::SLEEP , instruction::pcl_types::normal, instruction::flags::power      },
 	{ "00000001100100", "CLRWDT", pic12f::CLRWDT, instruction::pcl_types::normal, instruction::flags::power      },
 	{ "0000000xx00000", "NOP"   , pic12f::NOP   , instruction::pcl_types::normal, instruction::flags::none       },

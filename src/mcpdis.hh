@@ -123,7 +123,7 @@ struct instruction {
 	};
 
 	enum class pcl_types {
-		normal, skip, jump, call
+		normal, skip, jump, call, ret
 	};
 
 	// variables
