@@ -124,8 +124,10 @@ namespace pic12f {
 
 	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	F(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
+
 	F(BTFSC) { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification")); }
 	F(BTFSS) { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification")); }
+
 	F(CALL) { throw std::runtime_error(std::string("CALL overwrites program counter")); }
 	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
