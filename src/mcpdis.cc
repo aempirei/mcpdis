@@ -30,53 +30,62 @@ namespace pic12f {
 		c[d] = D;
 	}
 
+	void f_function(std::string name, operation& o, dictionary& c) {
+		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
+		std::string f = register_string(o.args.value('f'));
+		c.touch(f);
+		expression& D = c[d];
+		D = c.at(f);
+		D.push_front(name);
+		D.parens();
+	}
+
 	F(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
 	F(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
 	F(SLEEP) { }
 	F(CLRWDT) { }
 	F(NOP) { /* no operation */ }
+
 	G(CLR) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		c[d] = { "0" };
 	}
+
 	G(MOVWF) {
 		std::string f = register_string(o.args.value('f'));
 		c.touch("W");
 		c[f] = c.at("W");
 	}
+
 	G(IORWF) { wf_function("IOR", o, c); }
 	G(ANDWF) { wf_function("AND", o, c); }
 	G(XORWF) { wf_function("XOR", o, c); }
 	G(SUBWF) { wf_function("SUB", o, c); }
 	G(ADDWF) { wf_function("ADD", o, c); }
+
 	G(MOVF) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_string(o.args.value('f'));
 		c.touch(f);
 		c[d] = c.at(f);
 	}
-	F(COMF) {
-	}
-	F(DECF) {
-	}
-	F(INCF) {
-	}
-	F(RRF) {
-	}
-	F(RLF) {
-	}
-	F(SWAPF) {
-	}
-	F(BCF) {
-	}
-	F(BSF) {
-	}
+
+	G(COMF)  { f_function("COM" , o, c); }
+	G(DECF)  { f_function("DEC" , o, c); }
+	G(INCF)  { f_function("INC" , o, c); }
+	G(RRF)   { f_function("RR"  , o, c); }
+	G(RLF)   { f_function("RL"  , o, c); }
+	G(SWAPF) { f_function("SWAP", o, c); }
+	G(BCF)   { f_function("BC"  , o, c); }
+	G(BSF)   { f_function("BS"  , o, c); }
+
 	F(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	F(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
 	F(BTFSC) { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification")); }
 	F(BTFSS) { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification")); }
 	F(CALL) { throw std::runtime_error(std::string("CALL overwrites program counter")); }
 	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
+
 	F(MOVLW) { }
 	F(RETLW) { }
 	F(IORLW) { }
