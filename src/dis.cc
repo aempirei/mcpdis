@@ -259,6 +259,13 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 			}
 
 			std::cout << std::endl;
+
+			for(const auto& k : d) {
+				if(k.second.size() != 1 || k.second.front() != k.first) {
+					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first;
+					std::cout << " -> " << k.second.str() << std::endl;
+				}
+			}
 		}
 	}
 }

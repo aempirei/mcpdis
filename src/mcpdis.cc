@@ -15,7 +15,11 @@ namespace pic12f {
 	F(CLRWDT) { }
 	F(NOP) { }
 	F(CLR) { }
-	F(MOVWF) { }
+	G(MOVWF) {
+		std::string f = register_name(o.args.value('f'));
+		d.touch("W");
+		d[f] = d["W"];
+	}
 	F(IORWF) { }
 	F(ANDWF) { }
 	F(XORWF) { }
@@ -64,8 +68,8 @@ instruction_set pic12f675 = {
 	{ "0000000xx00000", "NOP"   , pic12f::NOP   , instruction::pcl_types::normal, instruction::flags::none       },
 	{ "00000001100011", "SLEEP" , pic12f::SLEEP , instruction::pcl_types::normal, instruction::flags::power      },
 	{ "00000001100100", "CLRWDT", pic12f::CLRWDT, instruction::pcl_types::normal, instruction::flags::power      },
-	{ "000001dfffffff", "CLR"   , pic12f::CLR   , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "0000001fffffff", "MOVWF" , pic12f::MOVWF , instruction::pcl_types::normal, instruction::flags::none       },
+	{ "000001dfffffff", "CLR"   , pic12f::CLR   , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "000100dfffffff", "IORWF" , pic12f::IORWF , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "000101dfffffff", "ANDWF" , pic12f::ANDWF , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "000110dfffffff", "XORWF" , pic12f::XORWF , instruction::pcl_types::normal, instruction::flags::Z          },
@@ -86,8 +90,8 @@ instruction_set pic12f675 = {
 	{ "0111bbbfffffff", "BTFSS" , pic12f::BTFSS , instruction::pcl_types::skip  , instruction::flags::none       },
 	{ "100kkkkkkkkkkk", "CALL"  , pic12f::CALL  , instruction::pcl_types::call  , instruction::flags::none       },
 	{ "101kkkkkkkkkkk", "GOTO"  , pic12f::GOTO  , instruction::pcl_types::jump  , instruction::flags::none       },
+	{ "1101xxkkkkkkkk", "RETLW" , pic12f::RETLW , instruction::pcl_types::ret   , instruction::flags::none       },
 	{ "1100xxkkkkkkkk", "MOVLW" , pic12f::MOVLW , instruction::pcl_types::normal, instruction::flags::none       },
-	{ "1101xxkkkkkkkk", "RETLW" , pic12f::RETLW , instruction::pcl_types::normal, instruction::flags::none       },
 	{ "111000kkkkkkkk", "IORLW" , pic12f::IORLW , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "111001kkkkkkkk", "ANDLW" , pic12f::ANDLW , instruction::pcl_types::normal, instruction::flags::Z          },
 	{ "111010kkkkkkkk", "XORLW" , pic12f::XORLW , instruction::pcl_types::normal, instruction::flags::Z          },
@@ -266,6 +270,20 @@ expression expression::expand(const value_type& s, const dictionary& d) const {
 	}
 
 	return e;
+}
+
+std::string expression::str() const {
+
+	std::stringstream ss;
+
+	for(auto iter = begin(); iter != end(); iter++) {
+		ss << *iter;
+		if(next(iter) != end())
+			ss << ' ';
+	}
+
+	return ss.str();
+
 }
 
 //

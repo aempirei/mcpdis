@@ -29,6 +29,7 @@ using _expression = std::list<std::string>;
 struct expression : _expression {
 	using _expression::_expression;
 	expression expand(const value_type&,const dictionary&) const;
+	std::string str() const;
 };
 
 //
