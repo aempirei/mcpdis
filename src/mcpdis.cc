@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdlib>
+#include <cstdint>
+#include <climits>
 #include <iostream>
 
 namespace pic12f {
@@ -412,35 +414,109 @@ bool expr::is_nullary() const {
 	return type == expr_type::symbol && args.empty();
 }
 
+bool expr::is_nonterminal() const {
+	return type == expr_type::symbol && !args.empty();
+}
+
+bool expr::is_terminal() const {
+	return type == expr_type::literal || is_nullary();
+}
+
 expr expr::expand(const dictionary::key_type& s,const dictionary& d) const {
 
-	if(type == expr_type::literal) {
-
+	if(type == expr_type::literal)
 		return *this;
 
-	} else if(is_nullary()) {
-
+	if(is_nullary())
 		return (prefix == s) ? d.at(s) : *this;
 
-	} else {
+	expr e(prefix);
 
-		expr e(prefix);
+	for(const auto& arg : args)
+		e.args.push_back(arg.expand(s,d));
 
-		for(const auto& arg : args)
-			e.args.push_back(arg.expand(s,d));
-
-		return e;
-	}
+	return e;
 }
 
 expr expr::optimize() const {
 
-	if(type == expr_type::literal || is_nullary()) {
+	if(is_terminal())
 		return *this;
-	} else {
-		expr e(*this);
-		return e;
+
+	const std::list<std::string> unary = { "><", "~", "!>", "<!" };
+	const std::list<std::string> binary = { "-" };
+
+	unsigned int arity = UINT_MAX;
+
+	for(const auto& op : unary) {
+		if(prefix == op) {
+			arity = args.size();
+			if(arity != 1) {
+				std::stringstream ss;
+				ss << "unary operator \"" << prefix << "\" has unexpected argument count of " << args.size();
+				throw std::runtime_error(ss.str());
+			}
+		}
 	}
+
+	for(const auto& op : binary) {
+		if(prefix == op) {
+			arity = args.size();
+			if(arity != 2) {
+				std::stringstream ss;
+				ss << "binary operator \"" << prefix << "\" has unexpected argument count of " << args.size();
+				throw std::runtime_error(ss.str());
+			}
+		}
+	}
+
+	if(arity == 1) {
+
+		if(args.front().is_nonterminal()) {
+			if(
+					(prefix == "><" && args.front().prefix == prefix) ||
+					(prefix == "~"  && args.front().prefix == prefix) ||
+					(prefix == "<!" && args.front().prefix == "!>"  ) ||
+					(prefix == "!>" && args.front().prefix == "<!"  )
+			  )
+			{
+				return args.front().args.front().optimize();
+			}
+		}
+		
+		// fall-thru
+
+	} else if(arity == 2) {
+
+		// do nothing
+
+	} else if(arity == UINT_MAX) {
+
+			expr e(prefix);
+
+			for(const auto& arg : args) {
+
+				expr sub = arg.optimize();
+
+				if(sub.is_nonterminal() && sub.prefix == prefix) {
+
+					for(const auto& subarg : sub.args)
+						e.args.push_back(subarg.optimize());
+
+				} else {
+					e.args.push_back(sub);
+				}
+			}
+
+			return e;
+	}
+
+	expr e(prefix);
+
+	for(const auto& arg : args)
+		e.args.push_back(arg.optimize());
+
+	return e;
 }
 
 //

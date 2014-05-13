@@ -58,6 +58,8 @@ struct expr {
 	expr optimize() const;
 
 	bool is_nullary() const;
+	bool is_nonterminal() const;
+	bool is_terminal() const;
 };
 
 //
