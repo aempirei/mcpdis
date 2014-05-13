@@ -21,6 +21,10 @@ namespace pic12f {
 		return o.args.value('k');
 	}
 
+	uint8_t load_b(operation& o) {
+		return 1 << o.args.value('b');
+	}
+
 	void function0(std::string name, std::string l, std::string r, dictionary& c) {
 		c[l] = expr(name, { c.touch(r) });
 	}
@@ -62,6 +66,9 @@ namespace pic12f {
 #define FN(a) void a(operation&, dictionary&)
 #define GN(a) void a(operation&o, dictionary&c)
 
+#define LOAD_D std::string d = load_d(o)
+#define LOAD_F std::string f = load_f(o)
+#define LOAD_K unsigned long k = load_k(o)
 
 	FN(RETURN) {
 		// implement call return
@@ -85,49 +92,32 @@ namespace pic12f {
 		// no operation
 	}
 
-	GN(CLR) {
-		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		c[d] = 0;
-	}
+	GN(CLR)   { LOAD_D; c[d] = expr(0);      }
+	GN(MOVWF) { LOAD_F; c[f] = c.touch("W"); }
 
-	GN(MOVWF) {
-		std::string f = register_name(o.args.value('f'));
-		c[f] = c.touch("W");
-	}
+	GN(IORWF) { LOAD_D; LOAD_F; c[d] = expr("|", { c.touch(f), c.touch("W") }); }
+	GN(ANDWF) { LOAD_D; LOAD_F; c[d] = expr("&", { c.touch(f), c.touch("W") }); }
+	GN(XORWF) { LOAD_D; LOAD_F; c[d] = expr("^", { c.touch(f), c.touch("W") }); }
+	GN(SUBWF) { LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f), c.touch("W") }); }
+	GN(ADDWF) { LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f), c.touch("W") }); }
 
-	GN(IORWF) { wf_function("|", o, c); }
-	GN(ANDWF) { wf_function("&", o, c); }
-	GN(XORWF) { wf_function("^", o, c); }
-	GN(SUBWF) { wf_function("-", o, c); }
-	GN(ADDWF) { wf_function("+", o, c); }
-
-	GN(MOVF) {
-		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		std::string f = register_name(o.args.value('f'));
-		c[d] = c.touch(f);
-	}
-
-#define LOAD_D std::string d = load_d(o)
-#define LOAD_F std::string f = load_f(o)
-#define LOAD_K unsigned long k = load_k(o)
+	GN(MOVF) { LOAD_D; LOAD_F; c[d] = c.touch(f); }
 
 	GN(DECF) { LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f), 1 }); }
 	GN(INCF) { LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f), 1 }); }
 
-	GN(COMF)  { f_function("~" , o, c); }
-	GN(RRF)   { f_function("!>", o, c); }
-	GN(RLF)   { f_function("<!", o, c); }
-	GN(SWAPF) { f_function("><", o, c); }
-
-
+	GN(COMF)  { LOAD_D; LOAD_F; c[d] = expr("~" , { c.touch(f) }); }
+	GN(RRF)   { LOAD_D; LOAD_F; c[d] = expr("!>", { c.touch(f) }); }
+	GN(RLF)   { LOAD_D; LOAD_F; c[d] = expr("<!", { c.touch(f) }); }
+	GN(SWAPF) { LOAD_D; LOAD_F; c[d] = expr("><", { c.touch(f) }); }
 
 	GN(BCF)   {
-		uint8_t k = ~(1 << o.args.value('b'));
+		uint8_t k = ~load_b(o);
 		bxf_function("&", k, o, c);
 	}
 
 	GN(BSF) {
-		uint8_t k = (1 << o.args.value('b'));
+		uint8_t k = load_b(o);
 		bxf_function("|", k, o, c);
 	}
 
@@ -174,6 +164,10 @@ namespace pic12f {
 	FN(PC) {
 		throw std::runtime_error("PCL/PCLATH (PC) program counter unimplemented");
 	}
+
+#undef LOAD_D
+#undef LOAD_F
+#undef LOAD_K
 
 #undef FN
 #undef GN
