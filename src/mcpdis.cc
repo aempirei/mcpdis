@@ -28,10 +28,10 @@ namespace pic12f {
 #define FN(a) void a(operation&, dictionary&)
 #define GN(a) void a(operation&o, dictionary&c)
 
-#define LOAD_D std::string d = load_d(o)
-#define LOAD_F std::string f = load_f(o)
+#define LOAD_D const std::string d = load_d(o)
+#define LOAD_F const std::string f = load_f(o)
 #define LOAD_W const std::string w = "W"
-#define LOAD_K unsigned long k = load_k(o)
+#define LOAD_K const unsigned long k = load_k(o)
 #define LOAD_B uint8_t b = load_b(o)
 
 	FN(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
