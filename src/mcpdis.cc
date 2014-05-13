@@ -9,48 +9,54 @@
 
 namespace pic12f {
 
-	void wf_function(std::string name, operation& o, dictionary& c) {
-
-		std::string f = register_name(o.args.value('f'));
-		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-
-		expr& F = c.touch(f);
-		expr& W = c.touch("W");
-
-		c[d] = expr(name, { F, W });
-	}
-
 	void e_function(expr e, operation& o, dictionary& c) {
 
-		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
+		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 
 		expr& F = c.touch(f);
 
-		e.args.push_back(F);
+		e.args.push_front(F);
 
 		c[d] = e;
+	}
+
+	void k_function(std::string name, std::string d, unsigned long k, dictionary& c) {
+		
+		expr& D = c.touch(d);
+
+		D = expr(name, { k, D });
+	}
+
+	void l_function(std::string name, std::string d, operation& o, dictionary& c) {
+
+		unsigned long k = o.args.value('k');
+
+		k_function(name, d, k, c);
 	}
 
 	void f_function(std::string name, operation& o, dictionary& c) {
 		e_function(expr(name), o, c);
 	}
 
-	void lw_function(std::string name, operation& o, dictionary& c) {
+	void wf_function(std::string name, operation& o, dictionary& c) {
 
 		expr& W = c.touch("W");
-		unsigned long k = o.args.value('k');
 
-		W = expr(name, { k, W });
+		e_function(expr(name, { W }), o, c);
+	}
+
+
+	void lw_function(std::string name, operation& o, dictionary& c) {
+
+		l_function(name, "W", o, c);
 	}
 
 	void bxf_function(std::string name, unsigned long k, operation& o, dictionary& c) {
 
 		std::string f = register_name(o.args.value('f'));
 
-		expr& F = c.touch(f);
-
-		F = expr(name, { k, F });
+		k_function(name, f, k, c);
 	}
 
 #define FN(a) void a(operation&, dictionary&)
