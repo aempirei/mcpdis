@@ -12,14 +12,10 @@ namespace pic12f {
 		std::string f = register_name(o.args.value('f'));
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 
-		expr F = c.touch(f);
-		expr W = c.touch("W");
+		expr& F = c.touch(f);
+		expr& W = c.touch("W");
 
-		expr e(name);
-
-		e.args = { F, W };
-
-		c[d] = e;
+		c[d] = expr(name, { F, W });
 	}
 
 	void e_function(expr e, operation& o, dictionary& c) {
@@ -27,9 +23,7 @@ namespace pic12f {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
 
-		expr F = c.touch(f);
-
-		e.args = { F };
+		e.args.push_back( c.touch(f) );
 
 		c[d] = e;
 	}
@@ -40,26 +34,19 @@ namespace pic12f {
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
 
-		expr W = c.touch("W");
+		expr& W = c.touch("W");
 		unsigned long k = o.args.value('k');
 
-		expr e(name);
-		e.args = { k, W };
-
-		c["W"] = e;
+		W = expr(name, { k, W });
 	}
 
 	void bxf_function(std::string name, uint8_t k, operation& o, dictionary& c) {
 
 		std::string f = register_name(o.args.value('f'));
 
-		expr F = c.touch(f);
+		expr& F = c.touch(f);
 
-		expr e(name);
-
-		e.args = { k, F };
-		
-		c[f] = e;
+		F = expr(name, { k, F });
 	}
 
 #define FN(a) void a(operation&, dictionary&)
@@ -140,8 +127,7 @@ namespace pic12f {
 	FN(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
 	GN(MOVLW) {
-		unsigned long k = o.args.value('k');
-		c["W"] = expr(k);
+		c["W"] = expr( o.args.value('k') );
 	}
 
 	GN(RETLW) {
