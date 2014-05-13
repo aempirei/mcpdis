@@ -378,19 +378,19 @@ bool arguments::has_args(const key_type *s) const {
 // struct expr
 //
 
-expr::expr() : type(expr_type::symbol) {
+expr::expr() : expr("", {}) {
 }
 
 expr::expr(unsigned long my_value) : value(my_value), type(expr_type::literal) {
 }
 
-expr::expr(const expr& r) : prefix(r.prefix), value(r.value), args(r.args), type(r.type) {
+expr::expr(const expr& r) : prefix(r.prefix), value(r.value), type(r.type), args(r.args) {
 }
 
-expr::expr(const std::string& my_prefix) : prefix(my_prefix), type(expr_type::symbol) {
+expr::expr(const std::string& my_prefix) : expr(my_prefix, {}) {
 }
 
-expr::expr(const std::string& my_prefix, std::initializer_list<expr> my_args) : prefix(my_prefix), args(my_args) {
+expr::expr(const std::string& my_prefix, std::initializer_list<expr> my_args) : prefix(my_prefix), type(expr_type::symbol), args(my_args) {
 }
 
 std::string expr::str() const {

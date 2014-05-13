@@ -40,11 +40,11 @@ struct expr {
 	std::string prefix;
 	unsigned long value;
 
-	std::list<expr> args;
-
 	enum class expr_type { symbol, literal };
 
 	expr_type type;
+
+	std::list<expr> args;
 
 	expr();
 	expr(unsigned long);
