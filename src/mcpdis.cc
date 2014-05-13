@@ -47,14 +47,12 @@ namespace pic12f {
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
 
-		std::string k = std::to_string(o.args.value('k'));
-
 		c.touch("W");
 
-		const expr& W = c.at("W");
+		expr& W = c.at("W");
 
 		expr e(name);
-		expr K(k);
+		expr K(o.args.value('k'));
 
 		e.args.push_back(K);
 		e.args.push_back(W);
@@ -121,11 +119,15 @@ namespace pic12f {
 
 		c.touch(f);
 
-		expr& e = c[f];
+		expr e(name);
+		expr K(k);
 
-		e.push_front(std::to_string(k));
-		e.push_front(name);
-		e.parens();
+		expr& F = c.at(f);
+
+		e.args.push_back(K);
+		e.args.push_back(F);
+
+		F = e;
 	}
 
 
@@ -149,8 +151,7 @@ namespace pic12f {
 	F(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
 	G(MOVLW) {
-		std::string k = std::to_string(o.args.value('k'));
-		c["W"] = { k };
+		c["W"] = expr(o.args.value('k'));
 	}
 
 	G(RETLW) {
@@ -426,7 +427,7 @@ std::string expr::str() const {
 	return ss.str();
 }
 
-expr expand(const dictionary::key_type& s,const dictionary& d) const {
+expr expr::expand(const std::string&,const dictionary&) const {
 
 	expr e(*this);
 
@@ -463,7 +464,7 @@ bool dictionary::has_key(const key_type& s) const {
 
 void dictionary::touch(const key_type& s) {
 	if(!has_key(s))
-		operator[](s) = value_type(s);
+		operator[](s) = expr(s);
 }
 
 //
