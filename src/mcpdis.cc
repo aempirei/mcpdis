@@ -408,11 +408,39 @@ std::string expr::str() const {
 	return ss.str();
 }
 
-expr expr::expand(const dictionary::key_type&,const dictionary&) const {
+bool expr::is_nullary() const {
+	return type == expr_type::symbol && args.empty();
+}
 
-	expr e(*this);
+expr expr::expand(const dictionary::key_type& s,const dictionary& d) const {
 
-	return e;
+	if(type == expr_type::literal) {
+
+		return *this;
+
+	} else if(is_nullary()) {
+
+		return (prefix == s) ? d.at(s) : *this;
+
+	} else {
+
+		expr e(prefix);
+
+		for(const auto& arg : args)
+			e.args.push_back(arg.expand(s,d));
+
+		return e;
+	}
+}
+
+expr expr::optimize() const {
+
+	if(type == expr_type::literal || is_nullary()) {
+		return *this;
+	} else {
+		expr e(*this);
+		return e;
+	}
 }
 
 //

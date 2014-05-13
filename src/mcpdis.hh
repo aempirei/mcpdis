@@ -55,6 +55,9 @@ struct expr {
 	std::string str() const;
 
 	expr expand(const dictionary::key_type&,const dictionary&) const;
+	expr optimize() const;
+
+	bool is_nullary() const;
 };
 
 //

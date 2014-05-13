@@ -266,8 +266,13 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					// do nothing for identity
 
 				} else {
-					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first;
-					std::cout << " := " << k.second.str() << std::endl;
+
+					std::string sexpr1 = k.second.str();
+					std::string sexpr2 = k.second.optimize().str();
+
+					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first << " := " << sexpr1 << std::endl;
+					if(sexpr1 != sexpr2)
+						std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << ' ' << " := " << sexpr2 << std::endl;
 				}
 			}
 		}
