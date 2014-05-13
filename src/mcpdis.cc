@@ -23,7 +23,9 @@ namespace pic12f {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
 
-		e.args.push_back( c.touch(f) );
+		expr& F = c.touch(f);
+
+		e.args.push_back(F);
 
 		c[d] = e;
 	}
