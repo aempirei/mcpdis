@@ -35,10 +35,22 @@ struct expression : _expression {
 };
 
 struct expr {
-	std::string value;
-	std::vector<expr> args;
-	enum class expr_type { function, symbol, literal };
+
+	std::string prefix;
+	int value;
+
+	std::list<expr> args;
+
+	enum class expr_type { symbol, literal };
+
 	expr_type type;
+
+	std::string str() const;
+
+	expr();
+	expr(int);
+	expr(const expr&);
+	expr(const std::string&);
 };
 
 //

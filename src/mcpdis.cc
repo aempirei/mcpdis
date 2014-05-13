@@ -379,6 +379,50 @@ bool arguments::has_args(const key_type *s) const {
 }
 
 //
+// struct expr
+//
+
+expr::expr() : type(expr_type::symbol) {
+}
+
+expr::expr(int my_value) : value(my_value), type(expr_type::literal) {
+}
+
+expr::expr(const expr& r) : prefix(r.prefix), value(r.value), args(r.args), type(r.type) {
+}
+
+expr::expr(const std::string& my_prefix) : prefix(my_prefix), type(expr_type::symbol) {
+}
+
+std::string expr::str() const {
+
+	std::stringstream ss;
+
+	if(type == expr_type::symbol) {
+
+		if(args.empty()) {
+
+			ss << prefix;
+
+		} else {
+
+			ss << '(' << prefix;
+
+			for(const auto& sub : args)
+				ss << ' ' << sub.str();
+
+			ss << ')';
+		}
+
+	} else if(type == expr_type::literal) {
+		ss << std::dec << value;
+	}
+
+	return ss.str();
+}
+
+
+//
 // struct expression
 //
 
