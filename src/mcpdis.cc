@@ -15,18 +15,10 @@ namespace pic12f {
 		std::string f = register_name(o.args.value('f'));
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 
-		c.touch("W");
-		c.touch(f);
+		const expr& W = c.touch("W");
+		const expr& F = c.touch(f);
 
-		const expr& W = c.at("W");
-		const expr& F = c.at(f);
-
-		expr e(name);
-
-		e.args.push_back(F);
-		e.args.push_back(W);
-
-		c[d] = e;
+		c[d] = expr(name, { F, W });
 	}
 
 	void e_function(expr e, operation& o, dictionary& c) {
@@ -34,9 +26,7 @@ namespace pic12f {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
 
-		c.touch(f);
-
-		const expr& F = c.at(f);
+		const expr& F = c.touch(f);
 
 		e.args.push_back(F);
 
@@ -44,25 +34,14 @@ namespace pic12f {
 	}
 
 	void f_function(std::string name, operation& o, dictionary& c) {
-
-		expr e(name);
-
 		e_function(expr(name), o, c);
 	}
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
 
-		c.touch("W");
+		expr& W = c.touch("W");
 
-		expr& W = c.at("W");
-
-		expr e(name);
-		expr K(o.args.value('k'));
-
-		e.args.push_back(K);
-		e.args.push_back(W);
-
-		W = e;
+		W = expr(name, { o.args.value('k'), W });
 	}
 
 	F(RETURN) {
@@ -89,13 +68,12 @@ namespace pic12f {
 
 	G(CLR) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		c[d] = { "0" };
+		c[d] = expr(0);
 	}
 
 	G(MOVWF) {
 		std::string f = register_name(o.args.value('f'));
-		c.touch("W");
-		c[f] = c.at("W");
+		c[f] = c.touch("W");
 	}
 
 	G(IORWF) { wf_function("|", o, c); }
@@ -398,7 +376,7 @@ bool arguments::has_args(const key_type *s) const {
 expr::expr() : type(expr_type::symbol) {
 }
 
-expr::expr(int my_value) : value(my_value), type(expr_type::literal) {
+expr::expr(unsigned long my_value) : value(my_value), type(expr_type::literal) {
 }
 
 expr::expr(const expr& r) : prefix(r.prefix), value(r.value), args(r.args), type(r.type) {
@@ -452,9 +430,10 @@ bool dictionary::has_key(const key_type& s) const {
 	return (find(s) != end());
 }
 
-void dictionary::touch(const key_type& s) {
+expr& dictionary::touch(const key_type& s) {
 	if(!has_key(s))
 		operator[](s) = expr(s);
+	return at(s);
 }
 
 //

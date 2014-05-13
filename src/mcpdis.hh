@@ -27,7 +27,7 @@ using sourcecode = std::list<operation>;
 struct expr {
 
 	std::string prefix;
-	int value;
+	unsigned long value;
 
 	std::list<expr> args;
 
@@ -36,7 +36,7 @@ struct expr {
 	expr_type type;
 
 	expr();
-	expr(int);
+	expr(unsigned long);
 	expr(const expr&);
 	expr(const std::string&);
 	expr(const std::string&, const std::list<expr>&);
@@ -54,7 +54,7 @@ using _dictionary = std::map<std::string,expr>;
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
 	bool has_key(const key_type&) const;
-	void touch(const key_type&);
+	expr& touch(const key_type&);
 };
 
 //
