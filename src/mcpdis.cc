@@ -42,7 +42,7 @@ namespace pic12f {
 		W = expr(name, { k, W });
 	}
 
-	void bxf_function(std::string name, uint8_t k, operation& o, dictionary& c) {
+	void bxf_function(std::string name, unsigned long k, operation& o, dictionary& c) {
 
 		std::string f = register_name(o.args.value('f'));
 
@@ -79,7 +79,7 @@ namespace pic12f {
 
 	GN(CLR) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
-		c[d] = expr(0);
+		c[d] = 0;
 	}
 
 	GN(MOVWF) {
@@ -99,8 +99,8 @@ namespace pic12f {
 		c[d] = c.touch(f);
 	}
 
-	GN(DECF)  { e_function( expr("-", { expr(1) }), o, c); }
-	GN(INCF)  { e_function( expr("+", { expr(1) }), o, c); }
+	GN(DECF)  { e_function( expr("-", { 1 }), o, c); }
+	GN(INCF)  { e_function( expr("+", { 1 }), o, c); }
 
 	GN(COMF)  { f_function("~" , o, c); }
 	GN(RRF)   { f_function("!>", o, c); }
@@ -115,7 +115,7 @@ namespace pic12f {
 	}
 
 	GN(BSF) {
-		uint8_t k = 1 << o.args.value('b');
+		uint8_t k = (1 << o.args.value('b'));
 		bxf_function("|", k, o, c);
 	}
 
@@ -129,7 +129,7 @@ namespace pic12f {
 	FN(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
 
 	GN(MOVLW) {
-		c["W"] = expr( o.args.value('k') );
+		c["W"] = o.args.value('k');
 	}
 
 	GN(RETLW) {
