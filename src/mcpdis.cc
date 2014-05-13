@@ -85,8 +85,7 @@ namespace pic12f {
 	G(MOVF) {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
-		c.touch(f);
-		c[d] = c.at(f);
+		c[d] = c.touch(f);
 	}
 
 
@@ -102,14 +101,10 @@ namespace pic12f {
 
 		std::string f = register_name(o.args.value('f'));
 
-		c.touch(f);
-
+		expr& F = c.touch(f);
 		expr e(name);
-		expr K(k);
 
-		expr& F = c.at(f);
-
-		e.args.push_back(K);
+		e.args.push_back(k);
 		e.args.push_back(F);
 
 		F = e;
