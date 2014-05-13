@@ -18,14 +18,13 @@ namespace pic12f {
 		c.touch("W");
 		c.touch(f);
 
-		const auto& W = c.at("W");
-		const auto& F = c.at(f);
+		const expr& W = c.at("W");
+		const expr& F = c.at(f);
 
-		expression e = { name };
+		expr e(name);
 
-		e.append(F);
-		e.append(W);
-		e.parens();
+		e.args.push_back(F);
+		e.args.push_back(W);
 
 		c[d] = e;
 	}
@@ -37,11 +36,13 @@ namespace pic12f {
 
 		c.touch(f);
 
-		expression& e = c[d];
+		const expr& F = c.at(f);
 
-		e = c.at(f);
-		e.push_front(name);
-		e.parens();
+		expr e(name);
+
+		e.args.push_back(F);
+
+		c[d] = e;
 	}
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
@@ -50,11 +51,15 @@ namespace pic12f {
 
 		c.touch("W");
 
-		expression& e = c["W"];
+		const expr& W = c.at("W");
 
-		e.push_front(k);
-		e.push_front(name);
-		e.parens();
+		expr e(name);
+		expr K(k);
+
+		e.args.push_back(K);
+		e.args.push_back(W);
+
+		W = e;
 	}
 
 	F(RETURN) {
@@ -116,7 +121,7 @@ namespace pic12f {
 
 		c.touch(f);
 
-		expression& e = c[f];
+		expr& e = c[f];
 
 		e.push_front(std::to_string(k));
 		e.push_front(name);
@@ -421,49 +426,32 @@ std::string expr::str() const {
 	return ss.str();
 }
 
+expr expand(const dictionary::key_type& s,const dictionary& d) const {
+
+	expr e(*this);
+
+	return e;
+}
 
 //
 // struct expression
 //
 
-expression expression::expand(const value_type& s, const dictionary& d) const {
-
-	expression e;
-
-	expression sub = d.at(s);
-
-	for(auto iter = begin(); iter != end(); iter++) {
-		if(s == *iter)
-			e.insert(e.end(), sub.begin(), sub.end());
-		else
-			e.push_back(*iter);
-	}
-
-	return e;
-}
-
-std::string expression::str() const {
-
-	std::stringstream ss;
-
-	for(auto iter = begin(); iter != end(); iter++) {
-		ss << *iter;
-		if(next(iter) != end())
-			ss << ' ';
-	}
-
-	return ss.str();
-
-}
-
-void expression::parens() {
-	push_front("(");
-	push_back(")");
-}
-
-void expression::append(const expression& e) {
-	insert(end(), e.begin(), e.end());
-}
+//expression expression::expand(const value_type& s, const dictionary& d) const {
+//
+//	expression e;
+//
+//	expression sub = d.at(s);
+//
+//	for(auto iter = begin(); iter != end(); iter++) {
+//		if(s == *iter)
+//			e.insert(e.end(), sub.begin(), sub.end());
+//		else
+//			e.push_back(*iter);
+//	}
+//
+//	return e;
+//}
 
 //
 // struct dictionary
@@ -475,7 +463,7 @@ bool dictionary::has_key(const key_type& s) const {
 
 void dictionary::touch(const key_type& s) {
 	if(!has_key(s))
-		operator[](s) = { s };
+		operator[](s) = value_type(s);
 }
 
 //

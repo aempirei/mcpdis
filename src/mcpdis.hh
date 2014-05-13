@@ -14,25 +14,15 @@ struct instruction;
 struct operation;
 struct arguments;
 struct bitstream;
-struct expression;
 struct dictionary;
+struct expr;
 
 using accumulation_function = void (operation&, dictionary&);
 
 using sourcecode = std::list<operation>;
 
 //
-// expression
-
-using _expression = std::list<std::string>;
-
-struct expression : _expression {
-	using _expression::_expression;
-	expression expand(const value_type&,const dictionary&) const;
-	std::string str() const;
-	void parens();
-	void append(const expression&);
-};
+// expr
 
 struct expr {
 
@@ -45,18 +35,20 @@ struct expr {
 
 	expr_type type;
 
-	std::string str() const;
-
 	expr();
 	expr(int);
 	expr(const expr&);
 	expr(const std::string&);
+
+	std::string str() const;
+
+	expr expand(const dictionary::key_type&,const dictionary&) const;
 };
 
 //
 // dictionary
 
-using _dictionary = std::map<std::string,expression>;
+using _dictionary = std::map<std::string,expr>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
