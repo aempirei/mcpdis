@@ -102,6 +102,7 @@ namespace pic12f {
 		std::string f = register_name(o.args.value('f'));
 
 		expr& F = c.touch(f);
+
 		expr e(name);
 
 		e.args.push_back(k);
