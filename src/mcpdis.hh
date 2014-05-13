@@ -22,6 +22,17 @@ using accumulation_function = void (operation&, dictionary&);
 using sourcecode = std::list<operation>;
 
 //
+// dictionary
+
+using _dictionary = std::map<std::string,expr>;
+
+struct dictionary : _dictionary {
+	using _dictionary::_dictionary;
+	bool has_key(const key_type&) const;
+	dictionary::mapped_type& touch(const key_type&);
+};
+
+//
 // expr
 
 struct expr {
@@ -39,22 +50,11 @@ struct expr {
 	expr(unsigned long);
 	expr(const expr&);
 	expr(const std::string&);
-	expr(const std::string&, const std::list<expr>&);
+	template<class T> expr(const std::string&, std::initializer_list<T>);
 
 	std::string str() const;
 
-	expr expand(const std::string&,const dictionary&) const;
-};
-
-//
-// dictionary
-
-using _dictionary = std::map<std::string,expr>;
-
-struct dictionary : _dictionary {
-	using _dictionary::_dictionary;
-	bool has_key(const key_type&) const;
-	expr& touch(const key_type&);
+	expr expand(const dictionary::key_type&,const dictionary&) const;
 };
 
 //

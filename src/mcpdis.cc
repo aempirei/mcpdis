@@ -15,10 +15,12 @@ namespace pic12f {
 		std::string f = register_name(o.args.value('f'));
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 
-		const expr& W = c.touch("W");
-		const expr& F = c.touch(f);
+		expr e(name);
 
-		c[d] = expr(name, { F, W });
+		e.args.push_back( c.touch(f) );
+		e.args.push_back( c.touch("W") );
+
+		c[d] = e;
 	}
 
 	void e_function(expr e, operation& o, dictionary& c) {
@@ -26,9 +28,7 @@ namespace pic12f {
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
 
-		const expr& F = c.touch(f);
-
-		e.args.push_back(F);
+		e.args.push_back( c.touch(f) );
 
 		c[d] = e;
 	}
@@ -41,7 +41,12 @@ namespace pic12f {
 
 		expr& W = c.touch("W");
 
-		W = expr(name, { o.args.value('k'), W });
+		expr e(name);
+
+		e.args.push_back( o.args.value('k') );
+		e.args.push_back(W);
+
+		W = e;
 	}
 
 	F(RETURN) {
@@ -381,7 +386,7 @@ expr::expr(const expr& r) : prefix(r.prefix), value(r.value), args(r.args), type
 expr::expr(const std::string& my_prefix) : prefix(my_prefix), type(expr_type::symbol) {
 }
 
-expr::expr(const std::string& my_prefix, const std::list<expr>& my_args) : prefix(my_prefix), args(my_args) {
+template<class T> expr::expr(const std::string& my_prefix, std::initializer_list<T> my_args) : prefix(my_prefix), args(my_args) {
 }
 
 std::string expr::str() const {
@@ -411,7 +416,7 @@ std::string expr::str() const {
 	return ss.str();
 }
 
-expr expr::expand(const std::string&,const dictionary&) const {
+expr expr::expand(const dictionary::key_type&,const dictionary&) const {
 
 	expr e(*this);
 
@@ -422,13 +427,13 @@ expr expr::expand(const std::string&,const dictionary&) const {
 // struct dictionary
 //
 
-bool dictionary::has_key(const key_type& s) const {
+bool dictionary::has_key(const dictionary::key_type& s) const {
 	return (find(s) != end());
 }
 
-expr& dictionary::touch(const key_type& s) {
+dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
 	if(!has_key(s))
-		operator[](s) = expr(s);
+		operator[](s) = dictionary::mapped_type(s);
 	return at(s);
 }
 
