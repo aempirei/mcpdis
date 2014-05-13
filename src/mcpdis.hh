@@ -39,6 +39,7 @@ struct expr {
 	expr(int);
 	expr(const expr&);
 	expr(const std::string&);
+	expr(const std::string&, const std::list<expr>&);
 
 	std::string str() const;
 

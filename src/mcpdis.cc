@@ -29,7 +29,7 @@ namespace pic12f {
 		c[d] = e;
 	}
 
-	void f_function(std::string name, operation& o, dictionary& c) {
+	void e_function(expr e, operation& o, dictionary& c) {
 
 		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
 		std::string f = register_name(o.args.value('f'));
@@ -38,11 +38,16 @@ namespace pic12f {
 
 		const expr& F = c.at(f);
 
-		expr e(name);
-
 		e.args.push_back(F);
 
 		c[d] = e;
+	}
+
+	void f_function(std::string name, operation& o, dictionary& c) {
+
+		expr e(name);
+
+		e_function(expr(name), o, c);
 	}
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
@@ -106,9 +111,13 @@ namespace pic12f {
 		c[d] = c.at(f);
 	}
 
+
+	G(DECF)  { expr e("-", { expr(1) }); e_function(e, o, c); }
+	G(INCF)  { expr e("+", { expr(1) }); e_function(e, o, c); }
+
+	// G(DECF)  { f_function("--", o, c); }
+	// G(INCF)  { f_function("++", o, c); }
 	G(COMF)  { f_function("~" , o, c); }
-	G(DECF)  { f_function("--", o, c); }
-	G(INCF)  { f_function("++", o, c); }
 	G(RRF)   { f_function("!>", o, c); }
 	G(RLF)   { f_function("<!", o, c); }
 	G(SWAPF) { f_function("><", o, c); }
@@ -398,6 +407,9 @@ expr::expr(const expr& r) : prefix(r.prefix), value(r.value), args(r.args), type
 }
 
 expr::expr(const std::string& my_prefix) : prefix(my_prefix), type(expr_type::symbol) {
+}
+
+expr::expr(const std::string& my_prefix, const std::list<expr>& my_args) : prefix(my_prefix), args(my_args) {
 }
 
 std::string expr::str() const {
