@@ -9,54 +9,54 @@
 
 namespace pic12f {
 
-	void e_function(expr e, operation& o, dictionary& c) {
+	std::string load_d(operation& o) {
+		return dest_string(o.args.value('d'), o.args.value('f'));
+	}
 
-		std::string f = register_name(o.args.value('f'));
-		std::string d = dest_string(o.args.value('d'), o.args.value('f'));
+	std::string load_f(operation& o) {
+		return register_name(o.args.value('f'));
+	}
 
-		expr& F = c.touch(f);
+	unsigned long load_k(operation& o) {
+		return o.args.value('k');
+	}
 
-		e.args.push_front(F);
+	void function0(std::string name, std::string l, std::string r, dictionary& c) {
+		c[l] = expr(name, { c.touch(r) });
+	}
 
-		c[d] = e;
+
+	void function1(std::string name, std::string l, unsigned long k, std::string r, dictionary& c) {
+		c[l] = expr(name, { c.touch(r), k });
+	}
+
+	void function2(std::string name, std::string l, std::string r1, std::string r2, dictionary& c) {
+		c[l] = expr(name, { c.touch(r1), c.touch(r2) });
 	}
 
 	void k_function(std::string name, std::string d, unsigned long k, dictionary& c) {
-		
-		expr& D = c.touch(d);
-
-		D = expr(name, { k, D });
+		function1(name, d, k, d, c);
 	}
 
 	void l_function(std::string name, std::string d, operation& o, dictionary& c) {
-
-		unsigned long k = o.args.value('k');
-
-		k_function(name, d, k, c);
+		function1(name, d, load_k(o), d, c);
 	}
 
 	void f_function(std::string name, operation& o, dictionary& c) {
-		e_function(expr(name), o, c);
+		function0(name, load_d(o), load_f(o), c);
 	}
 
 	void wf_function(std::string name, operation& o, dictionary& c) {
-
-		expr& W = c.touch("W");
-
-		e_function(expr(name, { W }), o, c);
+		function2(name, load_d(o), load_f(o), "W", c);
 	}
 
 
 	void lw_function(std::string name, operation& o, dictionary& c) {
-
 		l_function(name, "W", o, c);
 	}
 
 	void bxf_function(std::string name, unsigned long k, operation& o, dictionary& c) {
-
-		std::string f = register_name(o.args.value('f'));
-
-		k_function(name, f, k, c);
+		k_function(name, load_f(o), k, c);
 	}
 
 #define FN(a) void a(operation&, dictionary&)
@@ -107,8 +107,12 @@ namespace pic12f {
 		c[d] = c.touch(f);
 	}
 
-	GN(DECF)  { e_function( expr("-", { 1 }), o, c); }
-	GN(INCF)  { e_function( expr("+", { 1 }), o, c); }
+#define LOAD_D std::string d = load_d(o)
+#define LOAD_F std::string f = load_f(o)
+#define LOAD_K unsigned long k = load_k(o)
+
+	GN(DECF) { LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f), 1 }); }
+	GN(INCF) { LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f), 1 }); }
 
 	GN(COMF)  { f_function("~" , o, c); }
 	GN(RRF)   { f_function("!>", o, c); }
