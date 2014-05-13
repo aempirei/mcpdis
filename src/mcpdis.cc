@@ -435,26 +435,6 @@ expr expr::expand(const std::string&,const dictionary&) const {
 }
 
 //
-// struct expression
-//
-
-//expression expression::expand(const value_type& s, const dictionary& d) const {
-//
-//	expression e;
-//
-//	expression sub = d.at(s);
-//
-//	for(auto iter = begin(); iter != end(); iter++) {
-//		if(s == *iter)
-//			e.insert(e.end(), sub.begin(), sub.end());
-//		else
-//			e.push_back(*iter);
-//	}
-//
-//	return e;
-//}
-
-//
 // struct dictionary
 //
 

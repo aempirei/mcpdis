@@ -262,7 +262,9 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : d) {
 				if(k.second.type == expr::expr_type::symbol && k.second.args.empty() && k.second.prefix == k.first) {
+
 					// do nothing for identity
+
 				} else {
 					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first;
 					std::cout << " := " << k.second.str() << std::endl;
