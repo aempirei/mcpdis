@@ -34,6 +34,13 @@ struct expression : _expression {
 	void append(const expression&);
 };
 
+struct expr {
+	std::string value;
+	std::vector<expr> args;
+	enum class expr_type { function, symbol, literal };
+	expr_type type;
+};
+
 //
 // dictionary
 
