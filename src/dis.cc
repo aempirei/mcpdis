@@ -270,9 +270,12 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					std::string sexpr1 = k.second.str();
 					std::string sexpr2 = k.second.optimize().str();
 
-					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first << " := " << sexpr1 << std::endl;
-					if(sexpr1 != sexpr2)
-						std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << ' ' << " := " << sexpr2 << std::endl;
+					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first << " := " << sexpr2 << std::endl;
+					if(sexpr1 != sexpr2) {
+						std::cout << "\033[1;33m";
+						std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << ' ' << " := " << sexpr2;
+						std::cout << "\033[0m" << std::endl;
+					}
 				}
 			}
 		}
