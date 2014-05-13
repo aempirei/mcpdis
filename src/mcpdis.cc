@@ -25,44 +25,6 @@ namespace pic12f {
 		return 1 << o.args.value('b');
 	}
 
-	void function0(std::string name, std::string l, std::string r, dictionary& c) {
-		c[l] = expr(name, { c.touch(r) });
-	}
-
-
-	void function1(std::string name, std::string l, unsigned long k, std::string r, dictionary& c) {
-		c[l] = expr(name, { c.touch(r), k });
-	}
-
-	void function2(std::string name, std::string l, std::string r1, std::string r2, dictionary& c) {
-		c[l] = expr(name, { c.touch(r1), c.touch(r2) });
-	}
-
-	void k_function(std::string name, std::string d, unsigned long k, dictionary& c) {
-		function1(name, d, k, d, c);
-	}
-
-	void l_function(std::string name, std::string d, operation& o, dictionary& c) {
-		function1(name, d, load_k(o), d, c);
-	}
-
-	void f_function(std::string name, operation& o, dictionary& c) {
-		function0(name, load_d(o), load_f(o), c);
-	}
-
-	void wf_function(std::string name, operation& o, dictionary& c) {
-		function2(name, load_d(o), load_f(o), "W", c);
-	}
-
-
-	void lw_function(std::string name, operation& o, dictionary& c) {
-		l_function(name, "W", o, c);
-	}
-
-	void bxf_function(std::string name, unsigned long k, operation& o, dictionary& c) {
-		k_function(name, load_f(o), k, c);
-	}
-
 #define FN(a) void a(operation&, dictionary&)
 #define GN(a) void a(operation&o, dictionary&c)
 
@@ -72,80 +34,57 @@ namespace pic12f {
 #define LOAD_K unsigned long k = load_k(o)
 #define LOAD_B uint8_t b = load_b(o)
 
-	FN(RETURN) {
-		// implement call return
-		throw std::runtime_error(std::string("RETURN overwrites program counter"));
-	}
+	FN(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
+	FN(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
 
-	FN(RETFIE) {
-		// implement return from interrupt
-		throw std::runtime_error(std::string("RETFIE overwrites program counter"));
-	}
+	FN(SLEEP)  { /* put microcontroller to sleep */ }
+	FN(CLRWDT) { /* clear watchdog timer */         } 
+	FN(NOP)    { /* no operation */                 }
 
-	FN(SLEEP) {
-		// put microcontroller to sleep
-	}
+	GN(CLR)    { LOAD_D;                 c[d] = 0;                                      }
+	GN(MOVWF)  { LOAD_W; LOAD_F;         c[f] = c.touch(w);                             }
+	GN(MOVF)   { LOAD_D; LOAD_F;         c[d] = c.touch(f);                             }
 
-	FN(CLRWDT) {
-		// clear watchdog timer
-	}
+	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("|", { c.touch(f) , c.touch(w) }); }
+	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("&", { c.touch(f) , c.touch(w) }); }
+	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("^", { c.touch(f) , c.touch(w) }); }
+	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f) , c.touch(w) }); }
+	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f) , c.touch(w) }); }
 
-	FN(NOP) {
-		// no operation
-	}
+	GN(DECF)   { LOAD_D; LOAD_F;         c[d] = expr("-" , { c.touch(f), 1          }); }
+	GN(INCF)   { LOAD_D; LOAD_F;         c[d] = expr("+" , { c.touch(f), 1          }); }
 
-	GN(CLR)   { LOAD_D; c[d] = 0; }
+	GN(COMF)   { LOAD_D; LOAD_F;         c[d] = expr("~" , { c.touch(f)             }); }
+	GN(RRF)    { LOAD_D; LOAD_F;         c[d] = expr("!>", { c.touch(f)             }); }
+	GN(RLF)    { LOAD_D; LOAD_F;         c[d] = expr("<!", { c.touch(f)             }); }
+	GN(SWAPF)  { LOAD_D; LOAD_F;         c[d] = expr("><", { c.touch(f)             }); }
 
-	GN(MOVWF) { LOAD_W; LOAD_F; c[f] = c.touch(w); }
-
-	GN(IORWF) { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("|", { c.touch(f), c.touch(w) }); }
-	GN(ANDWF) { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("&", { c.touch(f), c.touch(w) }); }
-	GN(XORWF) { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("^", { c.touch(f), c.touch(w) }); }
-	GN(SUBWF) { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f), c.touch(w) }); }
-	GN(ADDWF) { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f), c.touch(w) }); }
-
-	GN(MOVF) { LOAD_D; LOAD_F; c[d] = c.touch(f); }
-
-	GN(DECF) { LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f), 1 }); }
-	GN(INCF) { LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f), 1 }); }
-
-	GN(COMF)  { LOAD_D; LOAD_F; c[d] = expr("~" , { c.touch(f) }); }
-	GN(RRF)   { LOAD_D; LOAD_F; c[d] = expr("!>", { c.touch(f) }); }
-	GN(RLF)   { LOAD_D; LOAD_F; c[d] = expr("<!", { c.touch(f) }); }
-	GN(SWAPF) { LOAD_D; LOAD_F; c[d] = expr("><", { c.touch(f) }); }
-
-	GN(BCF) { LOAD_F; LOAD_B; b = ~b; c[f] = expr("&", { b, c.touch(f) }); }
-	GN(BSF) { LOAD_F; LOAD_B;         c[f] = expr("|", { b, c.touch(f) }); } 
+	GN(BCF)    { LOAD_F; LOAD_B; b = ~b; c[f] = expr("&" , { b         , c.touch(f) }); }
+	GN(BSF)    { LOAD_F; LOAD_B;         c[f] = expr("|" , { b         , c.touch(f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
+	FN(BTFSC)  { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification" )); }
+	FN(BTFSS)  { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification" )); }
+	FN(CALL)   { throw std::runtime_error(std::string("CALL overwrites program counter"                         )); }
+	FN(GOTO)   { throw std::runtime_error(std::string("GOTO overwrites program counter"                         )); }
 
-	FN(BTFSC) { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification")); }
-	FN(BTFSS) { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification")); }
+	GN(MOVLW)  { LOAD_K; LOAD_W;         c[w] = k;                                      }
 
-	FN(CALL) { throw std::runtime_error(std::string("CALL overwrites program counter")); }
-	FN(GOTO) { throw std::runtime_error(std::string("GOTO overwrites program counter")); }
+	GN(RETLW)  { MOVLW(o, c); throw std::runtime_error("RETLW overwrites program counter"); }
 
-	GN(MOVLW) { LOAD_K; LOAD_W; c[w] = k; }
+	GN(IORLW)  { LOAD_K; LOAD_W;         c[w] = expr("|", { k          , c.touch(w) }); }
+	GN(ANDLW)  { LOAD_K; LOAD_W;         c[w] = expr("&", { k          , c.touch(w) }); }
+	GN(XORLW)  { LOAD_K; LOAD_W;         c[w] = expr("^", { k          , c.touch(w) }); }
+	GN(SUBLW)  { LOAD_K; LOAD_W;         c[w] = expr("-", { k          , c.touch(w) }); }
+	GN(ADDLW)  { LOAD_K; LOAD_W;         c[w] = expr("+", { k          , c.touch(w) }); }
 
-	GN(RETLW) {
-		MOVLW(o, c);
-		// FIXME: add program counter PCL/ATH adjustment
-		throw std::runtime_error("RETLW overwrites program counter");
-	}
-
-	GN(IORLW) { LOAD_K; LOAD_W; c[w] = expr("|", { k, c.touch(w) }); }
-	GN(ANDLW) { LOAD_K; LOAD_W; c[w] = expr("&", { k, c.touch(w) }); }
-	GN(XORLW) { LOAD_K; LOAD_W; c[w] = expr("^", { k, c.touch(w) }); }
-	GN(SUBLW) { LOAD_K; LOAD_W; c[w] = expr("-", { k, c.touch(w) }); }
-	GN(ADDLW) { LOAD_K; LOAD_W; c[w] = expr("+", { k, c.touch(w) }); }
-
-	FN(Z)  { throw std::runtime_error("STATUS<Z> zero flag unimplemented"            ); }
-	FN(C)  { throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
-	FN(DC) { throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
-	FN(PD) { throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
-	FN(TO) { throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
-	FN(PC) { throw std::runtime_error("PCL/PCLATH (PC) program counter unimplemented"); }
+	FN(Z)      { throw std::runtime_error("STATUS<Z> zero flag unimplemented"            ); }
+	FN(C)      { throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
+	FN(DC)     { throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
+	FN(PD)     { throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
+	FN(TO)     { throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
+	FN(PC)     { throw std::runtime_error("PCL/PCLATH (PC) program counter unimplemented"); }
 
 #undef LOAD_D
 #undef LOAD_F
