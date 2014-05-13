@@ -50,7 +50,7 @@ struct expr {
 	expr(unsigned long);
 	expr(const expr&);
 	expr(const std::string&);
-	template<class T> expr(const std::string&, std::initializer_list<T>);
+	expr(const std::string&, std::initializer_list<expr>);
 
 	std::string str() const;
 
