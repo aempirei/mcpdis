@@ -112,11 +112,9 @@ namespace pic12f {
 	}
 
 
-	G(DECF)  { expr e("-", { expr(1) }); e_function(e, o, c); }
-	G(INCF)  { expr e("+", { expr(1) }); e_function(e, o, c); }
+	G(DECF)  { e_function( expr("-", { expr(1) }), o, c); }
+	G(INCF)  { e_function( expr("+", { expr(1) }), o, c); }
 
-	// G(DECF)  { f_function("--", o, c); }
-	// G(INCF)  { f_function("++", o, c); }
 	G(COMF)  { f_function("~" , o, c); }
 	G(RRF)   { f_function("!>", o, c); }
 	G(RLF)   { f_function("<!", o, c); }
