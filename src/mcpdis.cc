@@ -68,6 +68,7 @@ namespace pic12f {
 
 #define LOAD_D std::string d = load_d(o)
 #define LOAD_F std::string f = load_f(o)
+#define LOAD_B uint8_t b = load_b(o)
 #define LOAD_K unsigned long k = load_k(o)
 
 	FN(RETURN) {
@@ -111,15 +112,8 @@ namespace pic12f {
 	GN(RLF)   { LOAD_D; LOAD_F; c[d] = expr("<!", { c.touch(f) }); }
 	GN(SWAPF) { LOAD_D; LOAD_F; c[d] = expr("><", { c.touch(f) }); }
 
-	GN(BCF)   {
-		uint8_t k = ~load_b(o);
-		bxf_function("&", k, o, c);
-	}
-
-	GN(BSF) {
-		uint8_t k = load_b(o);
-		bxf_function("|", k, o, c);
-	}
+	GN(BCF) { LOAD_F; LOAD_B; b = ~b; c[f] = expr("&", { b, c.touch(f) }); }
+	GN(BSF) { LOAD_F; LOAD_B;         c[f] = expr("|", { b, c.touch(f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
@@ -167,6 +161,7 @@ namespace pic12f {
 
 #undef LOAD_D
 #undef LOAD_F
+#undef LOAD_B
 #undef LOAD_K
 
 #undef FN
