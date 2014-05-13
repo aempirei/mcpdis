@@ -492,23 +492,62 @@ expr expr::optimize() const {
 
 	} else if(arity == UINT_MAX) {
 
-			expr e(prefix);
+		expr e(prefix);
 
-			for(const auto& arg : args) {
+		for(const auto& arg : args) {
 
-				expr sub = arg.optimize();
+			expr sub = arg.optimize();
 
-				if(sub.is_nonterminal() && sub.prefix == prefix) {
+			if(sub.is_nonterminal() && sub.prefix == prefix) {
 
-					for(const auto& subarg : sub.args)
-						e.args.push_back(subarg.optimize());
+				for(const auto& subarg : sub.args)
+					e.args.push_back(subarg.optimize());
 
-				} else {
-					e.args.push_back(sub);
-				}
+			} else {
+				e.args.push_back(sub);
 			}
+		}
 
-			return e;
+		// literals
+
+		expr ee(prefix);
+
+		unsigned long aggregated_literal = 0;
+
+		bool literal_set = false;
+
+		for(const auto& arg : e.args) {
+
+			if(arg.type == expr_type::literal) {
+
+				if(literal_set) {
+					if(prefix == "+") {
+						aggregated_literal += arg.value;
+					} else if(prefix  == "^") {
+						aggregated_literal ^= arg.value;
+					} else if(prefix  == "|") {
+						aggregated_literal |= arg.value;
+					} else if(prefix  == "&") {
+						aggregated_literal &= arg.value;
+					} else {
+						throw std::runtime_error("unknown n-ary operator");
+					}
+				} else {
+					literal_set = true;
+					aggregated_literal = arg.value;
+				} 
+
+			} else {
+				ee.args.push_back(arg);
+			}
+		}
+
+		if(literal_set)
+			ee.args.push_front(aggregated_literal);
+
+		// if the n-ary operator has only 1 parameter, then drop the operator
+
+		return (ee.args.size() == 1) ? ee.args.front() : ee;
 	}
 
 	expr e(prefix);
