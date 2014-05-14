@@ -33,6 +33,7 @@ namespace pic12f {
 #define LOAD_W const std::string w = "W"
 #define LOAD_K const unsigned long k = load_k(o)
 #define LOAD_B uint8_t b = load_b(o)
+#define LOAD_R(R) const std::string r = register_name(instruction::file_register::R)
 
 	FN(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
 	FN(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
