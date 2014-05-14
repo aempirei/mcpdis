@@ -13,6 +13,7 @@ namespace pic12f {
 
 #define FN(a)		void a(operation&, dictionary&)
 #define GN(a)		void a(operation&o, dictionary&c)
+#define HN(a)		void a(operation&, dictionary&c)
 
 #define LOAD_D		const std::string d = load_d(o)
 #define LOAD_F		const std::string f = load_f(o)
@@ -75,13 +76,35 @@ namespace pic12f {
 	GN(SUBLW)  { LOAD_K; LOAD_W;         c[w] = expr("-", { k          , c.touch(w) }); }
 	GN(ADDLW)  { LOAD_K; LOAD_W;         c[w] = expr("+", { k          , c.touch(w) }); }
 
-	FN(Z)      { if(false) throw std::runtime_error("STATUS<Z> zero flag unimplemented"            ); }
+	HN(Z)      {
+		LOAD_R(STATUS);
+		c.touch(STATUS);
+		c[STATUS] = expr("&", { (uint8_t)~instruction::flags::Z, c[STATUS] });
+		c[STATUS] = expr("|", { (uint8_t) instruction::flags::Z, c[STATUS] });
+	}
+
 	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
 	FN(DC)     { if(false) throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
 	FN(PD)     { if(false) throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
 	FN(TO)     { if(false) throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
 
 	GN(PC)     { LOAD_PC; LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = (uint8_t)pc; c[PCLATH] = (uint8_t)(pc >> 8); }
+
+	FN(finalize) { /* update any registers and anything that happens not under direct control of program flow, such as GPIO. */ }
+
+	void power(dictionary& c) {
+
+		/* fix these for actual power on values */
+		
+		LOAD_R(PCL)   ; c[PCL]    = 0;
+		LOAD_R(STATUS); c[STATUS] = 0;
+		LOAD_R(PCLATH); c[PCLATH] = 0;
+		LOAD_R(INTCON); c[INTCON] = 0;
+		LOAD_R(PIR1)  ; c[PIR1]   = 0;
+		LOAD_R(T1CON) ; c[T1CON]  = 0;
+		LOAD_R(CMCON) ; c[CMCON]  = 0;
+		LOAD_R(ADCON0); c[ADCON0] = 0;
+	}
 
 #undef LOAD_D
 #undef LOAD_F
@@ -512,6 +535,9 @@ operation::operation(const std::string& my_s, unsigned long my_address, const in
 
 void operation::execute(dictionary& d) {
 
+	if(address == 0x000U)
+		pic12f::power(d);
+
 	opcode.fn(*this, d);
 
 	if(opcode.status & instruction::flags::Z)
@@ -531,4 +557,6 @@ void operation::execute(dictionary& d) {
 
 	if(opcode.pcl_type == instruction::pcl_types::normal)
 		pic12f::PC(*this, d);
+
+	pic12f::finalize(*this, d);
 }
