@@ -9,31 +9,26 @@
 
 namespace pic12f {
 
+#define OARG(X)		o.args.value(X)
+
+#define FN(a)		void a(operation&, dictionary&)
+#define GN(a)		void a(operation&o, dictionary&c)
+
+#define LOAD_D		const std::string d = load_d(o)
+#define LOAD_F		const std::string f = load_f(o)
+#define LOAD_W		const std::string w = "W"
+#define LOAD_K		const unsigned long k = OARG('k')
+#define LOAD_B		uint8_t b = (1 << OARG('b'))
+#define LOAD_R(R)	const std::string R = register_name(instruction::file_register::R)
+#define LOAD_PC		const unsigned long pc = o.address
+
 	std::string load_d(operation& o) {
-		return dest_string(o.args.value('d'), o.args.value('f'));
+		return dest_string(OARG('d'), OARG('f'));
 	}
 
 	std::string load_f(operation& o) {
-		return register_name(o.args.value('f'));
+		return register_name(OARG('f'));
 	}
-
-	unsigned long load_k(operation& o) {
-		return o.args.value('k');
-	}
-
-	uint8_t load_b(operation& o) {
-		return 1 << o.args.value('b');
-	}
-
-#define FN(a) void a(operation&, dictionary&)
-#define GN(a) void a(operation&o, dictionary&c)
-
-#define LOAD_D const std::string d = load_d(o)
-#define LOAD_F const std::string f = load_f(o)
-#define LOAD_W const std::string w = "W"
-#define LOAD_K const unsigned long k = load_k(o)
-#define LOAD_B uint8_t b = load_b(o)
-#define LOAD_R(R) const std::string r = register_name(instruction::file_register::R)
 
 	FN(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
 	FN(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
@@ -80,17 +75,21 @@ namespace pic12f {
 	GN(SUBLW)  { LOAD_K; LOAD_W;         c[w] = expr("-", { k          , c.touch(w) }); }
 	GN(ADDLW)  { LOAD_K; LOAD_W;         c[w] = expr("+", { k          , c.touch(w) }); }
 
-	FN(Z)      { throw std::runtime_error("STATUS<Z> zero flag unimplemented"            ); }
-	FN(C)      { throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
-	FN(DC)     { throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
-	FN(PD)     { throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
-	FN(TO)     { throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
-	FN(PC)     { throw std::runtime_error("PCL/PCLATH (PC) program counter unimplemented"); }
+	FN(Z)      { if(false) throw std::runtime_error("STATUS<Z> zero flag unimplemented"            ); }
+	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
+	FN(DC)     { if(false) throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
+	FN(PD)     { if(false) throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
+	FN(TO)     { if(false) throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
+
+	GN(PC)     { LOAD_PC; LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = (uint8_t)pc; c[PCLATH] = (uint8_t)(pc >> 8); }
 
 #undef LOAD_D
 #undef LOAD_F
-#undef LOAD_B
+#undef LOAD_W
 #undef LOAD_K
+#undef LOAD_B
+#undef LOAD_R
+#undef LOAD_PC
 
 #undef FN
 #undef GN
@@ -512,5 +511,24 @@ operation::operation(const std::string& my_s, unsigned long my_address, const in
 }
 
 void operation::execute(dictionary& d) {
+
 	opcode.fn(*this, d);
+
+	if(opcode.status & instruction::flags::Z)
+		pic12f::Z(*this, d);
+
+	if(opcode.status & instruction::flags::C)
+		pic12f::C(*this, d);
+
+	if(opcode.status & instruction::flags::DC)
+		pic12f::DC(*this, d);
+
+	if(opcode.status & instruction::flags::TO)
+		pic12f::TO(*this, d);
+
+	if(opcode.status & instruction::flags::PD)
+		pic12f::PD(*this, d);
+
+	if(opcode.pcl_type == instruction::pcl_types::normal)
+		pic12f::PC(*this, d);
 }
