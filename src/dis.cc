@@ -261,7 +261,8 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 			std::cout << std::endl;
 
 			for(const auto& k : d) {
-				if(k.second.type == expr::expr_type::symbol && k.second.args.empty() && k.second.prefix == k.first) {
+				if(k.second.is_function(k.first) && k.second.args.empty()) {
+						
 
 					// do nothing for identity
 

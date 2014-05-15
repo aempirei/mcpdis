@@ -40,26 +40,29 @@ struct expr {
 	std::string prefix;
 	unsigned long value;
 
-	enum class expr_type { symbol, literal };
+	enum class expr_type { literal, symbolic };
 
 	expr_type type;
 
-	std::list<expr> args;
+	using args_type = std::list<expr>;
+
+	args_type args;
 
 	expr();
 	expr(unsigned long);
 	expr(const expr&);
 	expr(const std::string&);
-	expr(const std::string&, std::initializer_list<expr>);
+	expr(const std::string&, const args_type&);
 
 	std::string str() const;
 
 	expr expand(const dictionary::key_type&,const dictionary&) const;
 	expr optimize() const;
+	expr flatten() const;
 
-	bool is_nullary() const;
-	bool is_nonterminal() const;
-	bool is_terminal() const;
+	template<class F> expr transform(F) const;
+
+	bool is_function(const std::string&) const;
 };
 
 //

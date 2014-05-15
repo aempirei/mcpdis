@@ -329,68 +329,89 @@ expr::expr(const expr& r) : prefix(r.prefix), value(r.value), type(r.type), args
 expr::expr(const std::string& my_prefix) : expr(my_prefix, {}) {
 }
 
-expr::expr(const std::string& my_prefix, std::initializer_list<expr> my_args) : prefix(my_prefix), type(expr_type::symbol), args(my_args) {
+expr::expr(const std::string& my_prefix, const args_type& my_args) : prefix(my_prefix), type(expr_type::symbolic), args(my_args) {
 }
 
 std::string expr::str() const {
 
 	std::stringstream ss;
 
-	if(type == expr_type::symbol) {
+	switch(type) {
 
-		if(args.empty()) {
+		case expr_type::symbolic:
+
+			if(!args.empty())
+				ss << '(';
 
 			ss << prefix;
-
-		} else {
-
-			ss << '(' << prefix;
 
 			for(const auto& sub : args)
 				ss << ' ' << sub.str();
 
-			ss << ')';
-		}
+			if(!args.empty())
+				ss << ')';
 
-	} else if(type == expr_type::literal) {
-		ss << std::dec << value;
+
+			break;
+
+		case expr_type::literal:
+
+			ss << std::dec << value;
+
+			break;
 	}
 
 	return ss.str();
 }
 
-bool expr::is_nullary() const {
-	return type == expr_type::symbol && args.empty();
-}
+expr expr::expand(const dictionary::key_type&,const dictionary&) const {
 
-bool expr::is_nonterminal() const {
-	return type == expr_type::symbol && !args.empty();
-}
-
-bool expr::is_terminal() const {
-	return type == expr_type::literal || is_nullary();
-}
-
-expr expr::expand(const dictionary::key_type& s,const dictionary& d) const {
-
-	if(type == expr_type::literal)
+	if(type != expr_type::symbolic)
 		return *this;
 
-	if(is_nullary())
-		return (prefix == s) ? d.at(s) : *this;
+	return *this;
+}
+
+bool expr::is_function(const std::string& s) const {
+	return type == expr_type::symbolic && prefix == s;
+}
+
+expr expr::flatten() const {
+
+	if(type != expr_type::symbolic)
+		return *this;
 
 	expr e(prefix);
 
-	for(const auto& arg : args)
-		e.args.push_back(arg.expand(s,d));
+	for(const auto& arg : args) {
+
+		if(arg.is_function(prefix)) {
+
+			expr sub_expr = arg.flatten();
+
+			for(const auto& sub_arg : sub_expr.args)
+				e.args.push_back(sub_arg);
+
+		} else {
+			e.args.push_back(arg);
+		}
+	}
 
 	return e;
 }
 
 expr expr::optimize() const {
 
-	if(is_terminal())
+	if(type != expr_type::symbolic)
 		return *this;
+
+	if(args.empty())
+		return *this;
+
+	expr::args_type dargs;
+
+	for(const auto& arg : args)
+		dargs.push_back(arg.optimize());
 
 	const std::list<std::string> unary = { "><", "~", "!>", "<!" };
 	const std::list<std::string> binary = { "-" };
@@ -399,10 +420,10 @@ expr expr::optimize() const {
 
 	for(const auto& op : unary) {
 		if(prefix == op) {
-			arity = args.size();
+			arity = dargs.size();
 			if(arity != 1) {
 				std::stringstream ss;
-				ss << "unary operator \"" << prefix << "\" has unexpected argument count of " << args.size();
+				ss << "unary operator \"" << prefix << "\" has unexpected argument count of " << dargs.size();
 				throw std::runtime_error(ss.str());
 			}
 		}
@@ -410,10 +431,10 @@ expr expr::optimize() const {
 
 	for(const auto& op : binary) {
 		if(prefix == op) {
-			arity = args.size();
+			arity = dargs.size();
 			if(arity != 2) {
 				std::stringstream ss;
-				ss << "binary operator \"" << prefix << "\" has unexpected argument count of " << args.size();
+				ss << "binary operator \"" << prefix << "\" has unexpected argument count of " << dargs.size();
 				throw std::runtime_error(ss.str());
 			}
 		}
@@ -421,90 +442,82 @@ expr expr::optimize() const {
 
 	if(arity == 1) {
 
-		if(args.front().is_nonterminal()) {
-			if(
-					(prefix == "><" && args.front().prefix == prefix) ||
-					(prefix == "~"  && args.front().prefix == prefix) ||
-					(prefix == "<!" && args.front().prefix == "!>"  ) ||
-					(prefix == "!>" && args.front().prefix == "<!"  )
-			  )
-			{
-				return args.front().args.front().optimize();
-			}
+		const expr& arg0 = dargs.front();
+
+		if(
+				(arg0.type == expr_type::symbolic)
+
+				&&
+
+				(
+				 (is_function("><") && arg0.is_function("><")) ||
+				 (is_function("~" ) && arg0.is_function("~" )) ||
+				 (is_function("<!") && arg0.is_function("!>")) ||
+				 (is_function("!>") && arg0.is_function("<!"))
+				)
+		  )
+		{
+			return arg0.args.front().optimize();
 		}
-		
-		// fall-thru
 
 	} else if(arity == 2) {
 
-		// do nothing
+		// nothing
 
 	} else if(arity == UINT_MAX) {
 
-		expr e(prefix);
-
-		for(const auto& arg : args) {
-
-			expr sub = arg.optimize();
-
-			if(sub.is_nonterminal() && sub.prefix == prefix) {
-
-				for(const auto& subarg : sub.args)
-					e.args.push_back(subarg.optimize());
-
-			} else {
-				e.args.push_back(sub);
-			}
-		}
-
 		// literals
 
-		expr ee(prefix);
+		args_type ddargs;
 
-		unsigned long aggregated_literal = 0;
+		unsigned long acc = 0;
+		int acc_count = 0;
 
-		bool literal_set = false;
-
-		for(const auto& arg : e.args) {
+		for(const auto& arg : dargs) {
 
 			if(arg.type == expr_type::literal) {
 
-				if(literal_set) {
+				if(acc_count++ == 0) {
+
+					acc = arg.value;
+
+				} else {
+
 					if(prefix == "+") {
-						aggregated_literal += arg.value;
-					} else if(prefix  == "^") {
-						aggregated_literal ^= arg.value;
-					} else if(prefix  == "|") {
-						aggregated_literal |= arg.value;
-					} else if(prefix  == "&") {
-						aggregated_literal &= arg.value;
+
+						acc += arg.value;
+
+					} else if(prefix == "^") {
+
+						acc ^= arg.value;
+
+					} else if(prefix == "|") {
+
+						acc |= arg.value;
+
+					} else if(prefix == "&") {
+
+						acc &= arg.value;
+
 					} else {
 						throw std::runtime_error("unknown n-ary operator");
 					}
-				} else {
-					literal_set = true;
-					aggregated_literal = arg.value;
 				} 
 
 			} else {
-				ee.args.push_back(arg);
+				ddargs.push_back(arg);
 			}
 		}
 
-		if(literal_set)
-			ee.args.push_front(aggregated_literal);
+		if(acc_count > 0)
+			ddargs.push_front(acc);
 
 		// if the n-ary operator has only 1 parameter, then drop the operator
 
-		return (ee.args.size() == 1) ? ee.args.front() : ee;
+		return (ddargs.size() == 1) ? ddargs.front() : expr(prefix, ddargs);
 	}
 
-	expr e(prefix);
-
-	for(const auto& arg : args)
-		e.args.push_back(arg.optimize());
-
-	return e;
+	return expr(prefix, dargs);
 }
 
 //
