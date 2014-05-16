@@ -130,14 +130,17 @@ struct instruction {
 
 		none = 0,
 
-		C   = 1 << 0,
-		DC  = 1 << 1,
-		Z   = 1 << 2,
-		PD  = 1 << 3,
-		TO  = 1 << 4,
-		RP0 = 1 << 5,
-		RP1 = 1 << 6,
-		IRP = 1 << 7,
+		C    = 1 << 0,
+		DC   = 1 << 1,
+		Z    = 1 << 2,
+		PD   = 1 << 3,
+		TO   = 1 << 4,
+		RP0  = 1 << 5,
+		RP1  = 1 << 6,
+		IRP  = 1 << 7,
+		
+		PEIE = 1 << 6,
+		GIE  = 1 << 7,
 
 		arithmetic = C | DC | Z,
 		power = TO | PD

@@ -247,20 +247,54 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 		
 		if(labels.find(iter->address) != labels.end()) {
 
-			dictionary d;
+			dictionary state;
 
-			std::cout << "vector_" << std::setw(2) << std::right << std::setfill('0') << n++ << " :";
+			std::cout << "vector_" << std::setw(2) << std::right << std::setfill('0') << n++ << " ";
 
-			for(auto jter = iter; jter != code.end() && jter->opcode.pcl_type == instruction::pcl_types::normal; jter++) {
+			std::stringstream range_ss;
+			std::stringstream opvector_ss;
 
-				jter->execute(d);
+			decltype(iter) jter;
 
-				std::cout << ' ' << address_string(jter->address);
+			for(jter = iter; jter != code.end() && jter->opcode.pcl_type == instruction::pcl_types::normal; jter++) {
+
+				jter->execute(state);
+
+				opvector_ss << ' ' << jter->opcode.name;
 			}
 
-			std::cout << std::endl;
+			if(jter != code.end()) {
 
-			for(const auto& k : d) {
+				opvector_ss << ' ' << jter->opcode.name;
+
+				switch(jter->opcode.pcl_type) {
+
+					case instruction::pcl_types::skip:
+
+						// jter->execute(state);
+						// TODO: handle branching
+						range_ss << "* ";
+						break;
+
+					case instruction::pcl_types::ret:
+					case instruction::pcl_types::jump:
+					case instruction::pcl_types::call:
+
+						jter->execute(state);
+						break;
+
+					case instruction::pcl_types::normal:
+
+						throw std::runtime_error("impossible");
+						break;
+				}
+			}
+
+			range_ss << address_string(iter->address) << '-' << address_string(jter->address);
+
+			std::cout << range_ss.str() << " : " << opvector_ss.str() << std::endl;
+
+			for(const auto& k : state) {
 				if(k.second.is_function(k.first) && k.second.args.empty()) {
 						
 
@@ -279,6 +313,8 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					}
 				}
 			}
+
+			std::cout << std::endl;
 		}
 	}
 }

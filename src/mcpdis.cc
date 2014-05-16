@@ -17,11 +17,16 @@ namespace pic12f {
 
 #define LOAD_D		const std::string d = load_d(o)
 #define LOAD_F		const std::string f = load_f(o)
-#define LOAD_W		const std::string w = "W"
+#define LOAD_W		const std::string W = "W"
+#define LOAD_STACK	const std::string STACK = "STACK"
 #define LOAD_K		const unsigned long k = OARG('k')
 #define LOAD_B		uint8_t b = (1 << OARG('b'))
 #define LOAD_R(R)	const std::string R = register_name(instruction::file_register::R)
 #define LOAD_PC		const unsigned long pc = o.address
+
+#define CLEAR_BIT(reg, mask) do{ LOAD_R(reg); c.touch(reg); c[reg] = expr("&", { (uint8_t)~(uint8_t)(mask), c[reg] }); }while(0)
+#define SET_BIT(reg, mask)   do{ LOAD_R(reg); c.touch(reg); c[reg] = expr("|", {           (uint8_t)(mask), c[reg] }); }while(0)
+
 
 	std::string load_d(operation& o) {
 		return dest_string(OARG('d'), OARG('f'));
@@ -31,22 +36,36 @@ namespace pic12f {
 		return register_name(OARG('f'));
 	}
 
-	FN(RETURN) { throw std::runtime_error(std::string("RETURN overwrites program counter")); }
-	FN(RETFIE) { throw std::runtime_error(std::string("RETFIE overwrites program counter")); }
+	HN(RETURN) { LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = expr("TOS.lo"); c[PCLATH] = expr("TOS.hi"); }
+	GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
 
 	FN(SLEEP)  { /* put microcontroller to sleep */ }
 	FN(CLRWDT) { /* clear watchdog timer */         } 
 	FN(NOP)    { /* no operation */                 }
 
-	GN(CLR)    { LOAD_D;                 c[d] = 0;                                      }
-	GN(MOVWF)  { LOAD_W; LOAD_F;         c[f] = c.touch(w);                             }
+	GN(CLR)    { LOAD_D;                 c[d] = 0; CLEAR_BIT(STATUS, instruction::flags::Z); }
+
+	GN(MOVWF)  { LOAD_W; LOAD_F;         c[f] = c.touch(W);                             }
 	GN(MOVF)   { LOAD_D; LOAD_F;         c[d] = c.touch(f);                             }
 
-	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("|", { c.touch(f) , c.touch(w) }); }
-	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("&", { c.touch(f) , c.touch(w) }); }
-	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("^", { c.touch(f) , c.touch(w) }); }
-	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f) , c.touch(w) }); }
-	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f) , c.touch(w) }); }
+	/*
+	{ "000001dfffffff", "CLR"   , pic12f::CLR   , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "000100dfffffff", "IORWF" , pic12f::IORWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "000101dfffffff", "ANDWF" , pic12f::ANDWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "000110dfffffff", "XORWF" , pic12f::XORWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "000010dfffffff", "SUBWF" , pic12f::SUBWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	{ "000111dfffffff", "ADDWF" , pic12f::ADDWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	{ "001000dfffffff", "MOVF"  , pic12f::MOVF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "001001dfffffff", "COMF"  , pic12f::COMF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "000011dfffffff", "DECF"  , pic12f::DECF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	{ "001010dfffffff", "INCF"  , pic12f::INCF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	*/
+	
+	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("|", { c.touch(f) , c.touch(W) }); }
+	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("&", { c.touch(f) , c.touch(W) }); }
+	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("^", { c.touch(f) , c.touch(W) }); }
+	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("-", { c.touch(f) , c.touch(W) }); }
+	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr("+", { c.touch(f) , c.touch(W) }); }
 
 	GN(DECF)   { LOAD_D; LOAD_F;         c[d] = expr("-" , { c.touch(f), 1          }); }
 	GN(INCF)   { LOAD_D; LOAD_F;         c[d] = expr("+" , { c.touch(f), 1          }); }
@@ -63,24 +82,28 @@ namespace pic12f {
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
 	FN(BTFSC)  { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification" )); }
 	FN(BTFSS)  { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification" )); }
-	FN(CALL)   { throw std::runtime_error(std::string("CALL overwrites program counter"                         )); }
-	FN(GOTO)   { throw std::runtime_error(std::string("GOTO overwrites program counter"                         )); }
 
-	GN(MOVLW)  { LOAD_K; LOAD_W;         c[w] = k;                                      }
+#define SET_PC(x) do{ LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = (uint8_t)(x); c[PCLATH] = (uint8_t)((x) >> 8); }while(0)
 
-	GN(RETLW)  { MOVLW(o, c); throw std::runtime_error("RETLW overwrites program counter"); }
+	GN(GOTO)   { LOAD_K; SET_PC(k); }
 
-	GN(IORLW)  { LOAD_K; LOAD_W;         c[w] = expr("|", { k          , c.touch(w) }); }
-	GN(ANDLW)  { LOAD_K; LOAD_W;         c[w] = expr("&", { k          , c.touch(w) }); }
-	GN(XORLW)  { LOAD_K; LOAD_W;         c[w] = expr("^", { k          , c.touch(w) }); }
-	GN(SUBLW)  { LOAD_K; LOAD_W;         c[w] = expr("-", { k          , c.touch(w) }); }
-	GN(ADDLW)  { LOAD_K; LOAD_W;         c[w] = expr("+", { k          , c.touch(w) }); }
+	GN(CALL)   { GOTO(o, c); LOAD_PC; LOAD_STACK; c[STACK] = expr(".", { pc + 1, c.touch(STACK) }); }
+
+	GN(MOVLW)  { LOAD_K; LOAD_W; c[W] = (uint8_t)k; }
+
+	GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
+
+	GN(IORLW)  { LOAD_K; LOAD_W; c[W] = expr("|", { k, c.touch(W) }); }
+	GN(ANDLW)  { LOAD_K; LOAD_W; c[W] = expr("&", { k, c.touch(W) }); }
+	GN(XORLW)  { LOAD_K; LOAD_W; c[W] = expr("^", { k, c.touch(W) }); }
+	GN(SUBLW)  { LOAD_K; LOAD_W; c[W] = expr("-", { k, c.touch(W) }); }
+	GN(ADDLW)  { LOAD_K; LOAD_W; c[W] = expr("+", { k, c.touch(W) }); }
 
 	HN(Z)      {
 		LOAD_R(STATUS);
 		c.touch(STATUS);
 		c[STATUS] = expr("&", { (uint8_t)~instruction::flags::Z, c[STATUS] });
-		c[STATUS] = expr("|", { (uint8_t) instruction::flags::Z, c[STATUS] });
+		c[STATUS] = expr("|", { expr("Z"), c[STATUS] });
 	}
 
 	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
@@ -88,7 +111,7 @@ namespace pic12f {
 	FN(PD)     { if(false) throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
 	FN(TO)     { if(false) throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
 
-	GN(PC)     { LOAD_PC; LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = (uint8_t)pc; c[PCLATH] = (uint8_t)(pc >> 8); }
+	GN(PC)     { LOAD_PC; SET_PC(pc); }
 
 	FN(finalize) { /* update any registers and anything that happens not under direct control of program flow, such as GPIO. */ }
 
@@ -356,7 +379,7 @@ std::string expr::str() const {
 
 		case expr_type::literal:
 
-			ss << std::dec << value;
+			ss << std::showbase << std::hex << value;
 
 			break;
 	}
@@ -410,8 +433,12 @@ expr expr::optimize() const {
 
 	expr::args_type dargs;
 
-	for(const auto& arg : args)
-		dargs.push_back(arg.optimize());
+	if(prefix == "&" || prefix == "|" || prefix == "^" || prefix == "+")
+		for(const auto& arg : flatten().args)
+			dargs.push_back(arg.optimize());
+	else
+		for(const auto& arg : args)
+			dargs.push_back(arg.optimize());
 
 	const std::list<std::string> unary = { "><", "~", "!>", "<!" };
 	const std::list<std::string> binary = { "-" };
@@ -440,6 +467,10 @@ expr expr::optimize() const {
 		}
 	}
 
+	if(is_function(".")) {
+		return flatten();
+	}
+
 	if(arity == 1) {
 
 		const expr& arg0 = dargs.front();
@@ -466,55 +497,90 @@ expr expr::optimize() const {
 
 	} else if(arity == UINT_MAX) {
 
-		// literals
-
 		args_type ddargs;
 
-		unsigned long acc = 0;
+		uint8_t acc = (prefix == "&") ? ~0 : 0;
 		int acc_count = 0;
 
 		for(const auto& arg : dargs) {
 
 			if(arg.type == expr_type::literal) {
 
-				if(acc_count++ == 0) {
+				acc_count++;
 
-					acc = arg.value;
+				if(prefix == "+") {
+
+					acc += arg.value;
+
+				} else if(prefix == "^") {
+
+					acc ^= arg.value;
+
+				} else if(prefix == "|") {
+
+					acc |= arg.value;
+
+				} else if(prefix == "&") {
+
+					acc &= arg.value;
 
 				} else {
 
-					if(prefix == "+") {
-
-						acc += arg.value;
-
-					} else if(prefix == "^") {
-
-						acc ^= arg.value;
-
-					} else if(prefix == "|") {
-
-						acc |= arg.value;
-
-					} else if(prefix == "&") {
-
-						acc &= arg.value;
-
-					} else {
-						throw std::runtime_error("unknown n-ary operator");
-					}
-				} 
+					throw std::runtime_error("unknown n-ary operator");
+				}
 
 			} else {
 				ddargs.push_back(arg);
 			}
 		}
 
-		if(acc_count > 0)
+		if(acc_count == 0) {
+
+			return expr(prefix, ddargs).flatten();
+
+		} else {
+			if(ddargs.size() == 0) {
+
+				return expr(acc);
+
+			} else if(ddargs.size() == 1) {
+
+				if(is_function("|") || is_function("&")) {
+
+					expr rarg = ddargs.front().optimize();
+
+					if(!rarg.args.empty() && (rarg.prefix == "|" || rarg.prefix == "&")) {
+
+						expr re(rarg.prefix);
+
+						for(const auto& sub_rarg : rarg.args) {
+
+							expr re_sub(prefix, { acc, sub_rarg });
+
+							re_sub = re_sub.optimize();
+
+							if(re_sub.type == expr_type::literal && re_sub.value == 0 && rarg.prefix == "|") {
+								// nothing
+							} else if(re_sub.type == expr_type::literal && re_sub.value == 255 && rarg.prefix == "&") {
+								// nothing
+							} else {
+								re.args.push_back( re_sub );
+							}
+						}
+
+						if(re.args.size() == 1)
+							return re.args.front();
+
+						return re.flatten();
+					}
+
+				}
+			}
+
 			ddargs.push_front(acc);
+			return expr(prefix, ddargs);
 
-		// if the n-ary operator has only 1 parameter, then drop the operator
-
-		return (ddargs.size() == 1) ? ddargs.front() : expr(prefix, ddargs);
+		}
 	}
 
 	return expr(prefix, dargs);
