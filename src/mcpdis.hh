@@ -48,9 +48,9 @@ struct expression {
 
 	wchar_t op;
 
-	enum class expr_type { literal, variable, function };
+	enum class expression_type { literal, variable, function };
 
-	expr_type type;
+	expression_type type;
 
 	using args_type = std::list<expression>;
 
@@ -62,7 +62,7 @@ struct expression {
 
 	expression(unsigned long);
 	expression(const std::wstring&);
-	expression(wchar_t, std::initializer_list<expression>);
+	expression(wchar_t, const args_type&);
 
 	std::wstring wstr() const;
 
