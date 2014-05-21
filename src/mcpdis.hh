@@ -64,11 +64,11 @@ struct expression {
 
 	std::wstring wstr() const;
 
-	expression expand(const dictionary::key_type&,const dictionary&) const;
-	expression optimize() const;
-	expression flatten() const;
+	//expression expand(const dictionary::key_type&,const dictionary&) const;
+	//expression optimize() const;
+	//expression flatten() const;
 
-	template<class F> expression transform(F) const;
+	//template<class F> expression transform(F) const;
 
 	bool is_function(wchar_t) const;
 };

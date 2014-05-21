@@ -402,17 +402,17 @@ std::wstring expression::wstr() const {
 	return ws.str();
 }
 
+bool expression::is_function(wchar_t my_op) const {
+	return type == expr_type::function && op == my_op;
+}
 
+/*
 expression expression::expand(const dictionary::key_type&,const dictionary&) const {
 
 	if(type != expr_type::function)
 		return *this;
 
 	return *this;
-}
-
-bool expression::is_function(wchar_t my_op) const {
-	return type == expr_type::function && op == my_op;
 }
 
 expression expression::flatten() const {
@@ -439,8 +439,6 @@ expression expression::flatten() const {
 	return e;
 }
 
-
-/*
 expression expression::optimize() const {
 
 	if(type != expr_type::function)
