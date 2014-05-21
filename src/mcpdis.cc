@@ -15,18 +15,19 @@ namespace pic12f {
 #define GN(a)		void a(operation&o, dictionary&c)
 #define HN(a)		void a(operation&, dictionary&c)
 
-#define LOAD_D		const std::wstring d = load_d(o)
-#define LOAD_F		const std::wstring f = load_f(o)
-#define LOAD_W		const std::wstring W = L"W"
-#define LOAD_STACK	const std::wstring STACK = L"STACK"
-#define LOAD_K		const unsigned long k = OARG(L'k')
-#define LOAD_B		uint8_t b = (1 << OARG(L'b'))
-#define LOAD_R(R)	const std::wstring R = register_name(instruction::file_register::R)
-#define LOAD_PC		const unsigned long pc = o.address
+#define USE_B		reg_t b = (1 << OARG(L'b'))
+#define USE_W		const std::wstring W = L"W"
+#define USE_D		const std::wstring d = load_d(o)
+#define USE_F		const std::wstring f = load_f(o)
+#define USE_K		const unsigned long k = OARG(L'k')
+#define USE_PC		const unsigned long pc = o.address
+#define USE_REG(R)	const std::wstring R = register_name(instruction::file_register::R)
+#define USE_STACK	const std::wstring STACK = L"STACK"
 
-#define CLEAR_BIT(reg, mask) do{ LOAD_R(reg); c.touch(reg); c[reg] = expression(OP_AND, { (uint8_t)~(uint8_t)(mask), c[reg] }); }while(0)
-#define SET_BIT(reg, mask)   do{ LOAD_R(reg); c.touch(reg); c[reg] = expression(OP_OR , {           (uint8_t)(mask), c[reg] }); }while(0)
+#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); c.touch(reg); c[reg] = expression(OP_AND, { (reg_t)~(reg_t)(mask), c[reg] }); }while(0)
+#define SET_BIT(reg, mask)   do{ USE_REG(reg); c.touch(reg); c[reg] = expression(OP_OR , {           (reg_t)(mask), c[reg] }); }while(0)
 
+#define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = (reg_t)(x); c[PCLATH] = (reg_t)((x) >> 8); }while(0)
 
 	std::wstring load_d(operation& o) {
 		return dest_string(OARG(L'd'), OARG(L'f'));
@@ -36,74 +37,116 @@ namespace pic12f {
 		return register_name(OARG(L'f'));
 	}
 
-	HN(RETURN) { LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = expression(L"TOS.lo"); c[PCLATH] = expression(L"TOS.hi"); }
+	HN(RETURN) {
+
+		USE_REG(PCL);
+		USE_REG(PCLATH);
+
+		c[PCL] = expression(L"TOS.lo");
+		c[PCLATH] = expression(L"TOS.hi");
+	}
+
 	GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
 
 	FN(SLEEP)  { /* put microcontroller to sleep */ }
 	FN(CLRWDT) { /* clear watchdog timer */         } 
 	FN(NOP)    { /* no operation */                 }
 
-	GN(CLR)    { LOAD_D;                 c[d] = 0; CLEAR_BIT(STATUS, instruction::flags::Z); }
+	GN(MOVWF)  {
 
-	GN(MOVWF)  { LOAD_W; LOAD_F;         c[f] = c.touch(W);                             }
-	GN(MOVF)   { LOAD_D; LOAD_F;         c[d] = c.touch(f);                             }
+		USE_W;
+		USE_F; 
+
+		c[f] = c.touch(W);  
+	}
+
+
+	GN(CLR)    {
+
+		USE_D;
+
+		c[d] = 0;
+
+		USE_REG(STATUS);
+
+		expression& reg = c.touch(STATUS);
+
+		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
+	}
 
 	/*
-	{ "000001dfffffff", "CLR"   , pic12f::CLR   , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "000100dfffffff", "IORWF" , pic12f::IORWF , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "000101dfffffff", "ANDWF" , pic12f::ANDWF , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "000110dfffffff", "XORWF" , pic12f::XORWF , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "000010dfffffff", "SUBWF" , pic12f::SUBWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
-	{ "000111dfffffff", "ADDWF" , pic12f::ADDWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
-	{ "001000dfffffff", "MOVF"  , pic12f::MOVF  , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "001001dfffffff", "COMF"  , pic12f::COMF  , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "000011dfffffff", "DECF"  , pic12f::DECF  , instruction::pcl_types::normal, instruction::flags::Z          },
-	{ "001010dfffffff", "INCF"  , pic12f::INCF  , instruction::pcl_types::normal, instruction::flags::Z          },
-	*/
-	
-	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_OR   , { c.touch(f) , c.touch(W) }); }
-	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_AND  , { c.touch(f) , c.touch(W) }); }
-	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_XOR  , { c.touch(f) , c.touch(W) }); }
-	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_MINUS, { c.touch(f) , c.touch(W) }); }
-	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_PLUS , { c.touch(f) , c.touch(W) }); }
+	   { "000001dfffffff", "CLR"   , pic12f::CLR   , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "000100dfffffff", "IORWF" , pic12f::IORWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "000101dfffffff", "ANDWF" , pic12f::ANDWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "000110dfffffff", "XORWF" , pic12f::XORWF , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "000010dfffffff", "SUBWF" , pic12f::SUBWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	   { "000111dfffffff", "ADDWF" , pic12f::ADDWF , instruction::pcl_types::normal, instruction::flags::arithmetic },
+	   { "001000dfffffff", "MOVF"  , pic12f::MOVF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "001001dfffffff", "COMF"  , pic12f::COMF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "000011dfffffff", "DECF"  , pic12f::DECF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	   { "001010dfffffff", "INCF"  , pic12f::INCF  , instruction::pcl_types::normal, instruction::flags::Z          },
+	 */
 
-	GN(DECF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_MINUS, { c.touch(f), 1          }); }
-	GN(INCF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_PLUS , { c.touch(f), 1          }); }
+	GN(MOVF)   {
 
-	GN(COMF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_NOT  , { c.touch(f)             }); }
-	GN(RRF)    { LOAD_D; LOAD_F;         c[d] = expression(OP_ROTR , { c.touch(f)             }); }
-	GN(RLF)    { LOAD_D; LOAD_F;         c[d] = expression(OP_ROTL , { c.touch(f)             }); }
-	GN(SWAPF)  { LOAD_D; LOAD_F;         c[d] = expression(OP_SWAP , { c.touch(f)             }); }
+		USE_D;
+		USE_F;
 
-	GN(BCF)    { LOAD_F; LOAD_B; b = ~b; c[f] = expression(OP_AND  , { b         , c.touch(f) }); }
-	GN(BSF)    { LOAD_F; LOAD_B;         c[f] = expression(OP_OR   , { b         , c.touch(f) }); } 
+		c[d] = c.touch(f);
+
+		USE_REG(STATUS);
+
+		expression& reg = c.touch(STATUS);
+
+		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
+		reg = expression(OP_OR, { expression(L"Z"), reg });
+
+	}
+
+	GN(IORWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_OR   , { c.touch(f) , c.touch(W) }); }
+	GN(ANDWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_AND  , { c.touch(f) , c.touch(W) }); }
+	GN(XORWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_XOR  , { c.touch(f) , c.touch(W) }); }
+	GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_MINUS, { c.touch(f) , c.touch(W) }); }
+	GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_PLUS , { c.touch(f) , c.touch(W) }); }
+
+	GN(DECF)   { USE_D; USE_F;         c[d] = expression(OP_MINUS, { c.touch(f), 1          }); }
+	GN(INCF)   { USE_D; USE_F;         c[d] = expression(OP_PLUS , { c.touch(f), 1          }); }
+
+	GN(COMF)   { USE_D; USE_F;         c[d] = expression(OP_NOT  , { c.touch(f)             }); }
+	GN(RRF)    { USE_D; USE_F;         c[d] = expression(OP_ROTR , { c.touch(f)             }); }
+	GN(RLF)    { USE_D; USE_F;         c[d] = expression(OP_ROTL , { c.touch(f)             }); }
+	GN(SWAPF)  { USE_D; USE_F;         c[d] = expression(OP_SWAP , { c.touch(f)             }); }
+
+	GN(BCF)    { USE_F; USE_B; b = ~b; c[f] = expression(OP_AND  , { b         , c.touch(f) }); }
+	GN(BSF)    { USE_F; USE_B;         c[f] = expression(OP_OR   , { b         , c.touch(f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
 	FN(BTFSC)  { throw std::runtime_error(std::string("BTFSC performs conditional program counter modification" )); }
 	FN(BTFSS)  { throw std::runtime_error(std::string("BTFSS performs conditional program counter modification" )); }
 
-#define SET_PC(x) do{ LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = (uint8_t)(x); c[PCLATH] = (uint8_t)((x) >> 8); }while(0)
+	GN(GOTO)   { USE_K; SET_PC(k); }
 
-	GN(GOTO)   { LOAD_K; SET_PC(k); }
+	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = expression(OP_COMPOSE, { pc + 1, c.touch(STACK) }); }
 
-	GN(CALL)   { GOTO(o, c); LOAD_PC; LOAD_STACK; c[STACK] = expression(OP_COMPOSE, { pc + 1, c.touch(STACK) }); }
-
-	GN(MOVLW)  { LOAD_K; LOAD_W; c[W] = (uint8_t)k; }
+	GN(MOVLW)  { USE_K; USE_W; c[W] = (reg_t)k; }
 
 	GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-	GN(IORLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_OR   , { k, c.touch(W) }); }
-	GN(ANDLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_AND  , { k, c.touch(W) }); }
-	GN(XORLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_XOR  , { k, c.touch(W) }); }
-	GN(SUBLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_MINUS, { k, c.touch(W) }); }
-	GN(ADDLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_PLUS , { k, c.touch(W) }); }
+	GN(IORLW)  { USE_K; USE_W; c[W] = expression(OP_OR   , { k, c.touch(W) }); }
+	GN(ANDLW)  { USE_K; USE_W; c[W] = expression(OP_AND  , { k, c.touch(W) }); }
+	GN(XORLW)  { USE_K; USE_W; c[W] = expression(OP_XOR  , { k, c.touch(W) }); }
+	GN(SUBLW)  { USE_K; USE_W; c[W] = expression(OP_MINUS, { k, c.touch(W) }); }
+	GN(ADDLW)  { USE_K; USE_W; c[W] = expression(OP_PLUS , { k, c.touch(W) }); }
 
 	HN(Z)      {
-		LOAD_R(STATUS);
-		c.touch(STATUS);
-		c[STATUS] = expression(OP_AND, { (uint8_t)~instruction::flags::Z, c[STATUS] });
-		c[STATUS] = expression(OP_OR , { expression(L"Z"), c[STATUS] });
+
+		USE_REG(STATUS);
+
+		expression& reg = c.touch(STATUS);
+
+		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
+		reg = expression(OP_OR , { expression(L"Z"), reg });
 	}
 
 	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
@@ -111,7 +154,7 @@ namespace pic12f {
 	FN(PD)     { if(false) throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
 	FN(TO)     { if(false) throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
 
-	GN(PC)     { LOAD_PC; SET_PC(pc); }
+	GN(PC)     { USE_PC; SET_PC(pc); }
 
 	FN(finalize) { /* update any registers and anything that happens not under direct control of program flow, such as GPIO. */ }
 
@@ -119,23 +162,24 @@ namespace pic12f {
 
 		/* fix these for actual power on values */
 		
-		LOAD_R(PCL)   ; c[PCL]    = 0;
-		LOAD_R(STATUS); c[STATUS] = 0;
-		LOAD_R(PCLATH); c[PCLATH] = 0;
-		LOAD_R(INTCON); c[INTCON] = 0;
-		LOAD_R(PIR1)  ; c[PIR1]   = 0;
-		LOAD_R(T1CON) ; c[T1CON]  = 0;
-		LOAD_R(CMCON) ; c[CMCON]  = 0;
-		LOAD_R(ADCON0); c[ADCON0] = 0;
+		USE_REG(PCL)   ; c[PCL]    = 0;
+		USE_REG(STATUS); c[STATUS] = 0;
+		USE_REG(PCLATH); c[PCLATH] = 0;
+		USE_REG(INTCON); c[INTCON] = 0;
+		USE_REG(PIR1)  ; c[PIR1]   = 0;
+		USE_REG(T1CON) ; c[T1CON]  = 0;
+		USE_REG(CMCON) ; c[CMCON]  = 0;
+		USE_REG(ADCON0); c[ADCON0] = 0;
 	}
 
-#undef LOAD_D
-#undef LOAD_F
-#undef LOAD_W
-#undef LOAD_K
-#undef LOAD_B
-#undef LOAD_R
-#undef LOAD_PC
+#undef USE_B
+#undef USE_W
+#undef USE_D
+#undef USE_F
+#undef USE_K
+#undef USE_PC
+#undef USE_REG
+#undef USE_STACK
 
 #undef FN
 #undef GN
@@ -293,7 +337,7 @@ std::wstring dest_string(bool f,unsigned long x) {
 	return f ? register_name(x) : L"W";
 }
 
-std::wstring register_name(uint8_t x) {
+std::wstring register_name(reg_t x) {
 
 	switch(x) {
 		case 0x00: return L"INDF";
@@ -353,7 +397,7 @@ bool arguments::has_args(const key_type *s) const {
 // struct expression
 //
 
-expression::expression() : op(OP_COMPOSE), type(expr_type::function), args({}) {
+expression::expression() : expression(OP_COMPOSE, {}) {
 }
 
 expression::expression(const expression& r) : name(r.name), value(r.value), op(r.op), type(r.type), args(r.args) {
@@ -365,7 +409,7 @@ expression::expression(unsigned long my_value) : value(my_value), type(expr_type
 expression::expression(const std::wstring& my_name) : name(my_name), type(expr_type::variable) {
 }
 
-expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), type(expr_type::function), args(my_args) {
+expression::expression(wchar_t my_op, std::initializer_list<expression> my_args) : op(my_op), type(expr_type::function), args(my_args) {
 }
 
 std::wstring expression::wstr() const {
@@ -514,7 +558,7 @@ expression expression::optimize() const {
 
 		args_type ddargs;
 
-		uint8_t acc = (op == OP_AND) ? ~0 : 0;
+		reg_t acc = (op == OP_AND) ? ~0 : 0;
 		int acc_count = 0;
 
 		for(const auto& arg : dargs) {

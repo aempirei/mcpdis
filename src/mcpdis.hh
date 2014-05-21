@@ -24,6 +24,8 @@ using accumulation_function = void (operation&, dictionary&);
 
 using sourcecode = std::list<operation>;
 
+using reg_t = uint8_t;
+
 //
 // dictionary
 
@@ -60,7 +62,7 @@ struct expression {
 
 	expression(unsigned long);
 	expression(const std::wstring&);
-	expression(wchar_t, const args_type&);
+	expression(wchar_t, std::initializer_list<expression>);
 
 	std::wstring wstr() const;
 
@@ -114,7 +116,7 @@ struct instruction {
 
 	// types
 
-	enum file_register : uint8_t {
+	enum file_register : reg_t {
 
 		INDF   = 0x00,
 		TMR0   = 0x01,
@@ -134,7 +136,7 @@ struct instruction {
 
 	};
 
-	enum flags : uint8_t {
+	enum flags : reg_t {
 
 		none = 0,
 
@@ -168,7 +170,7 @@ struct instruction {
 
 	pcl_types pcl_type;
 
-	uint8_t status;
+	reg_t status;
 
 
 	// methods
@@ -216,5 +218,5 @@ extern instruction_set pic12f675;
 
 std::wstring address_string(unsigned long);
 std::wstring register_string(unsigned long);
-std::wstring register_name(uint8_t);
+std::wstring register_name(reg_t);
 std::wstring dest_string(bool,unsigned long);
