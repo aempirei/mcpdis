@@ -8,6 +8,8 @@
 #include <list>
 #include <map>
 
+#include <operators.hh>
+
 // mcpdis.hh
 
 struct instruction_set;
@@ -16,7 +18,7 @@ struct operation;
 struct arguments;
 struct bitstream;
 struct dictionary;
-struct expr;
+struct expression;
 
 using accumulation_function = void (operation&, dictionary&);
 
@@ -25,7 +27,7 @@ using sourcecode = std::list<operation>;
 //
 // dictionary
 
-using _dictionary = std::map<std::wstring,expr>;
+using _dictionary = std::map<std::wstring,expression>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
@@ -34,36 +36,41 @@ struct dictionary : _dictionary {
 };
 
 //
-// expr
+// expression
 
-struct expr {
+struct expression {
 
-	std::wstring prefix;
+	std::wstring name;
+
 	unsigned long value;
 
-	enum class expr_type { literal, symbolic };
+	wchar_t op;
+
+	enum class expr_type { literal, variable, function };
 
 	expr_type type;
 
-	using args_type = std::list<expr>;
+	using args_type = std::list<expression>;
 
 	args_type args;
 
-	expr();
-	expr(unsigned long);
-	expr(const expr&);
-	expr(const std::wstring&);
-	expr(const std::wstring&, const args_type&);
+	expression();
+
+	expression(const expression&);
+
+	expression(unsigned long);
+	expression(const std::wstring&);
+	expression(wchar_t, const args_type&);
 
 	std::wstring wstr() const;
 
-	expr expand(const dictionary::key_type&,const dictionary&) const;
-	expr optimize() const;
-	expr flatten() const;
+	expression expand(const dictionary::key_type&,const dictionary&) const;
+	expression optimize() const;
+	expression flatten() const;
 
-	template<class F> expr transform(F) const;
+	template<class F> expression transform(F) const;
 
-	bool is_function(const std::wstring&) const;
+	bool is_function(wchar_t) const;
 };
 
 //

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
+#include <clocale>
 
 #include <unistd.h>
 
@@ -56,6 +57,8 @@ int main(int argc, char **argv) {
 	configuration config;
 	bitstream b(stdin);
 	int opt;
+
+	setlocale(LC_CTYPE, "");
 
 	while ((opt = getopt(argc, argv, "hvx:")) != -1) {
 		switch (opt) {
@@ -295,7 +298,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 			std::wcout << range_ws.str() << L" : " << opvector_ws.str() << std::endl;
 
 			for(const auto& k : state) {
-				if(k.second.is_function(k.first) && k.second.args.empty()) {
+				if(k.second.is_function(k.first[0]) && k.second.args.empty()) {
 						
 
 					// do nothing for identity

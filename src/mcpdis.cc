@@ -24,8 +24,8 @@ namespace pic12f {
 #define LOAD_R(R)	const std::wstring R = register_name(instruction::file_register::R)
 #define LOAD_PC		const unsigned long pc = o.address
 
-#define CLEAR_BIT(reg, mask) do{ LOAD_R(reg); c.touch(reg); c[reg] = expr(L"&", { (uint8_t)~(uint8_t)(mask), c[reg] }); }while(0)
-#define SET_BIT(reg, mask)   do{ LOAD_R(reg); c.touch(reg); c[reg] = expr(L"|", {           (uint8_t)(mask), c[reg] }); }while(0)
+#define CLEAR_BIT(reg, mask) do{ LOAD_R(reg); c.touch(reg); c[reg] = expression(OP_AND, { (uint8_t)~(uint8_t)(mask), c[reg] }); }while(0)
+#define SET_BIT(reg, mask)   do{ LOAD_R(reg); c.touch(reg); c[reg] = expression(OP_OR , {           (uint8_t)(mask), c[reg] }); }while(0)
 
 
 	std::wstring load_d(operation& o) {
@@ -36,7 +36,7 @@ namespace pic12f {
 		return register_name(OARG(L'f'));
 	}
 
-	HN(RETURN) { LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = expr(L"TOS.lo"); c[PCLATH] = expr(L"TOS.hi"); }
+	HN(RETURN) { LOAD_R(PCL); LOAD_R(PCLATH); c[PCL] = expression(L"TOS.lo"); c[PCLATH] = expression(L"TOS.hi"); }
 	GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
 
 	FN(SLEEP)  { /* put microcontroller to sleep */ }
@@ -61,22 +61,22 @@ namespace pic12f {
 	{ "001010dfffffff", "INCF"  , pic12f::INCF  , instruction::pcl_types::normal, instruction::flags::Z          },
 	*/
 	
-	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr(L"|", { c.touch(f) , c.touch(W) }); }
-	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr(L"&", { c.touch(f) , c.touch(W) }); }
-	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr(L"^", { c.touch(f) , c.touch(W) }); }
-	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr(L"-", { c.touch(f) , c.touch(W) }); }
-	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expr(L"+", { c.touch(f) , c.touch(W) }); }
+	GN(IORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_OR   , { c.touch(f) , c.touch(W) }); }
+	GN(ANDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_AND  , { c.touch(f) , c.touch(W) }); }
+	GN(XORWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_XOR  , { c.touch(f) , c.touch(W) }); }
+	GN(SUBWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_MINUS, { c.touch(f) , c.touch(W) }); }
+	GN(ADDWF)  { LOAD_W; LOAD_D; LOAD_F; c[d] = expression(OP_PLUS , { c.touch(f) , c.touch(W) }); }
 
-	GN(DECF)   { LOAD_D; LOAD_F;         c[d] = expr(L"-" , { c.touch(f), 1          }); }
-	GN(INCF)   { LOAD_D; LOAD_F;         c[d] = expr(L"+" , { c.touch(f), 1          }); }
+	GN(DECF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_MINUS, { c.touch(f), 1          }); }
+	GN(INCF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_PLUS , { c.touch(f), 1          }); }
 
-	GN(COMF)   { LOAD_D; LOAD_F;         c[d] = expr(L"~" , { c.touch(f)             }); }
-	GN(RRF)    { LOAD_D; LOAD_F;         c[d] = expr(L"!>", { c.touch(f)             }); }
-	GN(RLF)    { LOAD_D; LOAD_F;         c[d] = expr(L"<!", { c.touch(f)             }); }
-	GN(SWAPF)  { LOAD_D; LOAD_F;         c[d] = expr(L"><", { c.touch(f)             }); }
+	GN(COMF)   { LOAD_D; LOAD_F;         c[d] = expression(OP_NOT  , { c.touch(f)             }); }
+	GN(RRF)    { LOAD_D; LOAD_F;         c[d] = expression(OP_ROTR , { c.touch(f)             }); }
+	GN(RLF)    { LOAD_D; LOAD_F;         c[d] = expression(OP_ROTL , { c.touch(f)             }); }
+	GN(SWAPF)  { LOAD_D; LOAD_F;         c[d] = expression(OP_SWAP , { c.touch(f)             }); }
 
-	GN(BCF)    { LOAD_F; LOAD_B; b = ~b; c[f] = expr(L"&" , { b         , c.touch(f) }); }
-	GN(BSF)    { LOAD_F; LOAD_B;         c[f] = expr(L"|" , { b         , c.touch(f) }); } 
+	GN(BCF)    { LOAD_F; LOAD_B; b = ~b; c[f] = expression(OP_AND  , { b         , c.touch(f) }); }
+	GN(BSF)    { LOAD_F; LOAD_B;         c[f] = expression(OP_OR   , { b         , c.touch(f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
@@ -87,23 +87,23 @@ namespace pic12f {
 
 	GN(GOTO)   { LOAD_K; SET_PC(k); }
 
-	GN(CALL)   { GOTO(o, c); LOAD_PC; LOAD_STACK; c[STACK] = expr(L".", { pc + 1, c.touch(STACK) }); }
+	GN(CALL)   { GOTO(o, c); LOAD_PC; LOAD_STACK; c[STACK] = expression(OP_COMPOSE, { pc + 1, c.touch(STACK) }); }
 
 	GN(MOVLW)  { LOAD_K; LOAD_W; c[W] = (uint8_t)k; }
 
 	GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-	GN(IORLW)  { LOAD_K; LOAD_W; c[W] = expr(L"|", { k, c.touch(W) }); }
-	GN(ANDLW)  { LOAD_K; LOAD_W; c[W] = expr(L"&", { k, c.touch(W) }); }
-	GN(XORLW)  { LOAD_K; LOAD_W; c[W] = expr(L"^", { k, c.touch(W) }); }
-	GN(SUBLW)  { LOAD_K; LOAD_W; c[W] = expr(L"-", { k, c.touch(W) }); }
-	GN(ADDLW)  { LOAD_K; LOAD_W; c[W] = expr(L"+", { k, c.touch(W) }); }
+	GN(IORLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_OR   , { k, c.touch(W) }); }
+	GN(ANDLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_AND  , { k, c.touch(W) }); }
+	GN(XORLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_XOR  , { k, c.touch(W) }); }
+	GN(SUBLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_MINUS, { k, c.touch(W) }); }
+	GN(ADDLW)  { LOAD_K; LOAD_W; c[W] = expression(OP_PLUS , { k, c.touch(W) }); }
 
 	HN(Z)      {
 		LOAD_R(STATUS);
 		c.touch(STATUS);
-		c[STATUS] = expr(L"&", { (uint8_t)~instruction::flags::Z, c[STATUS] });
-		c[STATUS] = expr(L"|", { expr(L"Z"), c[STATUS] });
+		c[STATUS] = expression(OP_AND, { (uint8_t)~instruction::flags::Z, c[STATUS] });
+		c[STATUS] = expression(OP_OR , { expression(L"Z"), c[STATUS] });
 	}
 
 	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
@@ -350,42 +350,44 @@ bool arguments::has_args(const key_type *s) const {
 }
 
 //
-// struct expr
+// struct expression
 //
 
-expr::expr() : expr(L"", {}) {
+expression::expression() : op(OP_COMPOSE), type(expr_type::function), args({}) {
 }
 
-expr::expr(unsigned long my_value) : value(my_value), type(expr_type::literal) {
+expression::expression(const expression& r) : name(r.name), value(r.value), op(r.op), type(r.type), args(r.args) {
 }
 
-expr::expr(const expr& r) : prefix(r.prefix), value(r.value), type(r.type), args(r.args) {
+expression::expression(unsigned long my_value) : value(my_value), type(expr_type::literal) {
 }
 
-expr::expr(const std::wstring& my_prefix) : expr(my_prefix, {}) {
+expression::expression(const std::wstring& my_name) : name(my_name), type(expr_type::variable) {
 }
 
-expr::expr(const std::wstring& my_prefix, const args_type& my_args) : prefix(my_prefix), type(expr_type::symbolic), args(my_args) {
+expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), type(expr_type::function), args(my_args) {
 }
 
-std::wstring expr::wstr() const {
+std::wstring expression::wstr() const {
 
 	std::wstringstream ws;
 
 	switch(type) {
 
-		case expr_type::symbolic:
+		case expr_type::variable:
 
-			if(!args.empty())
-				ws << L'(';
+			ws << name;
 
-			ws << prefix;
+			break;
+
+		case expr_type::function:
+
+			ws << L'(' << (wchar_t)op;
 
 			for(const auto& sub : args)
 				ws << L' ' << sub.wstr();
 
-			if(!args.empty())
-				ws << L')';
+			ws << L')';
 
 
 			break;
@@ -401,30 +403,30 @@ std::wstring expr::wstr() const {
 }
 
 
-expr expr::expand(const dictionary::key_type&,const dictionary&) const {
+expression expression::expand(const dictionary::key_type&,const dictionary&) const {
 
-	if(type != expr_type::symbolic)
+	if(type != expr_type::function)
 		return *this;
 
 	return *this;
 }
 
-bool expr::is_function(const std::wstring& s) const {
-	return type == expr_type::symbolic && prefix == s;
+bool expression::is_function(wchar_t my_op) const {
+	return type == expr_type::function && op == my_op;
 }
 
-expr expr::flatten() const {
+expression expression::flatten() const {
 
-	if(type != expr_type::symbolic)
+	if(type != expr_type::function)
 		return *this;
 
-	expr e(prefix);
+	expression e(op);
 
 	for(const auto& arg : args) {
 
-		if(arg.is_function(prefix)) {
+		if(arg.is_function(op)) {
 
-			expr sub_expr = arg.flatten();
+			expression sub_expr = arg.flatten();
 
 			for(const auto& sub_arg : sub_expr.args)
 				e.args.push_back(sub_arg);
@@ -437,68 +439,67 @@ expr expr::flatten() const {
 	return e;
 }
 
-expr expr::optimize() const {
+expression expression::optimize() const {
 
-	if(type != expr_type::symbolic)
+	if(type != expr_type::function)
 		return *this;
 
 	if(args.empty())
 		return *this;
 
-	expr::args_type dargs;
+	expression::args_type dargs;
 
-	if(prefix == L"&" || prefix == L"|" || prefix == L"^" || prefix == L"+")
+	if(op == OP_AND || op == OP_OR || op == OP_XOR || op == OP_PLUS)
 		for(const auto& arg : flatten().args)
 			dargs.push_back(arg.optimize());
 	else
 		for(const auto& arg : args)
 			dargs.push_back(arg.optimize());
 
-	const std::list<std::wstring> unary = { L"><", L"~", L"!>", L"<!" };
-	const std::list<std::wstring> binary = { L"-" };
+	const std::list<wchar_t> unary = { OP_SWAP, OP_NOT, OP_ROTL, OP_ROTR };
+	const std::list<wchar_t> binary = { OP_MINUS };
 
 	unsigned int arity = UINT_MAX;
 
-	for(const auto& op : unary) {
-		if(prefix == op) {
+	for(const auto& my_op : unary) {
+		if(op == my_op) {
 			arity = dargs.size();
 			if(arity != 1) {
 				std::wstringstream ss;
-				ss << "unary operator \"" << prefix << "\" has unexpected argument count of " << dargs.size();
+				ss << "unary operator \"" << op << "\" has unexpected argument count of " << dargs.size();
 				throw ss.str();
 			}
 		}
 	}
 
-	for(const auto& op : binary) {
-		if(prefix == op) {
+	for(const auto& my_op : binary) {
+		if(op == my_op) {
 			arity = dargs.size();
 			if(arity != 2) {
 				std::wstringstream ss;
-				ss << "binary operator \"" << prefix << "\" has unexpected argument count of " << dargs.size();
+				ss << "binary operator \"" << op << "\" has unexpected argument count of " << dargs.size();
 				throw ss.str();
 			}
 		}
 	}
 
-	if(is_function(L".")) {
+	if(is_function(OP_COMPOSE))
 		return flatten();
-	}
 
 	if(arity == 1) {
 
-		const expr& arg0 = dargs.front();
+		const expression& arg0 = dargs.front();
 
 		if(
-				(arg0.type == expr_type::symbolic)
+				(arg0.type == expr_type::function)
 
 				&&
 
 				(
-				 (is_function(L"><") && arg0.is_function(L"><")) ||
-				 (is_function(L"~" ) && arg0.is_function(L"~" )) ||
-				 (is_function(L"<!") && arg0.is_function(L"!>")) ||
-				 (is_function(L"!>") && arg0.is_function(L"<!"))
+				 (is_function(OP_SWAP) && arg0.is_function(OP_SWAP)) ||
+				 (is_function(OP_NOT ) && arg0.is_function(OP_NOT )) ||
+				 (is_function(OP_ROTL) && arg0.is_function(OP_ROTR)) ||
+				 (is_function(OP_ROTR) && arg0.is_function(OP_ROTL))
 				)
 		  )
 		{
@@ -513,7 +514,7 @@ expr expr::optimize() const {
 
 		args_type ddargs;
 
-		uint8_t acc = (prefix == L"&") ? ~0 : 0;
+		uint8_t acc = (op == OP_AND) ? ~0 : 0;
 		int acc_count = 0;
 
 		for(const auto& arg : dargs) {
@@ -522,19 +523,19 @@ expr expr::optimize() const {
 
 				acc_count++;
 
-				if(prefix == L"+") {
+				if(op == OP_PLUS) {
 
 					acc += arg.value;
 
-				} else if(prefix == L"^") {
+				} else if(op == OP_XOR) {
 
 					acc ^= arg.value;
 
-				} else if(prefix == L"|") {
+				} else if(op == OP_OR) {
 
 					acc |= arg.value;
 
-				} else if(prefix == L"&") {
+				} else if(op == OP_AND) {
 
 					acc &= arg.value;
 
@@ -550,32 +551,32 @@ expr expr::optimize() const {
 
 		if(acc_count == 0) {
 
-			return expr(prefix, ddargs).flatten();
+			return expression(op, ddargs).flatten();
 
 		} else {
 			if(ddargs.size() == 0) {
 
-				return expr(acc);
+				return acc;
 
 			} else if(ddargs.size() == 1) {
 
-				if(is_function(L"|") || is_function(L"&")) {
+				if(is_function(OP_OR) || is_function(OP_AND)) {
 
-					expr rarg = ddargs.front().optimize();
+					expression rarg = ddargs.front().optimize();
 
-					if(!rarg.args.empty() && (rarg.prefix == L"|" || rarg.prefix == L"&")) {
+					if(!rarg.args.empty() && (rarg.op == OP_OR || rarg.op == OP_AND)) {
 
-						expr re(rarg.prefix);
+						expression re(rarg.op);
 
 						for(const auto& sub_rarg : rarg.args) {
 
-							expr re_sub(prefix, { acc, sub_rarg });
+							expression re_sub(op, { (unsigned long)acc, sub_rarg });
 
 							re_sub = re_sub.optimize();
 
-							if(re_sub.type == expr_type::literal && re_sub.value == 0 && rarg.prefix == L"|") {
+							if(re_sub.type == expr_type::literal && re_sub.value == 0 && rarg.op == OP_OR) {
 								// nothing
-							} else if(re_sub.type == expr_type::literal && re_sub.value == 255 && rarg.prefix == L"&") {
+							} else if(re_sub.type == expr_type::literal && re_sub.value == 255 && rarg.op == OP_AND) {
 								// nothing
 							} else {
 								re.args.push_back( re_sub );
@@ -592,12 +593,12 @@ expr expr::optimize() const {
 			}
 
 			ddargs.push_front(acc);
-			return expr(prefix, ddargs);
+			return expression(op, ddargs);
 
 		}
 	}
 
-	return expr(prefix, dargs);
+	return expression(op, dargs);
 }
 
 //
