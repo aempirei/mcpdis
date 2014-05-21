@@ -15,7 +15,7 @@
 
 struct configuration;
 
-typedef std::string stream_processor_fn(bitstream&);
+typedef std::wstring stream_processor_fn(bitstream&);
 
 stream_processor_fn be14;
 stream_processor_fn le16;
@@ -27,28 +27,28 @@ struct configuration {
 	stream_processor_fn *stream_processor = be14;
 };
 
-std::string arg_string(char, std::string);
-std::string arg_string(char, std::string, std::string);
+std::wstring arg_string(wchar_t, std::wstring);
+std::wstring arg_string(wchar_t, std::wstring, std::wstring);
 
-std::string arg_string(char ch, std::string parameter, std::string message) {
-	std::stringstream ss;
-	ss << '\t' << '-' << ch << ' ' << std::setw(7) << std::left << parameter << ' ' << message << std::endl;
+std::wstring arg_string(wchar_t wc, std::wstring parameter, std::wstring message) {
+	std::wstringstream ss;
+	ss << L'\t' << L'-' << wc << L' ' << std::setw(7) << std::left << parameter << L' ' << message << std::endl;
 	return ss.str();
 }
 
-std::string arg_string(char ch, std::string message) {
-	return arg_string(ch, "", message);
+std::wstring arg_string(wchar_t wc, std::wstring message) {
+	return arg_string(wc, L"", message);
 }
 
 void usage(const char *arg0) {
 
-	std::cerr << std::endl << "usage: " << arg0 << " [-{hv}] [-x {le16|be14}]" << std::endl << std::endl;
+	std::wcerr << std::endl << L"usage: " << arg0 << L" [-{hv}] [-x {le16|be14}]" << std::endl << std::endl;
 
-	std::cerr << arg_string('h', "show help");
-	std::cerr << arg_string('v', "verbose");
-	std::cerr << arg_string('x', "format", "stream type (default: be14)");
+	std::wcerr << arg_string(L'h', L"show help");
+	std::wcerr << arg_string(L'v', L"verbose");
+	std::wcerr << arg_string(L'x', L"format", L"stream type (default: be14)");
 
-	std::cerr << std::endl;
+	std::wcerr << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -97,21 +97,21 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-std::string le16(bitstream& b) {
+std::wstring le16(bitstream& b) {
 
-	std::string hi;
-	std::string lo;
+	std::wstring hi;
+	std::wstring lo;
 
 	hi = b.get(8);
 	lo = b.get(8);
 
 	if(hi.empty() || lo.empty())
-		return "";
+		return L"";
 
 	return (lo + hi).substr(2);
 }
 
-std::string be14(bitstream& b) {
+std::wstring be14(bitstream& b) {
 	return b.get(14);
 }
 
@@ -126,70 +126,70 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 		if(config.verbose) {
 
 			if(labels.find(op.address) == labels.end())
-				std::cout << ' ';
+				std::wcout << L' ';
 			else
-				std::cout << '*';
+				std::wcout << L'*';
 
-			std::cout << address_string(op.address) << ": " << op.s;
+			std::wcout << address_string(op.address) << L": " << op.s;
 
 			if(!op.opcode.name.empty()) {
 
-				std::cout << ' ' << op.opcode.pattern << ' ' << op.opcode.name;
+				std::wcout << L' ' << op.opcode.pattern << L' ' << op.opcode.name;
 
 				for(auto iter = op.args.begin(); iter != op.args.end(); iter++) {
 
-					std::cout << ' ' << iter->first << '=';
+					std::wcout << L' ' << iter->first << L'=';
 
 					if(isalpha(iter->first)) {
 
-						unsigned long x = strtoul(iter->second.c_str(), NULL, 2);
+						unsigned long x = wcstoul(iter->second.c_str(), NULL, 2);
 
-						std::cout << std::dec << x;
+						std::wcout << std::dec << x;
 
 					} else {
 
-						std::cout << iter->second;
+						std::wcout << iter->second;
 					}
 
 
 				}
 			}
 
-			std::cout << std::endl;
+			std::wcout << std::endl;
 
 		} else {
 
 			if(labels.find(op.address) != labels.end()) 
-				std::cout << address_string(op.address) << ':';
+				std::wcout << address_string(op.address) << L':';
 			else
-				std::cout << "     ";
+				std::wcout << L"     ";
 
 			if(!op.opcode.name.empty()) {
 
-				std::cout << ' ' << std::setw(6) << std::setfill(' ') << std::left << op.opcode.name << ' ';
+				std::wcout << L' ' << std::setw(6) << std::setfill(L' ') << std::left << std::wstring(op.opcode.name) << L' ';
 
-				if(op.args.has_args("df")) {
+				if(op.args.has_args(L"df")) {
 
-					if(op.args.value('d') == 0)
-						std::cout << "W, ";
+					if(op.args.value(L'd') == 0)
+						std::wcout << L"W, ";
 
-					std::cout << register_name(op.args.value('f'));
+					std::wcout << register_name(op.args.value(L'f'));
 
-				} else if(op.args.has_args("bf")) {
+				} else if(op.args.has_args(L"bf")) {
 
-					std::cout << register_name(op.args.value('f')) << '<' << op.args.value('b') << '>';
+					std::wcout << register_name(op.args.value(L'f')) << L'<' << op.args.value(L'b') << L'>';
 
-				} else if(op.args.has_arg('f')) {
+				} else if(op.args.has_arg(L'f')) {
 
-					std::cout << register_name(op.args.value('f'));
+					std::wcout << register_name(op.args.value(L'f'));
 
-				} else if(op.args.has_arg('k')) {
+				} else if(op.args.has_arg(L'k')) {
 
-					std::cout << address_string(op.args.value('k'));
+					std::wcout << address_string(op.args.value(L'k'));
 				}
 			}
 
-			std::cout << std::endl;
+			std::wcout << std::endl;
 		}
 	}
 }
@@ -207,7 +207,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 	for(;;) {
 
-		std::string str = f(b);
+		std::wstring str = f(b);
 
 		if(str.empty())
 			break;
@@ -227,11 +227,11 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 		} else if(op.opcode.pcl_type == instruction::pcl_types::jump) {
 
-			labels.insert(op.args.value('k'));
+			labels.insert(op.args.value(L'k'));
 
 		} else if(op.opcode.pcl_type == instruction::pcl_types::call) {
 
-			labels.insert(op.args.value('k'));
+			labels.insert(op.args.value(L'k'));
 			labels.insert(op.address + 1);
 		}
 	}
@@ -249,10 +249,10 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			dictionary state;
 
-			std::cout << "vector_" << std::setw(2) << std::right << std::setfill('0') << n++ << " ";
+			std::wcout << L"vector_" << std::setw(2) << std::right << std::setfill(L'0') << n++ << L" ";
 
-			std::stringstream range_ss;
-			std::stringstream opvector_ss;
+			std::wstringstream range_ws;
+			std::wstringstream opvector_ws;
 
 			decltype(iter) jter;
 
@@ -260,12 +260,12 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 				jter->execute(state);
 
-				opvector_ss << ' ' << jter->opcode.name;
+				opvector_ws << L' ' << jter->opcode.name;
 			}
 
 			if(jter != code.end()) {
 
-				opvector_ss << ' ' << jter->opcode.name;
+				opvector_ws << L' ' << jter->opcode.name;
 
 				switch(jter->opcode.pcl_type) {
 
@@ -273,7 +273,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 						// jter->execute(state);
 						// TODO: handle branching
-						range_ss << "* ";
+						range_ws << L"* ";
 						break;
 
 					case instruction::pcl_types::ret:
@@ -290,9 +290,9 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 				}
 			}
 
-			range_ss << address_string(iter->address) << '-' << address_string(jter->address);
+			range_ws << address_string(iter->address) << L'-' << address_string(jter->address);
 
-			std::cout << range_ss.str() << " : " << opvector_ss.str() << std::endl;
+			std::wcout << range_ws.str() << L" : " << opvector_ws.str() << std::endl;
 
 			for(const auto& k : state) {
 				if(k.second.is_function(k.first) && k.second.args.empty()) {
@@ -302,19 +302,19 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 				} else {
 
-					std::string sexpr1 = k.second.str();
-					std::string sexpr2 = k.second.optimize().str();
+					std::wstring sexpr1 = k.second.wstr();
+					std::wstring sexpr2 = k.second.optimize().wstr();
 
-					std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << k.first << " := " << sexpr2 << std::endl;
+					std::wcout << L'\t' << std::setw(6) << std::right << std::setfill(L' ') << k.first << L" := " << sexpr2 << std::endl;
 					if(sexpr1 != sexpr2) {
-						std::cout << "\033[1;33m";
-						std::cout << '\t' << std::setw(6) << std::right << std::setfill(' ') << ' ' << " := " << sexpr1;
-						std::cout << "\033[0m" << std::endl;
+						std::wcout << L"\033[1;33m";
+						std::wcout << L'\t' << std::setw(6) << std::right << std::setfill(L' ') << L' ' << L" := " << sexpr1;
+						std::wcout << L"\033[0m" << std::endl;
 					}
 				}
 			}
 
-			std::cout << std::endl;
+			std::wcout << std::endl;
 		}
 	}
 }

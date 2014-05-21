@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cwchar>
 
 #include <string>
 #include <vector>
@@ -24,7 +25,7 @@ using sourcecode = std::list<operation>;
 //
 // dictionary
 
-using _dictionary = std::map<std::string,expr>;
+using _dictionary = std::map<std::wstring,expr>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
@@ -37,7 +38,7 @@ struct dictionary : _dictionary {
 
 struct expr {
 
-	std::string prefix;
+	std::wstring prefix;
 	unsigned long value;
 
 	enum class expr_type { literal, symbolic };
@@ -51,10 +52,10 @@ struct expr {
 	expr();
 	expr(unsigned long);
 	expr(const expr&);
-	expr(const std::string&);
-	expr(const std::string&, const args_type&);
+	expr(const std::wstring&);
+	expr(const std::wstring&, const args_type&);
 
-	std::string str() const;
+	std::wstring wstr() const;
 
 	expr expand(const dictionary::key_type&,const dictionary&) const;
 	expr optimize() const;
@@ -62,13 +63,13 @@ struct expr {
 
 	template<class F> expr transform(F) const;
 
-	bool is_function(const std::string&) const;
+	bool is_function(const std::wstring&) const;
 };
 
 //
 // arguments
 
-using _arguments = std::map<char,std::string>;
+using _arguments = std::map<wchar_t,std::wstring>;
 
 struct arguments : _arguments {
 	using _arguments::_arguments;
@@ -91,9 +92,9 @@ struct bitstream {
 	int buffer_size;
 	int buffer_pos;
 
-	std::string left;
+	std::wstring left;
 
-	std::string get(int);
+	std::wstring get(int);
 
 	bitstream();
 	bitstream(FILE *);
@@ -153,8 +154,8 @@ struct instruction {
 
 	// variables
 
-	std::string pattern;
-	std::string name;
+	std::wstring pattern;
+	std::wstring name;
 
 	accumulation_function *fn;
 
@@ -165,8 +166,8 @@ struct instruction {
 
 	// methods
 
-	bool match(const std::string&) const;
-	template<class T> bool match(const std::string&, T) const;
+	bool match(const std::wstring&) const;
+	template<class T> bool match(const std::wstring&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -180,7 +181,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	value_type find(const std::string&) const;
+	value_type find(const std::wstring&) const;
 
 	void sort();
 };
@@ -190,7 +191,7 @@ struct instruction_set : _instruction_set {
 
 struct operation {
 
-	std::string s;
+	std::wstring s;
 
 	unsigned long address;
 
@@ -199,14 +200,14 @@ struct operation {
 	arguments args;
 
 	operation();
-	operation(const std::string&, unsigned long, const instruction_set&);
+	operation(const std::wstring&, unsigned long, const instruction_set&);
 
 	void execute(dictionary&);
 };
 
 extern instruction_set pic12f675;
 
-std::string address_string(unsigned long);
-std::string register_string(unsigned long);
-std::string register_name(uint8_t);
-std::string dest_string(bool,unsigned long);
+std::wstring address_string(unsigned long);
+std::wstring register_string(unsigned long);
+std::wstring register_name(uint8_t);
+std::wstring dest_string(bool,unsigned long);
