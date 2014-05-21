@@ -409,7 +409,15 @@ expression::expression(unsigned long my_value) : value(my_value), type(expr_type
 expression::expression(const std::wstring& my_name) : name(my_name), type(expr_type::variable) {
 }
 
-expression::expression(wchar_t my_op, std::initializer_list<expression> my_args) : op(my_op), type(expr_type::function), args(my_args) {
+template<wchar_t OP, class ARGS> void function_expression(expression& e, ARGS args) {
+
+	for(const auto& arg : args)
+		e.args.push_back(arg);
+}
+
+expression::expression(wchar_t my_op, std::initializer_list<expression> my_args) : op(my_op), type(expr_type::function) {
+
+	function_expression<OP_AND,decltype(my_args)>(*this, my_args);
 }
 
 std::wstring expression::wstr() const {
