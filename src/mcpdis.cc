@@ -439,6 +439,8 @@ expression expression::flatten() const {
 	return e;
 }
 
+
+/*
 expression expression::optimize() const {
 
 	if(type != expr_type::function)
@@ -600,6 +602,7 @@ expression expression::optimize() const {
 
 	return expression(op, dargs);
 }
+*/
 
 //
 // struct dictionary
