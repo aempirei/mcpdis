@@ -129,7 +129,7 @@ namespace pic12f {
 
 	GN(GOTO)   { USE_K; SET_PC(k); }
 
-	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = expression(OP_COMPOSE, { pc + 1, c.touch(STACK) }); }
+	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = expression(OP_LIST, { pc + 1, c.touch(STACK) }); }
 
 	GN(MOVLW)  { USE_K; USE_W; c[W] = (reg_t)k; }
 
@@ -141,25 +141,14 @@ namespace pic12f {
 	GN(SUBLW)  { USE_K; USE_W; c[W] = expression(OP_MINUS, { k, c.touch(W) }); }
 	GN(ADDLW)  { USE_K; USE_W; c[W] = expression(OP_PLUS , { k, c.touch(W) }); }
 
-	HN(Z)      {
-
-		USE_REG(STATUS);
-
-		expression& reg = c.touch(STATUS);
-
-		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
-		reg = expression(OP_OR , { (reg_t) instruction::flags::Z, reg });
-		// reg = expression(OP_OR , { expression(L"Z"), reg });
+	GN(PC)     {
+		USE_PC;
+		SET_PC(pc);
 	}
 
-	FN(C)      { if(false) throw std::runtime_error("STATUS<C> carry flag unimplemented"           ); }
-	FN(DC)     { if(false) throw std::runtime_error("STATUS<DC> decimal carry flag unimplemented"  ); }
-	FN(PD)     { if(false) throw std::runtime_error("STATUS<PD> power down flag unimplemented"     ); }
-	FN(TO)     { if(false) throw std::runtime_error("STATUS<TO> time-out flag unimplemented"       ); }
-
-	GN(PC)     { USE_PC; SET_PC(pc); }
-
-	FN(finalize) { /* update any registers and anything that happens not under direct control of program flow, such as GPIO. */ }
+	void finalize() {
+		/* update any registers and anything that happens not under direct control of program flow, such as GPIO. */
+	}
 
 	void power(dictionary& c) {
 
@@ -396,57 +385,6 @@ bool arguments::has_args(const key_type *s) const {
 	return true;
 }
 
-
-template<wchar_t> static void function_expression(expression&, const expression::args_type&);
-
-template<> void function_expression<OP_SWAP>(expression& e, const expression::args_type& args) {
-
-	if(args.size() != 1) {
-		std::stringstream ss;
-		ss << "unexpected arity of " << args.size() << " for unary swap (\"OP_SWAP\") operation." << std::endl;
-		throw std::runtime_error(ss.str());
-	}
-
-	if(args.front().is_function(OP_SWAP)) {
-
-		e = args.front().args.front();
-
-	} else if(args.front().is_literal()) {
-
-		uint8_t reg = args.front().value;
-
-		reg = (reg << 4) | (reg >> 4);
-		e = reg;
-
-	} else {
-		e.args = args;
-	}
-}
-
-template<> void function_expression<OP_NOT>(expression& e, const expression::args_type& args) {
-
-	if(args.size() != 1) {
-		std::stringstream ss;
-		ss << "unexpected arity of " << args.size() << " for unary not (\"OP_NOT\") operation." << std::endl;
-		throw std::runtime_error(ss.str());
-	}
-
-	if(args.front().is_function(OP_NOT)) {
-
-		e = args.front().args.front();
-
-	} else if(args.front().is_literal()) {
-
-		uint8_t reg = args.front().value;
-
-		reg = ~reg;
-		e = reg;
-
-	} else {
-		e.args = args;
-	}
-}
-
 template<class F> static void aggregate_literals(expression& e, reg_t x0, F f) {
 
 	reg_t x = x0;
@@ -521,8 +459,6 @@ static void distribution_rule(expression& e, wchar_t op1, wchar_t op2) {
 
 	const auto& e1 = *jter;
 
-	expression::args_type dargs;
-
 	for(auto& arg : kter->args) {
 		const auto& e2 = arg;
 		arg = expression(op1, { e1, e2 });
@@ -531,28 +467,76 @@ static void distribution_rule(expression& e, wchar_t op1, wchar_t op2) {
 	e.args.erase(jter);
 }
 
+template<wchar_t> static void function_expression(expression&, const expression::args_type&);
+
+template<> void function_expression<OP_SWAP>(expression& e, const expression::args_type& args) {
+
+	if(args.size() != 1) {
+		std::stringstream ss;
+		ss << "unexpected arity of " << args.size() << " for unary swap (\"OP_SWAP\") operation." << std::endl;
+		throw std::runtime_error(ss.str());
+	}
+
+	if(args.front().is_function(OP_SWAP)) {
+
+		e = args.front().args.front();
+
+	} else if(args.front().is_literal()) {
+
+		uint8_t reg = args.front().value;
+
+		reg = (reg << 4) | (reg >> 4);
+		e = reg;
+
+	} else {
+		e.args = args;
+	}
+}
+
+template<> void function_expression<OP_NOT>(expression& e, const expression::args_type& args) {
+
+	if(args.size() != 1) {
+		std::stringstream ss;
+		ss << "unexpected arity of " << args.size() << " for unary not (\"OP_NOT\") operation." << std::endl;
+		throw std::runtime_error(ss.str());
+	}
+
+	if(args.front().is_function(OP_NOT)) {
+
+		e = args.front().args.front();
+
+	} else if(args.front().is_literal()) {
+
+		uint8_t reg = args.front().value;
+
+		reg = ~reg;
+		e = reg;
+
+	} else {
+		e.args = args;
+	}
+}
+
 template<> void function_expression<OP_OR>(expression& e, const expression::args_type& args) {
 
 	association_rule(e, OP_OR, args);
 
-	aggregate_literals(e, 0, [](reg_t a, reg_t x) -> reg_t { return a | x; });
+	aggregate_literals(e, (reg_t)0, [](reg_t a, reg_t x) -> reg_t { return a | x; });
 
 	distribution_rule(e, OP_OR, OP_AND);
-
-	if(e.is_unary())
-		e = e.args.front();
+	
+	if(e.is_unary() && OP_IS_UNARY_NOP(e.op)) e = e.args.front();
 }
 
 template<> void function_expression<OP_AND>(expression& e, const expression::args_type& args) {
 
 	association_rule(e, OP_AND, args);
 
-	aggregate_literals(e, ~0, [](reg_t a, reg_t x) -> reg_t { return a & x; });
+	aggregate_literals(e, (reg_t)~0, [](reg_t a, reg_t x) -> reg_t { return a & x; });
 
 	distribution_rule(e, OP_AND, OP_OR);
 
-	if(e.is_unary())
-		e = e.args.front();
+	if(e.is_unary() && OP_IS_UNARY_NOP(e.op)) e = e.args.front();
 }
 
 template<> void function_expression<OP_PLUS>(expression& e, const expression::args_type& args) {
@@ -560,9 +544,6 @@ template<> void function_expression<OP_PLUS>(expression& e, const expression::ar
 	association_rule(e, OP_PLUS, args);
 
 	aggregate_literals(e, 0, [](reg_t a, reg_t x) -> reg_t { return a + x; });
-
-	if(e.is_unary())
-		e = e.args.front();
 }
 
 template<wchar_t> static void function_expression(expression& e, const expression::args_type& args) {
@@ -581,7 +562,7 @@ expression& expression::operator=(const expression& r) {
 
 		if(r.is_function())
 			my_args = r.args;
-		else if(is_function())
+		else if(is_function() && !args.empty())
 			args.clear();
 
 		type = r.type;
@@ -609,7 +590,7 @@ expression& expression::operator=(const expression& r) {
 	return *this;
 }
 
-expression::expression() : expression(OP_COMPOSE, {}) {
+expression::expression() : expression(OP_LIST, {}) {
 }
 
 expression::expression(const expression& r) {
@@ -625,7 +606,6 @@ expression::expression(const std::wstring& my_name) : name(my_name), type(expres
 #define OPERATION_HANDLER(__OP__) case __OP__: function_expression<__OP__>(*this, my_args); break
 
 expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), type(expression_type::function) {
-
 	switch(op) {
 
 		OPERATION_HANDLER(OP_AND);
@@ -638,6 +618,7 @@ expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), typ
 		OPERATION_HANDLER(OP_ROTL);
 		OPERATION_HANDLER(OP_ROTR);
 		OPERATION_HANDLER(OP_COMPOSE);
+		OPERATION_HANDLER(OP_LIST);
 
 		default:
 		throw std::runtime_error("unhandled operation");
@@ -735,6 +716,49 @@ bool expression::operator==(const expression& r) const {
 	return false;
 }
 
+/*
+bool expression::operator<(const expression& r) const {
+
+	if(type != r.type)
+		return type < r.type;
+
+	switch(type) {
+
+		case expression_type::literal:
+
+			return value < r.value;
+
+		case expression_type::variable:
+
+			return name < r.name;
+
+		case expression_type::function: 
+
+			// lexicographic comparison
+
+			auto iter = args.cbegin();
+			auto jter = r.args.cbegin();
+
+			while(iter != args.end() && jter != r.args.end()) {
+
+				if(*iter < *jter) {
+
+					return true;
+
+				} else if(*iter == *jter) {
+
+					iter++;
+					jter++;
+
+				} else {
+					return false;
+				}
+			}
+	}
+
+	return false;
+}
+*/
 
 //
 // struct dictionary
@@ -775,23 +799,8 @@ void operation::execute(dictionary& d) {
 
 	opcode.fn(*this, d);
 
-	if(opcode.status & instruction::flags::Z)
-		pic12f::Z(*this, d);
-
-	if(opcode.status & instruction::flags::C)
-		pic12f::C(*this, d);
-
-	if(opcode.status & instruction::flags::DC)
-		pic12f::DC(*this, d);
-
-	if(opcode.status & instruction::flags::TO)
-		pic12f::TO(*this, d);
-
-	if(opcode.status & instruction::flags::PD)
-		pic12f::PD(*this, d);
-
 	if(opcode.pcl_type == instruction::pcl_types::normal)
 		pic12f::PC(*this, d);
 
-	pic12f::finalize(*this, d);
+	pic12f::finalize();
 }

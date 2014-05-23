@@ -85,8 +85,7 @@ struct expression {
 	expression& operator=(const expression&);
 
 	bool operator==(const expression&) const;
-
-
+	bool operator<(const expression&) const;
 };
 
 //
