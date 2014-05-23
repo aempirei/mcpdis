@@ -276,7 +276,6 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 						// jter->execute(state);
 						// TODO: handle branching
-						range_ws << L"* ";
 						break;
 
 					case instruction::pcl_types::ret:
@@ -295,28 +294,17 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			range_ws << address_string(iter->address) << L'-' << address_string(jter->address);
 
-			std::wcout << range_ws.str() << L" : " << opvector_ws.str() << std::endl;
+			std::wcout << range_ws.str() << L" : " << opvector_ws.str() << std::endl << std::endl;
 
 			for(const auto& k : state) {
-				if(k.second.is_function(k.first[0]) && k.second.args.empty()) {
-						
 
+				if(k.second.is_variable(k.first)) {
+						
 					// do nothing for identity
 
 				} else {
 
-					std::wstring sexpr1 = k.second.wstr();
-					// std::wstring sexpr2 = k.second.optimize().wstr();
-
-					std::wcout << L'\t' << std::setw(6) << std::right << std::setfill(L' ') << k.first << L" := " << sexpr1 << std::endl;
-					/*
-					std::wcout << L'\t' << std::setw(6) << std::right << std::setfill(L' ') << k.first << L" := " << sexpr2 << std::endl;
-					if(sexpr1 != sexpr2) {
-						std::wcout << L"\033[1;33m";
-						std::wcout << L'\t' << std::setw(6) << std::right << std::setfill(L' ') << L' ' << L" := " << sexpr1;
-						std::wcout << L"\033[0m" << std::endl;
-					}
-					*/
+					std::wcout << L'\t' << str(k) << std::endl;
 				}
 			}
 

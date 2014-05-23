@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <climits>
 #include <iostream>
+#include <set>
 
 namespace pic12f {
 
@@ -383,7 +384,7 @@ unsigned long arguments::value(key_type ch) const {
 }
 
 bool arguments::has_arg(key_type ch) const {
-	return (find(ch) != end());
+	return find(ch) != end();
 }
 
 bool arguments::has_args(const key_type *s) const {
@@ -396,18 +397,21 @@ bool arguments::has_args(const key_type *s) const {
 }
 
 
-template<wchar_t OP> void function_expression(expression& e, const expression::args_type& args, bool base = true);
+template<wchar_t> static void function_expression(expression&, const expression::args_type&);
 
-template<> void function_expression<OP_SWAP>(expression& e, const expression::args_type& args, bool) {
+template<> void function_expression<OP_SWAP>(expression& e, const expression::args_type& args) {
 
-	if(args.size() != 1)
-		throw std::runtime_error("unexpected non-unary swap operation");
+	if(args.size() != 1) {
+		std::stringstream ss;
+		ss << "unexpected arity of " << args.size() << " for unary swap (\"OP_SWAP\") operation." << std::endl;
+		throw std::runtime_error(ss.str());
+	}
 
 	if(args.front().is_function(OP_SWAP)) {
 
 		e = args.front().args.front();
 
-	} else if(args.front().type == expression::expression_type::literal) {
+	} else if(args.front().is_literal()) {
 
 		uint8_t reg = args.front().value;
 
@@ -419,85 +423,149 @@ template<> void function_expression<OP_SWAP>(expression& e, const expression::ar
 	}
 }
 
-template<> void function_expression<OP_NOT>(expression& e, const expression::args_type& args, bool) {
+template<> void function_expression<OP_NOT>(expression& e, const expression::args_type& args) {
 
-	if(args.size() != 1)
-		throw std::runtime_error("unexpected non-unary swap operation");
+	if(args.size() != 1) {
+		std::stringstream ss;
+		ss << "unexpected arity of " << args.size() << " for unary not (\"OP_NOT\") operation." << std::endl;
+		throw std::runtime_error(ss.str());
+	}
 
 	if(args.front().is_function(OP_NOT)) {
+
 		e = args.front().args.front();
-	} else if(args.front().type == expression::expression_type::literal) {
+
+	} else if(args.front().is_literal()) {
+
 		uint8_t reg = args.front().value;
+
 		reg = ~reg;
 		e = reg;
+
 	} else {
 		e.args = args;
 	}
 }
 
-template<> void function_expression<OP_OR>(expression& e, const expression::args_type& args, bool base) {
+template<class F> static void aggregate_literals(expression& e, reg_t x0, F f) {
+
+	reg_t x = x0;
+
+	auto iter = e.args.begin();
+
+	while(iter != e.args.end()) {
+
+		auto jter = next(iter);
+
+		if(iter->is_literal()) {
+			x = f(x, iter->value);
+			e.args.erase(iter);
+		}
+
+		iter = jter;
+	}
+
+	if(x != x0)
+		e.args.push_front(x);
+}
+
+static void association_rule(expression& e, wchar_t op, const expression::args_type& args) {
 
 	for(const auto& arg : args) {
 
-		if(arg.is_function(OP_OR)) {
-			function_expression<OP_OR>(e, arg.args, false);
-		} else {
+		if(arg.is_function(op))
+			e.args.insert(e.args.end(), arg.args.begin(), arg.args.end());
+		else
 			e.args.push_back(arg);
-		}
-	}
-
-	if(base) {
-
-		reg_t x = (reg_t)0;
-
-		auto iter = e.args.begin();
-
-		while(iter != e.args.end()) {
-			auto jter = next(iter);
-			if(iter->type == expression::expression_type::literal) {
-				x |= iter->value;
-				e.args.erase(iter);
-			}
-			iter = jter;
-		}
-
-		if(x != (reg_t)0)
-			e.args.push_front(x);
 	}
 }
 
-template<> void function_expression<OP_AND>(expression& e, const expression::args_type& args, bool base) {
+static void distribution_rule(expression& e, wchar_t op1, wchar_t op2) {
 
-	for(const auto& arg : args) {
+	// find term to distribute
+	// in order of highest priority first
+	// : literals, variables, functions ("OP_AND" only)
 
-		if(arg.is_function(OP_AND)) {
-			function_expression<OP_AND>(e, arg.args, false);
-		} else {
-			e.args.push_back(arg);
-		}
+	auto jter = e.args.begin();
+
+	while(jter != e.args.end() && !jter->is_literal())
+		jter++;
+
+	if(jter == e.args.end()) {
+		jter = e.args.begin();
+		while(jter != e.args.end() && jter->is_variable())
+			jter++;
 	}
 
-	if(base) {
-
-		reg_t x = (reg_t)~0;
-
-		auto iter = e.args.begin();
-
-		while(iter != e.args.end()) {
-			auto jter = next(iter);
-			if(iter->type == expression::expression_type::literal) {
-				x &= iter->value;
-				e.args.erase(iter);
-			}
-			iter = jter;
-		}
-
-		if(x != (reg_t)~0)
-			e.args.push_front(x);
+	if(jter == e.args.end()) {
+		jter = e.args.begin();
+		while(jter != e.args.end() && !jter->is_function(op2))
+			jter++;
 	}
+
+	if(jter == e.args.end())
+		return;
+
+	// find term to distribute over
+	// specifically ("OP_AND") functions only
+
+	auto kter = e.args.begin();
+
+	while(kter != e.args.end() && (kter == jter || !kter->is_function(op2)))
+		kter++;
+
+	if(kter == e.args.end())
+		return;
+
+	// distribute *jter over kter->args
+
+	const auto& e1 = *jter;
+
+	expression::args_type dargs;
+
+	for(auto& arg : kter->args) {
+		const auto& e2 = arg;
+		arg = expression(op1, { e1, e2 });
+	}
+
+	e.args.erase(jter);
 }
 
-template<wchar_t OP> void function_expression(expression& e, const expression::args_type& args, bool) {
+template<> void function_expression<OP_OR>(expression& e, const expression::args_type& args) {
+
+	association_rule(e, OP_OR, args);
+
+	aggregate_literals(e, 0, [](reg_t a, reg_t x) -> reg_t { return a | x; });
+
+	distribution_rule(e, OP_OR, OP_AND);
+
+	if(e.is_unary())
+		e = e.args.front();
+}
+
+template<> void function_expression<OP_AND>(expression& e, const expression::args_type& args) {
+
+	association_rule(e, OP_AND, args);
+
+	aggregate_literals(e, ~0, [](reg_t a, reg_t x) -> reg_t { return a & x; });
+
+	distribution_rule(e, OP_AND, OP_OR);
+
+	if(e.is_unary())
+		e = e.args.front();
+}
+
+template<> void function_expression<OP_PLUS>(expression& e, const expression::args_type& args) {
+
+	association_rule(e, OP_PLUS, args);
+
+	aggregate_literals(e, 0, [](reg_t a, reg_t x) -> reg_t { return a + x; });
+
+	if(e.is_unary())
+		e = e.args.front();
+}
+
+template<wchar_t> static void function_expression(expression& e, const expression::args_type& args) {
 	e.args = args;
 }
 
@@ -505,10 +573,47 @@ template<wchar_t OP> void function_expression(expression& e, const expression::a
 // struct expression
 //
 
+expression& expression::operator=(const expression& r) {
+
+	if(this != &r) {
+
+		expression::args_type my_args;
+
+		if(r.is_function())
+			my_args = r.args;
+		else if(is_function())
+			args.clear();
+
+		type = r.type;
+
+		switch(type) {
+
+			case expression_type::literal:
+
+				value = r.value;
+				break;
+
+			case expression_type::variable:
+
+				name = r.name;
+				break;
+
+			case expression_type::function:
+
+				op = r.op;
+				args = my_args;
+				break;
+		}
+	}
+
+	return *this;
+}
+
 expression::expression() : expression(OP_COMPOSE, {}) {
 }
 
-expression::expression(const expression& r) : name(r.name), value(r.value), op(r.op), type(r.type), args(r.args) {
+expression::expression(const expression& r) {
+	*this = r;
 }
 
 expression::expression(unsigned long my_value) : value(my_value), type(expression_type::literal) {
@@ -568,7 +673,7 @@ std::wstring expression::wstr() const {
 
 		case expression_type::literal:
 
-			ws << std::showbase << std::hex << value;
+			ws << std::showbase << (value < 10 ? std::dec : std::hex) << value;
 
 			break;
 	}
@@ -580,201 +685,56 @@ bool expression::is_function(wchar_t my_op) const {
 	return type == expression_type::function && op == my_op;
 }
 
-/*
-expression expression::expand(const dictionary::key_type&,const dictionary&) const {
-
-	if(type != expression_type::function)
-		return *this;
-
-	return *this;
+bool expression::is_variable(const std::wstring& my_name) const {
+	return type == expression_type::variable && name == my_name;
 }
 
-expression expression::flatten() const {
-
-	if(type != expression_type::function)
-		return *this;
-
-	expression e(op);
-
-	for(const auto& arg : args) {
-
-		if(arg.is_function(op)) {
-
-			expression sub_expr = arg.flatten();
-
-			for(const auto& sub_arg : sub_expr.args)
-				e.args.push_back(sub_arg);
-
-		} else {
-			e.args.push_back(arg);
-		}
-	}
-
-	return e;
+bool expression::is_literal(unsigned long my_value) const {
+	return type == expression_type::literal && value == my_value;
 }
 
-expression expression::optimize() const {
-
-	if(type != expression_type::function)
-		return *this;
-
-	if(args.empty())
-		return *this;
-
-	expression::args_type dargs;
-
-	if(op == OP_AND || op == OP_OR || op == OP_XOR || op == OP_PLUS)
-		for(const auto& arg : flatten().args)
-			dargs.push_back(arg.optimize());
-	else
-		for(const auto& arg : args)
-			dargs.push_back(arg.optimize());
-
-	const std::list<wchar_t> unary = { OP_SWAP, OP_NOT, OP_ROTL, OP_ROTR };
-	const std::list<wchar_t> binary = { OP_MINUS };
-
-	unsigned int arity = UINT_MAX;
-
-	for(const auto& my_op : unary) {
-		if(op == my_op) {
-			arity = dargs.size();
-			if(arity != 1) {
-				std::wstringstream ss;
-				ss << "unary operator \"" << op << "\" has unexpected argument count of " << dargs.size();
-				throw ss.str();
-			}
-		}
-	}
-
-	for(const auto& my_op : binary) {
-		if(op == my_op) {
-			arity = dargs.size();
-			if(arity != 2) {
-				std::wstringstream ss;
-				ss << "binary operator \"" << op << "\" has unexpected argument count of " << dargs.size();
-				throw ss.str();
-			}
-		}
-	}
-
-	if(is_function(OP_COMPOSE))
-		return flatten();
-
-	if(arity == 1) {
-
-		const expression& arg0 = dargs.front();
-
-		if(
-				(arg0.type == expression_type::function)
-
-				&&
-
-				(
-				 (is_function(OP_SWAP) && arg0.is_function(OP_SWAP)) ||
-				 (is_function(OP_NOT ) && arg0.is_function(OP_NOT )) ||
-				 (is_function(OP_ROTL) && arg0.is_function(OP_ROTR)) ||
-				 (is_function(OP_ROTR) && arg0.is_function(OP_ROTL))
-				)
-		  )
-		{
-			return arg0.args.front().optimize();
-		}
-
-	} else if(arity == 2) {
-
-		// nothing
-
-	} else if(arity == UINT_MAX) {
-
-		args_type ddargs;
-
-		reg_t acc = (op == OP_AND) ? ~0 : 0;
-		int acc_count = 0;
-
-		for(const auto& arg : dargs) {
-
-			if(arg.type == expression_type::literal) {
-
-				acc_count++;
-
-				if(op == OP_PLUS) {
-
-					acc += arg.value;
-
-				} else if(op == OP_XOR) {
-
-					acc ^= arg.value;
-
-				} else if(op == OP_OR) {
-
-					acc |= arg.value;
-
-				} else if(op == OP_AND) {
-
-					acc &= arg.value;
-
-				} else {
-
-					throw std::runtime_error("unknown n-ary operator");
-				}
-
-			} else {
-				ddargs.push_back(arg);
-			}
-		}
-
-		if(acc_count == 0) {
-
-			return expression(op, ddargs).flatten();
-
-		} else {
-			if(ddargs.size() == 0) {
-
-				return acc;
-
-			} else if(ddargs.size() == 1) {
-
-				if(is_function(OP_OR) || is_function(OP_AND)) {
-
-					expression rarg = ddargs.front().optimize();
-
-					if(!rarg.args.empty() && (rarg.op == OP_OR || rarg.op == OP_AND)) {
-
-						expression re(rarg.op);
-
-						for(const auto& sub_rarg : rarg.args) {
-
-							expression re_sub(op, { (unsigned long)acc, sub_rarg });
-
-							re_sub = re_sub.optimize();
-
-							if(re_sub.type == expression_type::literal && re_sub.value == 0 && rarg.op == OP_OR) {
-								// nothing
-							} else if(re_sub.type == expression_type::literal && re_sub.value == 255 && rarg.op == OP_AND) {
-								// nothing
-							} else {
-								re.args.push_back( re_sub );
-							}
-						}
-
-						if(re.args.size() == 1)
-							return re.args.front();
-
-						return re.flatten();
-					}
-
-				}
-			}
-
-			ddargs.push_front(acc);
-			return expression(op, ddargs);
-
-		}
-	}
-
-	return expression(op, dargs);
+bool expression::is_function() const {
+	return type == expression_type::function;
 }
-*/
+
+bool expression::is_variable() const {
+	return type == expression_type::variable;
+}
+
+bool expression::is_literal() const {
+	return type == expression_type::literal;
+}
+
+bool expression::is_nullary() const {
+	return is_arity(0);
+}
+
+bool expression::is_unary() const {
+	return is_arity(1);
+}
+
+bool expression::is_binary() const {
+	return is_arity(2);
+}
+
+bool expression::is_arity(int n) const {
+	return is_function() && (int)args.size() == n;
+}
+
+bool expression::operator==(const expression& r) const {
+
+	if(type != r.type)
+		return false;
+
+	switch(type) {
+		case expression_type::literal  : return value == r.value;
+		case expression_type::variable : return name == r.name;
+		case expression_type::function : return args == r.args;
+	}
+
+	return false;
+}
+
 
 //
 // struct dictionary
@@ -788,6 +748,12 @@ dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
 	if(!has_key(s))
 		operator[](s) = dictionary::mapped_type(s);
 	return at(s);
+}
+
+std::wstring str(const dictionary::value_type& x) {
+	std::wstringstream ws;
+	ws << std::setw(6) << std::left << std::setfill(L' ') << x.first << L" := " << x.second.wstr();
+	return ws.str();
 }
 
 //

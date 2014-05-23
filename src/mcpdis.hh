@@ -37,6 +37,8 @@ struct dictionary : _dictionary {
 	dictionary::mapped_type& touch(const key_type&);
 };
 
+std::wstring str(const dictionary::value_type&);
+
 //
 // expression
 
@@ -66,13 +68,25 @@ struct expression {
 
 	std::wstring wstr() const;
 
-	//expression expand(const dictionary::key_type&,const dictionary&) const;
-	//expression optimize() const;
-	//expression flatten() const;
-
-	//template<class F> expression transform(F) const;
-
 	bool is_function(wchar_t) const;
+	bool is_variable(const std::wstring&) const;
+	bool is_literal(unsigned long) const;
+
+	bool is_function() const;
+	bool is_variable() const;
+	bool is_literal() const;
+
+	bool is_nullary() const;
+	bool is_unary() const;
+	bool is_binary() const;
+
+	bool is_arity(int) const;
+
+	expression& operator=(const expression&);
+
+	bool operator==(const expression&) const;
+
+
 };
 
 //

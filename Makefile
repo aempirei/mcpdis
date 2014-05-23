@@ -1,7 +1,7 @@
 CXX = g++
 CPPFLAGS = -Isrc
-CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O3
-CFLAGS = -Wall -W -pedantic -std=c99 -O3
+CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O3 -ggdb
+CFLAGS = -Wall -W -pedantic -std=c99 -O3 -ggdb
 LIBFLAGS = -Llib -lmcpdis -lcrypto -lpthread
 TARGETS = lib/libmcpdis.a bin/dis
 
