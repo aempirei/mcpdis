@@ -580,6 +580,11 @@ bool function::operator==(const function& r) const {
 	return op == r.op && args == r.args;
 }
 
+void function::clear() {
+	op = OP_LIST;
+	args.clear();
+}
+
 size_t function::arity() const {
 	return args.size();
 }
@@ -596,25 +601,34 @@ term& term::operator=(const term& r) {
 
 	if(this != &r) {
 
-		if(is_function())
-			f.args.clear();
-
 		type = r.type;
 
 		switch(type) {
-			case term_type::literal  : l = r.l; break;
-			case term_type::variable : v = r.v; break;
-			case term_type::function : f = r.f; break;
+
+			case term_type::literal:
+
+				l = r.l;
+				v.clear();
+				f.clear();
+				break;
+
+			case term_type::variable:
+
+				l = 0;
+				v = r.v;
+				f.clear();
+				break;
+
+			case term_type::function:
+
+				l = 0;
+				v.clear();
+				f = r.f;
+				break;
 		}
 	}
 
 	return *this;
-}
-
-term::~term() {
-	if(type == term_type::function) {
-		f.args.~list();
-	}
 }
 
 term::term() : term(function(OP_LIST)) {

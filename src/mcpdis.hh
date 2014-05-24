@@ -64,6 +64,8 @@ struct function {
 	bool operator==(const function&) const;
 
 	size_t arity() const;
+
+	void clear();
 };
 
 //
@@ -79,19 +81,15 @@ struct term {
 
 	term_type type;
 
-	union {
-		literal_t l;
-		variable v;
-		function f;
-	};
+	literal_t l;
+	variable v;
+	function f;
 
 	term();
 	term(literal_t);
 	term(const variable&);
 	term(const function&);
 	term(const term&);
-
-	~term();
 
 	std::wstring wstr() const;
 
