@@ -10,6 +10,7 @@
 #include <initializer_list>
 
 #include <operators.hh>
+#include <ansicolor.hh>
 
 struct instruction_set;
 struct instruction;

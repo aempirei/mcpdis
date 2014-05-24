@@ -1,5 +1,5 @@
 CXX = g++
-CPPFLAGS = -Isrc
+CPPFLAGS = -Isrc -DUSE_COLOR
 CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O2
 LIBFLAGS = -Llib -lmcpdis # -lcrypto -lpthread
 TARGETS = lib/libmcpdis.a bin/dis
@@ -18,7 +18,7 @@ test: all
 	cat test.dis
 	md5sum test.dis
 
-src/mcpdis.o: src/mcpdis.hh src/operators.hh src/mcpdis.cc src/mcpdis-term.cc src/mcpdis-pic12f.cc
+src/mcpdis.o: src/mcpdis.hh src/operators.hh src/ansicolor.hh src/mcpdis.cc src/mcpdis-term.cc src/mcpdis-pic12f.cc
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 

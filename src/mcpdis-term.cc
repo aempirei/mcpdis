@@ -167,25 +167,25 @@ std::wstring term::wstr() const {
 
 		case term_type::variable:
 
-			ws << v;
+			ws << ANSI_LOGREEN << v << ANSI_CLR;
 
 			break;
 
 		case term_type::function:
 
-			ws << L'(' << f.op;
+			ws << ANSI_HIBLACK << L'(' << ANSI_HIYELLOW << f.op << ANSI_CLR;
 
 			for(const auto& arg : f.args)
 				ws << L' ' << arg.wstr();
 
-			ws << L')';
+			ws << ANSI_HIBLACK << L')' << ANSI_CLR;
 
 
 			break;
 
 		case term_type::literal:
 
-			ws << std::showbase << (l < 10 ? std::dec : std::hex) << l;
+			ws << ANSI_LORED << std::showbase << (l < 10 ? std::dec : std::hex) << l << ANSI_CLR;
 
 			break;
 	}
