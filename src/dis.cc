@@ -298,7 +298,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				if(k.second.is_variable(k.first)) {
+				if(k.second.is_symbol(k.first)) {
 						
 					// do nothing for identity
 

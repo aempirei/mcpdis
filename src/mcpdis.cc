@@ -17,7 +17,7 @@
 //
 /////////////////////
 
-template<class T> bool instruction::match(const std::wstring& s, T f) const {
+template<class T> bool instruction::match(const symbol& s, T f) const {
 	
 	if(s.length() != pattern.length())
 		return false;
@@ -35,14 +35,14 @@ template<class T> bool instruction::match(const std::wstring& s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const std::wstring& s, arguments *p) const {
+template<> bool instruction::match(const symbol& s, arguments *p) const {
 
 	p->clear();
 
 	return match(s, [&](int n) { (*p)[pattern[n]].push_back(s[n]); });
 }
 
-bool instruction::match(const std::wstring& s) const {
+bool instruction::match(const symbol& s) const {
 
 	return match(s, [](int){});
 }
@@ -59,7 +59,7 @@ bool instruction::operator<(const instruction& x) const {
 //
 /////////////////////////
 
-instruction_set::value_type instruction_set::find(const std::wstring& s) const {
+instruction_set::value_type instruction_set::find(const symbol& s) const {
 
 	for(const auto& op : *this)
 		if(op.match(s))
@@ -123,13 +123,13 @@ std::wstring bitstream::get(int n) {
 //
 ///////////////////
 
-unsigned long arguments::value(key_type ch) const {
+literal_t arguments::value(key_type ch) const {
 
 	unsigned long x = 0;
 
-	const std::wstring& s = at(ch);
+	const mapped_type& s = at(ch);
 
-	for(unsigned int n = 0; n < s.length(); n++) {
+	for(size_t n = 0; n < s.length(); n++) {
 
 		x <<= 1;
 
@@ -167,7 +167,7 @@ bool dictionary::has_key(const dictionary::key_type& s) const {
 
 dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
 	if(!has_key(s))
-		operator[](s) = dictionary::mapped_type(s);
+		operator[](s) = mapped_type(s);
 	return at(s);
 }
 
@@ -188,7 +188,7 @@ std::wstring str(const dictionary::value_type& x) {
 operation::operation() {
 }
 
-operation::operation(const std::wstring& my_s, unsigned long my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
+operation::operation(const symbol& my_s, literal_t my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
 	opcode = cpu.find(s);
 	opcode.match(s, &args);
 }

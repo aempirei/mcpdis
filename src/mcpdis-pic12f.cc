@@ -14,13 +14,13 @@
 #define HN(a)		void a(operation&, dictionary&c)
 
 #define USE_B		reg_t b = (1 << OARG(L'b'))
-#define USE_W		const std::wstring W = L"W"
-#define USE_D		const std::wstring d = load_d(o)
-#define USE_F		const std::wstring f = load_f(o)
-#define USE_K		const unsigned long k = OARG(L'k')
-#define USE_PC		const unsigned long pc = o.address
-#define USE_REG(R)	const std::wstring R = register_name(instruction::file_register::R)
-#define USE_STACK	const std::wstring STACK = L"STACK"
+#define USE_W		const symbol W = L"W"
+#define USE_D		const symbol d = load_d(o)
+#define USE_F		const symbol f = load_f(o)
+#define USE_K		const literal_t k = OARG(L'k')
+#define USE_PC		const literal_t pc = o.address
+#define USE_REG(R)	const symbol R = register_name(instruction::file_register::R)
+#define USE_STACK	const symbol STACK = L"STACK"
 
 #define CLEAR_BIT(reg, mask) do{ USE_REG(reg); c.touch(reg); c[reg] = function(OP_AND, { (reg_t)~(reg_t)(mask), c[reg] }); }while(0)
 #define SET_BIT(reg, mask)   do{ USE_REG(reg); c.touch(reg); c[reg] = function(OP_OR , {         (reg_t)(mask), c[reg] }); }while(0)
@@ -30,11 +30,11 @@
 namespace pic12f {
 
 
-	std::wstring load_d(operation& o) {
+	symbol load_d(operation& o) {
 		return dest_string(OARG(L'd'), OARG(L'f'));
 	}
 
-	std::wstring load_f(operation& o) {
+	symbol load_f(operation& o) {
 		return register_name(OARG(L'f'));
 	}
 
@@ -190,23 +190,23 @@ namespace pic12f {
 	};
 
 
-	std::wstring address_string(literal_t x) {
+	symbol address_string(literal_t x) {
 		std::wstringstream ts;
 		ts << std::uppercase << std::right << std::hex << std::setw(3) << std::setfill(L'0') << x << L'h';
 		return ts.str();
 	}
 
-	std::wstring register_string(reg_t x) {
+	symbol register_string(reg_t x) {
 		std::wstringstream ts;
 		ts << L'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill(L'0') << x;
 		return ts.str();
 	}
 
-	std::wstring dest_string(bool f, reg_t x) {
+	symbol dest_string(bool f, reg_t x) {
 		return f ? register_name(x) : L"W";
 	}
 
-	std::wstring register_name(reg_t x) {
+	symbol register_name(reg_t x) {
 
 		switch(x) {
 			case 0x00: return L"INDF";

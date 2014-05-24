@@ -91,7 +91,7 @@ term::term(const term& r) {
 term::term(literal_t my_l) : type(term_type::literal), l(my_l) {
 }
 
-term::term(const variable& my_v) : type(term_type::variable), v(my_v) {
+term::term(const symbol& my_s) : type(term_type::symbol), s(my_s) {
 }
 
 term::term(const function& my_f) : type(term_type::function), f(my_f) {
@@ -108,21 +108,21 @@ term& term::operator=(const term& r) {
 			case term_type::literal:
 
 				l = r.l;
-				v.clear();
+				s.clear();
 				f.clear();
 				break;
 
-			case term_type::variable:
+			case term_type::symbol:
 
 				l = 0;
-				v = r.v;
+				s = r.s;
 				f.clear();
 				break;
 
 			case term_type::function:
 
 				l = 0;
-				v.clear();
+				s.clear();
 				f = r.f;
 				break;
 		}
@@ -137,9 +137,9 @@ bool term::operator==(const term& r) const {
 		return false;
 
 	switch(type) {
-		case term_type::literal  : return l == r.l;
-		case term_type::variable : return v == r.v;
-		case term_type::function : return f == r.f;
+		case term_type::literal : return l == r.l;
+		case term_type::symbol  : return s == r.s;
+		case term_type::function: return f == r.f;
 	}
 
 	return false;
@@ -151,9 +151,9 @@ bool term::operator<(const term& r) const {
 		return type < r.type;
 
 	switch(type) {
-		case term_type::literal  : return l < r.l;
-		case term_type::variable : return v < r.v;
-		case term_type::function : return f < r.f;
+		case term_type::literal : return l < r.l;
+		case term_type::symbol  : return s < r.s;
+		case term_type::function: return f < r.f;
 	}
 
 	return false;
@@ -165,9 +165,9 @@ std::wstring term::wstr() const {
 
 	switch(type) {
 
-		case term_type::variable:
+		case term_type::symbol:
 
-			ws << ANSI_LOGREEN << v << ANSI_CLR;
+			ws << ANSI_LOGREEN << s << ANSI_CLR;
 
 			break;
 
@@ -197,8 +197,8 @@ bool term::is_function(op_t my_op) const {
 	return type == term_type::function && f.op == my_op;
 }
 
-bool term::is_variable(const variable& my_v) const {
-	return type == term_type::variable && v == my_v;
+bool term::is_symbol(const symbol& my_s) const {
+	return type == term_type::symbol && s == my_s;
 }
 
 bool term::is_literal(literal_t my_l) const {
@@ -209,8 +209,8 @@ bool term::is_function() const {
 	return type == term_type::function;
 }
 
-bool term::is_variable() const {
-	return type == term_type::variable;
+bool term::is_symbol() const {
+	return type == term_type::symbol;
 }
 
 bool term::is_literal() const {
@@ -281,7 +281,7 @@ static void distribution_rule(term& e, op_t op1, op_t op2) {
 
 	// find term to distribute
 	// in order of highest priority first
-	// : literals, variables, functions ("OP_AND" only)
+	// : literals, symbols, functions ("OP_AND" only)
 
 	if(!e.is_function())
 		return;
@@ -293,7 +293,7 @@ static void distribution_rule(term& e, op_t op1, op_t op2) {
 
 	if(jter == e.f.args.end()) {
 		jter = e.f.args.begin();
-		while(jter != e.f.args.end() && jter->is_variable())
+		while(jter != e.f.args.end() && jter->is_symbol())
 			jter++;
 	}
 

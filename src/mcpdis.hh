@@ -23,7 +23,7 @@ struct function;
 
 typedef std::list<operation> sourcecode;
 typedef std::list<term> arglist;
-typedef std::wstring variable;
+typedef std::wstring symbol;
 
 typedef unsigned long literal_t;
 typedef uint8_t reg_t;
@@ -39,10 +39,10 @@ namespace pic12f {
 
 	extern instruction_set pic12f675;
 
-	std::wstring address_string(literal_t);
-	std::wstring register_string(reg_t);
-	std::wstring register_name(reg_t);
-	std::wstring dest_string(bool,reg_t);
+	symbol address_string(literal_t);
+	symbol register_string(reg_t);
+	symbol register_name(reg_t);
+	symbol dest_string(bool,reg_t);
 
 	void power(dictionary&);
 	void finalize(dictionary&);
@@ -53,7 +53,7 @@ namespace pic12f {
 //
 // dictionary
 
-using _dictionary = std::map<std::wstring,term>;
+using _dictionary = std::map<symbol,term>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
@@ -97,19 +97,19 @@ struct term {
 
 	enum class term_type {
 		literal,
-		variable,
+		symbol,
 		function
 	};
 
 	term_type type;
 
 	literal_t l;
-	variable v;
+	symbol s;
 	function f;
 
 	term();
 	term(literal_t);
-	term(const variable&);
+	term(const symbol&);
 	term(const function&);
 	term(const term&);
 
@@ -117,10 +117,10 @@ struct term {
 
 	bool is_function(op_t) const;
 	bool is_literal(literal_t) const;
-	bool is_variable(const variable&) const;
+	bool is_symbol(const symbol&) const;
 
 	bool is_function() const;
-	bool is_variable() const;
+	bool is_symbol() const;
 	bool is_literal() const;
 
 	bool is_nullary() const;
@@ -133,18 +133,6 @@ struct term {
 	bool operator<(const term&) const;
 
 	term& operator=(const term&);
-};
-
-//
-// arguments
-
-using _arguments = std::map<wchar_t,std::wstring>;
-
-struct arguments : _arguments {
-	using _arguments::_arguments;
-	unsigned long value(key_type) const;
-	bool has_arg(key_type) const;
-	bool has_args(const key_type *) const;
 };
 
 //
@@ -162,11 +150,22 @@ struct bitstream {
 	int buffer_pos;
 
 	std::wstring left;
-
 	std::wstring get(int);
 
 	bitstream();
 	bitstream(FILE *);
+};
+
+//
+// arguments
+
+using _arguments = std::map<op_t,symbol>;
+
+struct arguments : _arguments {
+	using _arguments::_arguments;
+	literal_t value(key_type) const;
+	bool has_arg(key_type) const;
+	bool has_args(const key_type *) const;
 };
 
 //
@@ -218,13 +217,15 @@ struct instruction {
 	};
 
 	enum class pcl_types {
-		normal, skip, jump, call, ret
+		normal,
+		skip,
+		jump,
+		call,
+		ret
 	};
 
-	// variables
-
-	std::wstring pattern;
-	std::wstring name;
+	symbol pattern;
+	symbol name;
 
 	accumulation_function *fn;
 
@@ -232,11 +233,8 @@ struct instruction {
 
 	reg_t status;
 
-
-	// methods
-
-	bool match(const std::wstring&) const;
-	template<class T> bool match(const std::wstring&, T) const;
+	bool match(const symbol&) const;
+	template<class T> bool match(const symbol&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -250,7 +248,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	value_type find(const std::wstring&) const;
+	value_type find(const symbol&) const;
 
 	void sort();
 };
@@ -260,16 +258,16 @@ struct instruction_set : _instruction_set {
 
 struct operation {
 
-	std::wstring s;
+	symbol s;
 
-	unsigned long address;
+	literal_t address;
 
 	instruction opcode;
 
 	arguments args;
 
 	operation();
-	operation(const std::wstring&, unsigned long, const instruction_set&);
+	operation(const symbol&, literal_t, const instruction_set&);
 
 	void execute(dictionary&);
 };
