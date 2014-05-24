@@ -39,7 +39,7 @@ template<> bool instruction::match(const std::wstring& s, arguments *p) const {
 
 	p->clear();
 
-	return match(s, [&](int n) { p->operator[](pattern[n]).push_back(s[n]); });
+	return match(s, [&](int n) { (*p)[pattern[n]].push_back(s[n]); });
 }
 
 bool instruction::match(const std::wstring& s) const {
