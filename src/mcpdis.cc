@@ -8,8 +8,6 @@
 #include <iostream>
 #include <set>
 
-namespace pic12f {
-
 #define OARG(X)		o.args.value(X)
 
 #define FN(a)		void a(operation&, dictionary&)
@@ -25,10 +23,12 @@ namespace pic12f {
 #define USE_REG(R)	const std::wstring R = register_name(instruction::file_register::R)
 #define USE_STACK	const std::wstring STACK = L"STACK"
 
-#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); c.touch(reg); c[reg] = expression(OP_AND, { (reg_t)~(reg_t)(mask), c[reg] }); }while(0)
-#define SET_BIT(reg, mask)   do{ USE_REG(reg); c.touch(reg); c[reg] = expression(OP_OR , {           (reg_t)(mask), c[reg] }); }while(0)
+#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); c.touch(reg); c[reg] = function(OP_AND, { (reg_t)~(reg_t)(mask), c[reg] }); }while(0)
+#define SET_BIT(reg, mask)   do{ USE_REG(reg); c.touch(reg); c[reg] = function(OP_OR , {         (reg_t)(mask), c[reg] }); }while(0)
 
 #define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = (reg_t)(x); c[PCLATH] = (reg_t)((x) >> 8); }while(0)
+
+namespace pic12f {
 
 	std::wstring load_d(operation& o) {
 		return dest_string(OARG(L'd'), OARG(L'f'));
@@ -43,8 +43,8 @@ namespace pic12f {
 		USE_REG(PCL);
 		USE_REG(PCLATH);
 
-		c[PCL] = expression(L"TOS.lo");
-		c[PCLATH] = expression(L"TOS.hi");
+		c[PCL] = term(L"TOS.lo");
+		c[PCLATH] = term(L"TOS.hi");
 	}
 
 	GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
@@ -70,9 +70,9 @@ namespace pic12f {
 
 		USE_REG(STATUS);
 
-		expression& reg = c.touch(STATUS);
+		term& reg = c.touch(STATUS);
 
-		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
+		reg = function(OP_AND, { (reg_t)~instruction::flags::Z, reg });
 	}
 
 	/*
@@ -97,30 +97,30 @@ namespace pic12f {
 
 		USE_REG(STATUS);
 
-		expression& reg = c.touch(STATUS);
+		term& reg = c.touch(STATUS);
 
-		reg = expression(OP_AND, { (reg_t)~instruction::flags::Z, reg });
-		reg = expression(OP_OR , { (reg_t) instruction::flags::Z, reg });
-		// reg = expression(OP_OR, { expression(L"Z"), reg });
+		reg = function(OP_AND, { (reg_t)~instruction::flags::Z, reg });
+		reg = function(OP_OR , { (reg_t) instruction::flags::Z, reg });
+		// reg = term(function(OP_OR, { term(L"Z"), reg }));
 
 	}
 
-	GN(IORWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_OR   , { c.touch(f) , c.touch(W) }); }
-	GN(ANDWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_AND  , { c.touch(f) , c.touch(W) }); }
-	GN(XORWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_XOR  , { c.touch(f) , c.touch(W) }); }
-	GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_MINUS, { c.touch(f) , c.touch(W) }); }
-	GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = expression(OP_PLUS , { c.touch(f) , c.touch(W) }); }
+	GN(IORWF)  { USE_W; USE_D; USE_F; c[d] = function(OP_OR   , { c.touch(f) , c.touch(W) }); }
+	GN(ANDWF)  { USE_W; USE_D; USE_F; c[d] = function(OP_AND  , { c.touch(f) , c.touch(W) }); }
+	GN(XORWF)  { USE_W; USE_D; USE_F; c[d] = function(OP_XOR  , { c.touch(f) , c.touch(W) }); }
+	GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = function(OP_MINUS, { c.touch(f) , c.touch(W) }); }
+	GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = function(OP_PLUS , { c.touch(f) , c.touch(W) }); }
 
-	GN(DECF)   { USE_D; USE_F;         c[d] = expression(OP_MINUS, { c.touch(f), 1          }); }
-	GN(INCF)   { USE_D; USE_F;         c[d] = expression(OP_PLUS , { c.touch(f), 1          }); }
+	GN(DECF)   { USE_D; USE_F;         c[d] = function(OP_MINUS, { c.touch(f), 1          }); }
+	GN(INCF)   { USE_D; USE_F;         c[d] = function(OP_PLUS , { c.touch(f), 1          }); }
 
-	GN(COMF)   { USE_D; USE_F;         c[d] = expression(OP_NOT  , { c.touch(f)             }); }
-	GN(RRF)    { USE_D; USE_F;         c[d] = expression(OP_ROTR , { c.touch(f)             }); }
-	GN(RLF)    { USE_D; USE_F;         c[d] = expression(OP_ROTL , { c.touch(f)             }); }
-	GN(SWAPF)  { USE_D; USE_F;         c[d] = expression(OP_SWAP , { c.touch(f)             }); }
+	GN(COMF)   { USE_D; USE_F;         c[d] = function(OP_NOT  , { c.touch(f)             }); }
+	GN(RRF)    { USE_D; USE_F;         c[d] = function(OP_ROTR , { c.touch(f)             }); }
+	GN(RLF)    { USE_D; USE_F;         c[d] = function(OP_ROTL , { c.touch(f)             }); }
+	GN(SWAPF)  { USE_D; USE_F;         c[d] = function(OP_SWAP , { c.touch(f)             }); }
 
-	GN(BCF)    { USE_F; USE_B; b = ~b; c[f] = expression(OP_AND  , { b         , c.touch(f) }); }
-	GN(BSF)    { USE_F; USE_B;         c[f] = expression(OP_OR   , { b         , c.touch(f) }); } 
+	GN(BCF)    { USE_F; USE_B; b = ~b; c[f] = function(OP_AND  , { b         , c.touch(f) }); }
+	GN(BSF)    { USE_F; USE_B;         c[f] = function(OP_OR   , { b         , c.touch(f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
@@ -129,17 +129,17 @@ namespace pic12f {
 
 	GN(GOTO)   { USE_K; SET_PC(k); }
 
-	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = expression(OP_LIST, { pc + 1, c.touch(STACK) }); }
+	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = function(OP_LIST, { pc + 1, c.touch(STACK) }); }
 
 	GN(MOVLW)  { USE_K; USE_W; c[W] = (reg_t)k; }
 
 	GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-	GN(IORLW)  { USE_K; USE_W; c[W] = expression(OP_OR   , { k, c.touch(W) }); }
-	GN(ANDLW)  { USE_K; USE_W; c[W] = expression(OP_AND  , { k, c.touch(W) }); }
-	GN(XORLW)  { USE_K; USE_W; c[W] = expression(OP_XOR  , { k, c.touch(W) }); }
-	GN(SUBLW)  { USE_K; USE_W; c[W] = expression(OP_MINUS, { k, c.touch(W) }); }
-	GN(ADDLW)  { USE_K; USE_W; c[W] = expression(OP_PLUS , { k, c.touch(W) }); }
+	GN(IORLW)  { USE_K; USE_W; c[W] = function(OP_OR   , { k, c.touch(W) }); }
+	GN(ANDLW)  { USE_K; USE_W; c[W] = function(OP_AND  , { k, c.touch(W) }); }
+	GN(XORLW)  { USE_K; USE_W; c[W] = function(OP_XOR  , { k, c.touch(W) }); }
+	GN(SUBLW)  { USE_K; USE_W; c[W] = function(OP_MINUS, { k, c.touch(W) }); }
+	GN(ADDLW)  { USE_K; USE_W; c[W] = function(OP_PLUS , { k, c.touch(W) }); }
 
 	GN(PC)     {
 		USE_PC;
@@ -215,9 +215,13 @@ instruction_set pic12f675 = {
 	{ L"11111xkkkkkkkk", L"ADDLW" , pic12f::ADDLW , instruction::pcl_types::normal, instruction::flags::arithmetic }
 };
 
+/////////////////////
+//
 //
 // struct instruction
 //
+//
+/////////////////////
 
 template<class T> bool instruction::match(const std::wstring& s, T f) const {
 	
@@ -253,9 +257,13 @@ bool instruction::operator<(const instruction& x) const {
 	return pattern < x.pattern;
 }
 
+/////////////////////////
+//
 //
 // struct instruction_set
 //
+//
+/////////////////////////
 
 instruction_set::value_type instruction_set::find(const std::wstring& s) const {
 
@@ -270,9 +278,13 @@ void instruction_set::sort() {
 	std::sort(begin(), end());
 }
 
+///////////////////
+//
 //
 // struct bitstream
 //
+//
+///////////////////
 
 bitstream::bitstream() : bitstream(stdin) {
 }
@@ -309,51 +321,13 @@ std::wstring bitstream::get(int n) {
 	return s;
 }
 
+///////////////////
 //
-// global
-//
-
-std::wstring register_string(unsigned long x) {
-	std::wstringstream ts;
-	ts << L'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill(L'0') << x;
-	return ts.str();
-}
-
-std::wstring address_string(unsigned long x) {
-	std::wstringstream ts;
-	ts << std::uppercase << std::right << std::hex << std::setw(3) << std::setfill(L'0') << x << L'h';
-	return ts.str();
-}
-
-std::wstring dest_string(bool f,unsigned long x) {
-	return f ? register_name(x) : L"W";
-}
-
-std::wstring register_name(reg_t x) {
-
-	switch(x) {
-		case 0x00: return L"INDF";
-		case 0x01: return L"TMR0";
-		case 0x02: return L"PCL";
-		case 0x03: return L"STATUS";
-		case 0x04: return L"FSR";
-		case 0x05: return L"GPIO";
-		case 0x0a: return L"PCLATH";
-		case 0x0b: return L"INTCON";
-		case 0x0c: return L"PIR1";
-		case 0x0e: return L"TMR1L";
-		case 0x0f: return L"TMR1H";
-		case 0x10: return L"T1CON";
-		case 0x19: return L"CMCON";
-		case 0x1e: return L"ADRESH";
-		case 0x1f: return L"ADCON0";
-	}
-	return register_string(x);
-}
-
 //
 // struct arguments
 //
+//
+///////////////////
 
 unsigned long arguments::value(key_type ch) const {
 
@@ -385,91 +359,113 @@ bool arguments::has_args(const key_type *s) const {
 	return true;
 }
 
-template<class F> static void aggregate_literals(expression& e, reg_t x0, F f) {
+///////////////////////
+//
+//
+// transformation rules
+//
+//
+///////////////////////
+
+template<class F> static void aggregate_literals(term& e, reg_t x0, F f) {
 
 	reg_t x = x0;
 
-	auto iter = e.args.begin();
+	if(!e.is_function())
+		return;
 
-	while(iter != e.args.end()) {
+	auto iter = e.f.args.begin();
+
+	while(iter != e.f.args.end()) {
 
 		auto jter = next(iter);
 
 		if(iter->is_literal()) {
-			x = f(x, iter->value);
-			e.args.erase(iter);
+			x = f(x, iter->l);
+			e.f.args.erase(iter);
 		}
 
 		iter = jter;
 	}
 
 	if(x != x0)
-		e.args.push_front(x);
+		e.f.args.push_front(x);
 }
 
-static void association_rule(expression& e, wchar_t op, const expression::args_type& args) {
+static void association_rule(term& e, op_t op, const arglist& args) {
 
 	for(const auto& arg : args) {
 
 		if(arg.is_function(op))
-			e.args.insert(e.args.end(), arg.args.begin(), arg.args.end());
+			e.f.args.insert(e.f.args.end(), arg.f.args.begin(), arg.f.args.end());
 		else
-			e.args.push_back(arg);
+			e.f.args.push_back(arg);
 	}
 }
 
-static void distribution_rule(expression& e, wchar_t op1, wchar_t op2) {
+static void distribution_rule(term& e, op_t op1, op_t op2) {
 
 	// find term to distribute
 	// in order of highest priority first
 	// : literals, variables, functions ("OP_AND" only)
 
-	auto jter = e.args.begin();
+	if(!e.is_function())
+		return;
 
-	while(jter != e.args.end() && !jter->is_literal())
+	auto jter = e.f.args.begin();
+
+	while(jter != e.f.args.end() && !jter->is_literal())
 		jter++;
 
-	if(jter == e.args.end()) {
-		jter = e.args.begin();
-		while(jter != e.args.end() && jter->is_variable())
+	if(jter == e.f.args.end()) {
+		jter = e.f.args.begin();
+		while(jter != e.f.args.end() && jter->is_variable())
 			jter++;
 	}
 
-	if(jter == e.args.end()) {
-		jter = e.args.begin();
-		while(jter != e.args.end() && !jter->is_function(op2))
+	if(jter == e.f.args.end()) {
+		jter = e.f.args.begin();
+		while(jter != e.f.args.end() && !jter->is_function(op2))
 			jter++;
 	}
 
-	if(jter == e.args.end())
+	if(jter == e.f.args.end())
 		return;
 
 	// find term to distribute over
 	// specifically ("OP_AND") functions only
 
-	auto kter = e.args.begin();
+	auto kter = e.f.args.begin();
 
-	while(kter != e.args.end() && (kter == jter || !kter->is_function(op2)))
+	while(kter != e.f.args.end() && (kter == jter || !kter->is_function(op2)))
 		kter++;
 
-	if(kter == e.args.end())
+	if(kter == e.f.args.end())
 		return;
 
-	// distribute *jter over kter->args
+	// distribute *jter over kter->f.args
 
 	const auto& e1 = *jter;
 
-	for(auto& arg : kter->args) {
+	for(auto& arg : kter->f.args) {
 		const auto& e2 = arg;
-		arg = expression(op1, { e1, e2 });
+		arg = function(op1, { e1, e2 });
 	}
 
-	e.args.erase(jter);
+	e.f.args.erase(jter);
 }
 
-template<wchar_t> static void function_expression(expression&, const expression::args_type&);
+////////////////////////////////
+//
+//
+// function_expression templates
+//
+//
+////////////////////////////////
 
-template<> void function_expression<OP_SWAP>(expression& e, const expression::args_type& args) {
+template<wchar_t> static void function_expression(term&, const arglist&);
+
+template<> void function_expression<OP_SWAP>(term& e, const arglist& args) {
 
 	if(args.size() != 1) {
 		std::stringstream ss;
@@ -479,21 +475,21 @@ template<> void function_expression<OP_SWAP>(expression& e, const expression::ar
 
 	if(args.front().is_function(OP_SWAP)) {
 
-		e = args.front().args.front();
+		e = args.front().f.args.front();
 
 	} else if(args.front().is_literal()) {
 
-		uint8_t reg = args.front().value;
+		uint8_t reg = args.front().l;
 
 		reg = (reg << 4) | (reg >> 4);
 		e = reg;
 
 	} else {
-		e.args = args;
+		e.f.args = args;
 	}
 }
 
-template<> void function_expression<OP_NOT>(expression& e, const expression::args_type& args) {
+template<> void function_expression<OP_NOT>(term& e, const arglist& args) {
 
 	if(args.size() != 1) {
 		std::stringstream ss;
@@ -503,21 +499,21 @@ template<> void function_expression<OP_NOT>(expression& e, const expression::arg
 
 	if(args.front().is_function(OP_NOT)) {
 
-		e = args.front().args.front();
+		e = args.front().f.args.front();
 
 	} else if(args.front().is_literal()) {
 
-		uint8_t reg = args.front().value;
+		reg_t reg = args.front().l;
 
 		reg = ~reg;
 		e = reg;
 
 	} else {
-		e.args = args;
+		e.f.args = args;
 	}
 }
 
-template<> void function_expression<OP_OR>(expression& e, const expression::args_type& args) {
+template<> void function_expression<OP_OR>(term& e, const arglist& args) {
 
 	association_rule(e, OP_OR, args);
 
@@ -525,10 +521,10 @@ template<> void function_expression<OP_OR>(expression& e, const expression::args
 
 	distribution_rule(e, OP_OR, OP_AND);
 	
-	if(e.is_unary() && OP_IS_UNARY_NOP(e.op)) e = e.args.front();
+	if(e.is_unary() && OP_IS_UNARY_NOP(e.f.op)) e = e.f.args.front();
 }
 
-template<> void function_expression<OP_AND>(expression& e, const expression::args_type& args) {
+template<> void function_expression<OP_AND>(term& e, const arglist& args) {
 
 	association_rule(e, OP_AND, args);
 
@@ -536,76 +532,108 @@ template<> void function_expression<OP_AND>(expression& e, const expression::arg
 
 	distribution_rule(e, OP_AND, OP_OR);
 
-	if(e.is_unary() && OP_IS_UNARY_NOP(e.op)) e = e.args.front();
+	if(e.is_unary() && OP_IS_UNARY_NOP(e.f.op)) e = e.f.args.front();
 }
 
-template<> void function_expression<OP_PLUS>(expression& e, const expression::args_type& args) {
+template<> void function_expression<OP_PLUS>(term& e, const arglist& args) {
 
 	association_rule(e, OP_PLUS, args);
 
 	aggregate_literals(e, 0, [](reg_t a, reg_t x) -> reg_t { return a + x; });
 }
 
-template<wchar_t> static void function_expression(expression& e, const expression::args_type& args) {
-	e.args = args;
+template<wchar_t> static void function_expression(term& e, const arglist& args) {
+	e.f.args = args;
 }
 
+//////////////////
 //
-// struct expression
 //
+// struct function
+//
+//
+//////////////////
 
-expression& expression::operator=(const expression& r) {
+function::function() : function(OP_LIST, {}) {
+}
+
+function::function(op_t my_op) : function(my_op, {}) {
+}
+
+function::function(op_t my_op, const arglist& my_args) : op(my_op), args(my_args) {
+}
+
+function::function(const function&r) : function(r.op, r.args) {
+}
+
+function& function::operator=(const function& r) {
+
+	if(this != &r) {
+		op = r.op;
+		args = arglist(r.args);
+	}
+
+	return *this;
+}
+
+bool function::operator==(const function& r) const {
+	return op == r.op && args == r.args;
+}
+
+size_t function::arity() const {
+	return args.size();
+}
+
+//////////////
+//
+//
+// struct term
+//
+//
+//////////////
+
+term& term::operator=(const term& r) {
 
 	if(this != &r) {
 
-		expression::args_type my_args;
-
-		if(r.is_function())
-			my_args = r.args;
-		else if(is_function() && !args.empty())
-			args.clear();
+		if(is_function())
+			f.args.clear();
 
 		type = r.type;
 
 		switch(type) {
-
-			case expression_type::literal:
-
-				value = r.value;
-				break;
-
-			case expression_type::variable:
-
-				name = r.name;
-				break;
-
-			case expression_type::function:
-
-				op = r.op;
-				args = my_args;
-				break;
+			case term_type::literal  : l = r.l; break;
+			case term_type::variable : v = r.v; break;
+			case term_type::function : f = r.f; break;
 		}
 	}
 
 	return *this;
 }
 
-expression::expression() : expression(OP_LIST, {}) {
+term::~term() {
+	if(type == term_type::function) {
+		f.args.~list();
+	}
 }
 
-expression::expression(const expression& r) {
+term::term() : term(function(OP_LIST)) {
+}
+
+term::term(const term& r) {
 	*this = r;
 }
 
-expression::expression(unsigned long my_value) : value(my_value), type(expression_type::literal) {
+term::term(literal_t my_l) : type(term_type::literal), l(my_l) {
 }
 
-expression::expression(const std::wstring& my_name) : name(my_name), type(expression_type::variable) {
+term::term(const variable& my_v) : type(term_type::variable), v(my_v) {
 }
 
 #define OPERATION_HANDLER(__OP__) case __OP__: function_expression<__OP__>(*this, my_args); break
 
-expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), type(expression_type::function) {
+term::term(const function& my_f) : type(term_type::function), f(my_f) {
+	/*
 	switch(op) {
 
 		OPERATION_HANDLER(OP_AND);
@@ -624,27 +652,28 @@ expression::expression(wchar_t my_op, const args_type& my_args) : op(my_op), typ
 		throw std::runtime_error("unhandled operation");
 		break;
 	}
+	*/
 }
 
 #undef OPERATION_HANDLER
 
-std::wstring expression::wstr() const {
+std::wstring term::wstr() const {
 
 	std::wstringstream ws;
 
 	switch(type) {
 
-		case expression_type::variable:
+		case term_type::variable:
 
-			ws << name;
+			ws << v;
 
 			break;
 
-		case expression_type::function:
+		case term_type::function:
 
-			ws << L'(' << (wchar_t)op;
+			ws << L'(' << (op_t)f.op;
 
-			for(const auto& sub : args)
+			for(const auto& sub : f.args)
 				ws << L' ' << sub.wstr();
 
 			ws << L')';
@@ -652,9 +681,9 @@ std::wstring expression::wstr() const {
 
 			break;
 
-		case expression_type::literal:
+		case term_type::literal:
 
-			ws << std::showbase << (value < 10 ? std::dec : std::hex) << value;
+			ws << std::showbase << (l < 10 ? std::dec : std::hex) << l;
 
 			break;
 	}
@@ -662,77 +691,77 @@ std::wstring expression::wstr() const {
 	return ws.str();
 }
 
-bool expression::is_function(wchar_t my_op) const {
-	return type == expression_type::function && op == my_op;
+bool term::is_function(op_t my_op) const {
+	return type == term_type::function && f.op == my_op;
 }
 
-bool expression::is_variable(const std::wstring& my_name) const {
-	return type == expression_type::variable && name == my_name;
+bool term::is_variable(const variable& my_v) const {
+	return type == term_type::variable && v == my_v;
 }
 
-bool expression::is_literal(unsigned long my_value) const {
-	return type == expression_type::literal && value == my_value;
+bool term::is_literal(literal_t my_l) const {
+	return type == term_type::literal && l == my_l;
 }
 
-bool expression::is_function() const {
-	return type == expression_type::function;
+bool term::is_function() const {
+	return type == term_type::function;
 }
 
-bool expression::is_variable() const {
-	return type == expression_type::variable;
+bool term::is_variable() const {
+	return type == term_type::variable;
 }
 
-bool expression::is_literal() const {
-	return type == expression_type::literal;
+bool term::is_literal() const {
+	return type == term_type::literal;
 }
 
-bool expression::is_nullary() const {
+bool term::is_nullary() const {
 	return is_arity(0);
 }
 
-bool expression::is_unary() const {
+bool term::is_unary() const {
 	return is_arity(1);
 }
 
-bool expression::is_binary() const {
+bool term::is_binary() const {
 	return is_arity(2);
 }
 
-bool expression::is_arity(int n) const {
-	return is_function() && (int)args.size() == n;
+bool term::is_arity(size_t n) const {
+	return is_function() && f.arity() == n;
 }
 
-bool expression::operator==(const expression& r) const {
+bool term::operator==(const term& r) const {
 
 	if(type != r.type)
 		return false;
 
 	switch(type) {
-		case expression_type::literal  : return value == r.value;
-		case expression_type::variable : return name == r.name;
-		case expression_type::function : return args == r.args;
+		case term_type::literal  : return l == r.l;
+		case term_type::variable : return v == r.v;
+		case term_type::function : return f == r.f;
 	}
 
 	return false;
 }
 
 /*
-bool expression::operator<(const expression& r) const {
+bool term::operator<(const term& r) const {
 
 	if(type != r.type)
 		return type < r.type;
 
 	switch(type) {
 
-		case expression_type::literal:
+		case term_type::literal:
 
 			return value < r.value;
 
-		case expression_type::variable:
+		case term_type::variable:
 
-			return name < r.name;
+			return v < r.v;
 
-		case expression_type::function: 
+		case term_type::function: 
 
 			// lexicographic comparison
 
@@ -760,12 +789,16 @@ bool expression::operator<(const expression& r) const {
 }
 */
 
+////////////////////
+//
 //
 // struct dictionary
 //
+//
+////////////////////
 
 bool dictionary::has_key(const dictionary::key_type& s) const {
-	return (find(s) != end());
+	return find(s) != end();
 }
 
 dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
@@ -780,9 +813,13 @@ std::wstring str(const dictionary::value_type& x) {
 	return ws.str();
 }
 
+///////////////////
+//
 //
 // struct operation
 //
+//
+///////////////////
 
 operation::operation() {
 }
@@ -804,3 +841,51 @@ void operation::execute(dictionary& d) {
 
 	pic12f::finalize();
 }
+
+/////////
+//
+//
+// global
+//
+//
+/////////
+
+std::wstring address_string(literal_t x) {
+	std::wstringstream ts;
+	ts << std::uppercase << std::right << std::hex << std::setw(3) << std::setfill(L'0') << x << L'h';
+	return ts.str();
+}
+
+std::wstring register_string(reg_t x) {
+	std::wstringstream ts;
+	ts << L'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill(L'0') << x;
+	return ts.str();
+}
+
+std::wstring dest_string(bool f, reg_t x) {
+	return f ? register_name(x) : L"W";
+}
+
+std::wstring register_name(reg_t x) {
+
+	switch(x) {
+		case 0x00: return L"INDF";
+		case 0x01: return L"TMR0";
+		case 0x02: return L"PCL";
+		case 0x03: return L"STATUS";
+		case 0x04: return L"FSR";
+		case 0x05: return L"GPIO";
+		case 0x0a: return L"PCLATH";
+		case 0x0b: return L"INTCON";
+		case 0x0c: return L"PIR1";
+		case 0x0e: return L"TMR1L";
+		case 0x0f: return L"TMR1H";
+		case 0x10: return L"T1CON";
+		case 0x19: return L"CMCON";
+		case 0x1e: return L"ADRESH";
+		case 0x1f: return L"ADCON0";
+	}
+	return register_string(x);
+}
+
+

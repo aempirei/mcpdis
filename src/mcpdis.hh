@@ -18,74 +18,103 @@ struct operation;
 struct arguments;
 struct bitstream;
 struct dictionary;
-struct expression;
+struct term;
+struct function;
+
+typedef std::list<operation> sourcecode;
+typedef std::list<term> arglist;
+typedef std::wstring variable;
+
+typedef unsigned long literal_t;
+typedef uint8_t reg_t;
+typedef wchar_t op_t;
 
 using accumulation_function = void (operation&, dictionary&);
 
-using sourcecode = std::list<operation>;
-
-using reg_t = uint8_t;
 
 //
 // dictionary
 
-using _dictionary = std::map<std::wstring,expression>;
+using _dictionary = std::map<std::wstring,term>;
+typedef std::wstring variable;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
 	bool has_key(const key_type&) const;
-	dictionary::mapped_type& touch(const key_type&);
+	mapped_type& touch(const key_type&);
 };
 
 std::wstring str(const dictionary::value_type&);
 
 //
-// expression
+// function
 
-struct expression {
+struct function {
 
-	std::wstring name;
+	op_t op;
+	arglist args;
 
-	unsigned long value;
+	function();
+	function(op_t);
+	function(op_t, const arglist&);
+	function(const function&);
 
-	wchar_t op;
+	function& operator=(const function&);
 
-	enum class expression_type { literal, variable, function };
+	bool operator==(const function&) const;
 
-	expression_type type;
+	size_t arity() const;
+};
 
-	using args_type = std::list<expression>;
+//
+// term
 
-	args_type args;
+struct term {
 
-	expression();
+	enum class term_type {
+		literal,
+		variable,
+		function
+	};
 
-	expression(const expression&);
+	term_type type;
 
-	expression(unsigned long);
-	expression(const std::wstring&);
-	expression(wchar_t, const args_type&);
+	union {
+		literal_t l;
+		variable v;
+		function f;
+	};
+
+	term();
+	term(literal_t);
+	term(const variable&);
+	term(const function&);
+	term(const term&);
+
+	~term();
 
 	std::wstring wstr() const;
 
-	bool is_function(wchar_t) const;
-	bool is_variable(const std::wstring&) const;
-	bool is_literal(unsigned long) const;
+	bool is_function(op_t) const;
+	bool is_literal(literal_t) const;
+	bool is_variable(const variable&) const;
 
 	bool is_function() const;
 	bool is_variable() const;
 	bool is_literal() const;
 
+	// specific types of functions
+
 	bool is_nullary() const;
 	bool is_unary() const;
 	bool is_binary() const;
 
-	bool is_arity(int) const;
+	bool is_arity(size_t) const;
 
-	expression& operator=(const expression&);
+	bool operator==(const term&) const;
+	bool operator<(const term&) const;
 
-	bool operator==(const expression&) const;
-	bool operator<(const expression&) const;
+	term& operator=(const term&);
 };
 
 //
@@ -229,39 +258,7 @@ struct operation {
 
 extern instruction_set pic12f675;
 
-std::wstring address_string(unsigned long);
-std::wstring register_string(unsigned long);
+std::wstring address_string(literal_t);
+std::wstring register_string(reg_t);
 std::wstring register_name(reg_t);
-std::wstring dest_string(bool,unsigned long);
-
-//
-//
-//
-struct function;
-struct term;
-
-typedef unsigned long literal_t;
-typedef std::wstring variable_t;
-typedef std::list<term> arglist_t;
-
-struct function {
-	wchar_t op;
-	arglist_t args;
-};
-
-struct term {
-
-	enum class term_type {
-		literal,
-		variable,
-		function
-	};
-
-	term_type type;
-
-	union {
-		literal_t l;
-		variable_t v;
-		function f;
-	} value;
-};
+std::wstring dest_string(bool,reg_t);

@@ -242,7 +242,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 	print_code(config, code, labels);
 
 	//
-	// expression accumulator
+	// term accumulator
 
 	int n = 1;
 
