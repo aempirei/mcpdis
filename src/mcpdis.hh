@@ -233,3 +233,35 @@ std::wstring address_string(unsigned long);
 std::wstring register_string(unsigned long);
 std::wstring register_name(reg_t);
 std::wstring dest_string(bool,unsigned long);
+
+//
+//
+//
+struct function;
+struct term;
+
+typedef unsigned long literal_t;
+typedef std::wstring variable_t;
+typedef std::list<term> arglist_t;
+
+struct function {
+	wchar_t op;
+	arglist_t args;
+};
+
+struct term {
+
+	enum class term_type {
+		literal,
+		variable,
+		function
+	};
+
+	term_type type;
+
+	union {
+		literal_t l;
+		variable_t v;
+		function f;
+	} value;
+};
