@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <initializer_list>
 
 #include <operators.hh>
 

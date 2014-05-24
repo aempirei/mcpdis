@@ -1,12 +1,12 @@
-#include <mcpdis.hh>
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+
 #include <cstdlib>
 #include <cstdint>
 #include <climits>
-#include <iostream>
-#include <set>
+
+#include <mcpdis.hh>
 
 template<wchar_t> static void function_expression(term&, const arglist&);
 template<class F> static void aggregate_literals(term&, reg_t, F);
@@ -53,29 +53,6 @@ bool function::operator<(const function& r) const {
 		return op < r.op;
 
 	return args < r.args;
-
-	/*
-	// lexicographic comparison
-
-	auto iter = args.cbegin();
-	auto jter = r.args.cbegin();
-
-	while(iter != args.end() && jter != r.args.end()) {
-
-	if(*iter < *jter) {
-
-	return true;
-
-	} else if(*iter == *jter) {
-
-	iter++;
-	jter++;
-
-	} else {
-	return false;
-	}
-	}
-	 */
 }
 
 function& function::operator<<(const term& x) {
@@ -117,32 +94,8 @@ term::term(literal_t my_l) : type(term_type::literal), l(my_l) {
 term::term(const variable& my_v) : type(term_type::variable), v(my_v) {
 }
 
-#define OPERATION_HANDLER(__OP__) case __OP__: function_expression<__OP__>(*this, my_args); break
-
 term::term(const function& my_f) : type(term_type::function), f(my_f) {
-	/*
-	switch(op) {
-
-		OPERATION_HANDLER(OP_AND);
-		OPERATION_HANDLER(OP_OR);
-		OPERATION_HANDLER(OP_XOR);
-		OPERATION_HANDLER(OP_PLUS);
-		OPERATION_HANDLER(OP_MINUS);
-		OPERATION_HANDLER(OP_SWAP);
-		OPERATION_HANDLER(OP_NOT);
-		OPERATION_HANDLER(OP_ROTL);
-		OPERATION_HANDLER(OP_ROTR);
-		OPERATION_HANDLER(OP_COMPOSE);
-		OPERATION_HANDLER(OP_LIST);
-
-		default:
-		throw std::runtime_error("unhandled operation");
-		break;
-	}
-	*/
 }
-
-#undef OPERATION_HANDLER
 
 term& term::operator=(const term& r) {
 

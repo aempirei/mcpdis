@@ -1,12 +1,13 @@
-#include <mcpdis.hh>
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
+
 #include <cstdlib>
 #include <cstdint>
 #include <climits>
-#include <iostream>
-#include <set>
+
+#include <mcpdis.hh>
 
 /////////////////////
 //
