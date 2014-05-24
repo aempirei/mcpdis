@@ -93,9 +93,9 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	pic12f675.sort();
+	pic12f::pic12f675.sort();
 
-	handler(config, b, pic12f675, config.stream_processor);
+	handler(config, b, pic12f::pic12f675, config.stream_processor);
 
 	return 0;
 }
@@ -133,7 +133,7 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 			else
 				std::wcout << L'*';
 
-			std::wcout << address_string(op.address) << L": " << op.s;
+			std::wcout << pic12f::address_string(op.address) << L": " << op.s;
 
 			if(!op.opcode.name.empty()) {
 
@@ -163,7 +163,7 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 		} else {
 
 			if(labels.find(op.address) != labels.end()) 
-				std::wcout << address_string(op.address) << L':';
+				std::wcout << pic12f::address_string(op.address) << L':';
 			else
 				std::wcout << L"     ";
 
@@ -176,19 +176,19 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 					if(op.args.value(L'd') == 0)
 						std::wcout << L"W, ";
 
-					std::wcout << register_name(op.args.value(L'f'));
+					std::wcout << pic12f::register_name(op.args.value(L'f'));
 
 				} else if(op.args.has_args(L"bf")) {
 
-					std::wcout << register_name(op.args.value(L'f')) << L'<' << op.args.value(L'b') << L'>';
+					std::wcout << pic12f::register_name(op.args.value(L'f')) << L'<' << op.args.value(L'b') << L'>';
 
 				} else if(op.args.has_arg(L'f')) {
 
-					std::wcout << register_name(op.args.value(L'f'));
+					std::wcout << pic12f::register_name(op.args.value(L'f'));
 
 				} else if(op.args.has_arg(L'k')) {
 
-					std::wcout << address_string(op.args.value(L'k'));
+					std::wcout << pic12f::address_string(op.args.value(L'k'));
 				}
 			}
 
@@ -292,7 +292,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 				}
 			}
 
-			range_ws << address_string(iter->address) << L'-' << address_string(jter->address);
+			range_ws << pic12f::address_string(iter->address) << L'-' << pic12f::address_string(jter->address);
 
 			std::wcout << range_ws.str() << L" : " << opvector_ws.str() << std::endl << std::endl;
 

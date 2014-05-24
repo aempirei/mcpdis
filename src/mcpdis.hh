@@ -10,8 +10,6 @@
 
 #include <operators.hh>
 
-// mcpdis.hh
-
 struct instruction_set;
 struct instruction;
 struct operation;
@@ -31,12 +29,29 @@ typedef wchar_t op_t;
 
 using accumulation_function = void (operation&, dictionary&);
 
+//
+// globals
+
+
+namespace pic12f {
+
+	extern instruction_set pic12f675;
+
+	std::wstring address_string(literal_t);
+	std::wstring register_string(reg_t);
+	std::wstring register_name(reg_t);
+	std::wstring dest_string(bool,reg_t);
+
+	void power(dictionary&);
+	void finalize(dictionary&);
+
+	void PC(operation&, dictionary&);
+}
 
 //
 // dictionary
 
 using _dictionary = std::map<std::wstring,term>;
-typedef std::wstring variable;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
@@ -62,10 +77,15 @@ struct function {
 	function& operator=(const function&);
 
 	bool operator==(const function&) const;
+	bool operator<(const function&) const;
+
+	function& operator<<(const term&);
 
 	size_t arity() const;
 
 	void clear();
+
+	void concat(const arglist&);
 };
 
 //
@@ -100,8 +120,6 @@ struct term {
 	bool is_function() const;
 	bool is_variable() const;
 	bool is_literal() const;
-
-	// specific types of functions
 
 	bool is_nullary() const;
 	bool is_unary() const;
@@ -254,9 +272,3 @@ struct operation {
 	void execute(dictionary&);
 };
 
-extern instruction_set pic12f675;
-
-std::wstring address_string(literal_t);
-std::wstring register_string(reg_t);
-std::wstring register_name(reg_t);
-std::wstring dest_string(bool,reg_t);
