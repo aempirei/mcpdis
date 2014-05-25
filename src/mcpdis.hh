@@ -304,9 +304,11 @@ template <typename T> struct rule {
 	typedef rule_type types;
 
 	op_t op;
-	types type;
+	rule_type type;
 
 	std::list<predicate<value_type>> predicates;
+
+	rule();
 
 	rule(const rule&);
 
@@ -326,23 +328,26 @@ template <typename T> struct predicate {
 	enum class predicate_type { type, value, ref, any, end };
 
 	typedef predicate_type types;
+	typedef std::set<value_type_type> filter_type;
 
-	types type;
+	predicate_type type;
 
 	symbol ref;
 	value_type value;
-	std::set<value_type_type> filter;
+	filter_type filter;
 
 	range q;
+
+	predicate();
 
 	predicate(const predicate&);
 
 	predicate(predicate_type);
-	predicate(predicate_type, const value_type&);
-	predicate(predicate_type, const decltype(filter)&);
+	predicate(predicate_type, const range&);
 
+	predicate(const symbol&);
+	predicate(const filter_type&);
 	predicate(const value_type&);
-	predicate(const decltype(filter)&);
 
 	std::wstring str() const;
 
