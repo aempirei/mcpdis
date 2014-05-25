@@ -145,7 +145,7 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 					if(isalpha(iter->first)) {
 
-						unsigned long x = wcstoul(iter->second.c_str(), NULL, 2);
+						literal_t x = wcstoul(iter->second.c_str(), NULL, 2);
 
 						std::wcout << std::dec << x;
 
@@ -169,26 +169,27 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 			if(!op.opcode.name.empty()) {
 
-				std::wcout << L' ' << std::setw(6) << std::setfill(L' ') << std::left << std::wstring(op.opcode.name) << L' ';
+				std::wcout << L' ' << std::setw(6) << std::setfill(L' ') << std::left << op.opcode.name << L' ';
 
 				if(op.args.has_args(L"df")) {
 
 					if(op.args.value(L'd') == 0)
-						std::wcout << L"W, ";
+						std::wcout << ANSI_LOGREEN << L'W' << ANSI_CLR << ", ";
 
-					std::wcout << pic12f::register_name(op.args.value(L'f'));
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
 
 				} else if(op.args.has_args(L"bf")) {
 
-					std::wcout << pic12f::register_name(op.args.value(L'f')) << L'<' << op.args.value(L'b') << L'>';
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
+					std::wcout << L'<' << ANSI_LORED << op.args.value(L'b') << ANSI_CLR << L'>';
 
 				} else if(op.args.has_arg(L'f')) {
 
-					std::wcout << pic12f::register_name(op.args.value(L'f'));
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
 
 				} else if(op.args.has_arg(L'k')) {
 
-					std::wcout << pic12f::address_string(op.args.value(L'k'));
+					std::wcout << ANSI_LORED << pic12f::address_string(op.args.value(L'k')) << ANSI_CLR;
 				}
 			}
 

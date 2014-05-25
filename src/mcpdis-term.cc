@@ -271,9 +271,9 @@ static void association_rule(term& e, op_t op, const arglist& args) {
 	for(const auto& arg : args) {
 
 		if(arg.is_function(op))
-			e.f.args.insert(e.f.args.end(), arg.f.args.begin(), arg.f.args.end());
+			e.f.concat(arg.f.args);
 		else
-			e.f.args.push_back(arg);
+			e.f << arg;
 	}
 }
 
