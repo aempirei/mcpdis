@@ -34,12 +34,12 @@ using accumulation_function = void (operation&, dictionary&);
 
 // parser
 
-template <class> struct rule;
-template <class> struct predicate;
+template <typename> struct rule;
+template <typename> struct predicate;
 
 struct range;
 
-template<class T> using grammar = std::map<symbol,std::list<rule<T>>>;
+template<typename T> using grammar = std::map<symbol,std::list<rule<T>>>;
 
 //
 // globals
@@ -243,7 +243,7 @@ struct instruction {
 	reg_t status;
 
 	bool match(const symbol&) const;
-	template<class T> bool match(const symbol&, T) const;
+	template<typename T> bool match(const symbol&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -290,12 +290,12 @@ struct range : _range {
 	using _range::_range;
 	static const range star;
 	static const range plus;
-	static const range q;
+	static const range qm;
 	static const range one;
 	static const range zero;
 };
 
-template <class T> struct rule {
+template <typename T> struct rule {
 
 	typedef T value_type;
 
@@ -306,18 +306,22 @@ template <class T> struct rule {
 	op_t op;
 	types type;
 
-	std::list<predicate<T>> predicates;
+	std::list<predicate<value_type>> predicates;
+
+	rule(const rule&);
 
 	rule(op_t);
 	rule(op_t, rule_type);
 
 	rule& operator<<(const predicate<value_type>&);
+
+	std::wstring str() const;
 };
 
-template <class T> struct predicate {
+template <typename T> struct predicate {
 	
 	typedef T value_type;
-	typedef decltype(T::type) value_type_type;
+	typedef decltype(value_type::type) value_type_type;
 
 	enum class predicate_type { type, value, ref, any, end };
 
@@ -326,19 +330,26 @@ template <class T> struct predicate {
 	types type;
 
 	symbol ref;
-	T value;
+	value_type value;
 	std::set<value_type_type> filter;
 
 	range q;
 
-	predicate();
+	predicate(const predicate&);
 
 	predicate(predicate_type);
-	predicate(predicate_type, const T&);
+	predicate(predicate_type, const value_type&);
 	predicate(predicate_type, const decltype(filter)&);
 
-	predicate(const T&);
+	predicate(const value_type&);
 	predicate(const decltype(filter)&);
+
+	std::wstring str() const;
+
+	void star();
+	void plus();
+	void qm();
 };
 
 extern template struct rule<term>;
+extern template struct predicate<term>;
