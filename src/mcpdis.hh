@@ -20,7 +20,6 @@ struct arguments;
 struct bitstream;
 struct dictionary;
 struct function;
-struct parser;
 struct term;
 
 typedef std::list<operation> sourcecode;
@@ -33,9 +32,17 @@ typedef wchar_t op_t;
 
 using accumulation_function = void (operation&, dictionary&);
 
+// parser
+
+template <class> struct rule;
+template <class> struct predicate;
+
+struct range;
+
+template<class T> using grammar = std::map<symbol,std::list<rule<T>>>;
+
 //
 // globals
-
 
 namespace pic12f {
 
@@ -277,13 +284,6 @@ struct operation {
 //
 // parser
 
-template <class> struct rule;
-template <class> struct predicate;
-
-struct range;
-
-template<class T> using grammar = std::map<symbol,std::list<rule<T>>>;
-
 typedef std::pair<unsigned int, unsigned int> _range;
 
 struct range : _range {
@@ -303,11 +303,15 @@ template <class T> struct rule {
 
 	typedef rule_type types;
 
+	op_t op;
 	types type;
 
-	op_t op;
-
 	std::list<predicate<T>> predicates;
+
+	rule(op_t);
+	rule(op_t, rule_type);
+
+	rule& operator<<(const predicate<value_type>&);
 };
 
 template <class T> struct predicate {
@@ -326,4 +330,16 @@ template <class T> struct predicate {
 	std::set<value_type_type> filter;
 
 	range q;
+
+	predicate();
+
+	predicate(predicate_type);
+	predicate(predicate_type, const T&);
+	predicate(predicate_type, const decltype(filter)&);
+
+	predicate(const T&);
+	predicate(const decltype(filter)&);
 };
+
+extern template struct rule<term>;
+

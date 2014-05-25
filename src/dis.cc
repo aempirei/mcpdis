@@ -54,6 +54,8 @@ void usage(const char *arg0) {
 
 int main(int argc, char **argv) {
 
+	rule<term> rule0(OP_AND);
+
 	configuration config;
 	bitstream b(stdin);
 	int opt;
