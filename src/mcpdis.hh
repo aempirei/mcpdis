@@ -354,6 +354,8 @@ template <typename T> struct predicate {
 	void star();
 	void plus();
 	void qm();
+
+	static const predicate<value_type> end;
 };
 
 extern template struct rule<term>;
