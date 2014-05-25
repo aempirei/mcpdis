@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <set>
 #include <initializer_list>
 
 #include <operators.hh>
@@ -18,8 +19,9 @@ struct operation;
 struct arguments;
 struct bitstream;
 struct dictionary;
-struct term;
 struct function;
+struct parser;
+struct term;
 
 typedef std::list<operation> sourcecode;
 typedef std::list<term> arglist;
@@ -272,3 +274,56 @@ struct operation {
 	void execute(dictionary&);
 };
 
+//
+// parser
+
+template <class> struct rule;
+template <class> struct predicate;
+
+struct range;
+
+template<class T> using grammar = std::map<symbol,std::list<rule<T>>>;
+
+typedef std::pair<unsigned int, unsigned int> _range;
+
+struct range : _range {
+	using _range::_range;
+	static const range star;
+	static const range plus;
+	static const range q;
+	static const range one;
+	static const range zero;
+};
+
+template <class T> struct rule {
+
+	typedef T value_type;
+
+	enum class rule_type { ordered, unordered };
+
+	typedef rule_type types;
+
+	types type;
+
+	op_t op;
+
+	std::list<predicate<T>> predicates;
+};
+
+template <class T> struct predicate {
+	
+	typedef T value_type;
+	typedef decltype(T::type) value_type_type;
+
+	enum class predicate_type { type, value, ref, any, end };
+
+	typedef predicate_type types;
+
+	types type;
+
+	symbol ref;
+	T value;
+	std::set<value_type_type> filter;
+
+	range q;
+};
