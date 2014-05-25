@@ -39,7 +39,8 @@ template <typename> struct predicate;
 
 struct range;
 
-template<typename T> using grammar = std::map<symbol,std::list<rule<T>>>;
+template<typename T> using rules = std::list<rule<T>>;
+template<typename T> using grammar = std::map<symbol,rules<T>>;
 
 //
 // globals
@@ -317,6 +318,8 @@ template <typename T> struct rule {
 
 	rule& operator<<(const predicate<value_type>&);
 
+	rule& operator=(const rule<value_type>&);
+
 	std::wstring str() const;
 };
 
@@ -345,17 +348,18 @@ template <typename T> struct predicate {
 	predicate(predicate_type);
 	predicate(predicate_type, const range&);
 
+	predicate(const wchar_t *);
 	predicate(const symbol&);
 	predicate(const filter_type&);
 	predicate(const value_type&);
 
+	predicate& operator=(const predicate<value_type>&);
+
 	std::wstring str() const;
 
-	void star();
-	void plus();
-	void qm();
-
-	static const predicate<value_type> end;
+	predicate star() const;
+	predicate plus() const;
+	predicate qm() const;
 };
 
 extern template struct rule<term>;

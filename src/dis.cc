@@ -52,15 +52,33 @@ void usage(const char *arg0) {
 	std::wcerr << std::endl;
 }
 
+void initialize_grammar(grammar<term> &g) {
+
+
+	auto& add_rule = g[L"add"];
+
+	add_rule.push_back( rule<term>(OP_PLUS) << L"literal" << predicate<term>().star() << predicate<term>::predicate_type::end );
+}
+
 int main(int argc, char **argv) {
 
-	rule<term> rule0(OP_AND);
+	grammar<term> g;
 
 	configuration config;
 	bitstream b(stdin);
 	int opt;
 
 	setlocale(LC_CTYPE, "");
+
+	initialize_grammar(g);
+
+	for(const auto& x : g) {
+		for(const auto& y : x.second) {
+			std::wcout << x.first << L" := " << y.str() << std::endl;
+		}
+	}
+
+	return 0;
 
 	while ((opt = getopt(argc, argv, "hvx:")) != -1) {
 		switch (opt) {

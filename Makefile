@@ -1,6 +1,6 @@
 CXX = g++
-CPPFLAGS = -Isrc -DUSE_COLOR
-CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O2
+CPPFLAGS = -Isrc -DUSE_COLOR -ggdb
+CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O2 -ggdb
 LIBFLAGS = -Llib -lmcpdis # -lcrypto -lpthread
 TARGETS = lib/libmcpdis.a bin/dis
 
