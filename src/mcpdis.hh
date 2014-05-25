@@ -342,4 +342,3 @@ template <class T> struct predicate {
 };
 
 extern template struct rule<term>;
-
