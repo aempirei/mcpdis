@@ -37,8 +37,8 @@ template <typename> struct predicate;
 
 struct range;
 
-template<typename T> using rules = std::list<rule<T>>;
-template<typename T> using grammar = std::map<symbol,rules<T>>;
+template<typename T> using rulelist = std::list<rule<T>>;
+template<typename T> using grammar = std::map<symbol,rulelist<T>>;
 
 //
 // globals
@@ -334,6 +334,10 @@ template <typename T> struct predicate {
 	typedef predicate_type types;
 	typedef std::set<value_type_type> filter_type;
 
+	// abstract predicate
+	//
+	//
+
 	predicate_type type;
 
 	symbol ref;
@@ -341,6 +345,17 @@ template <typename T> struct predicate {
 	filter_type filter;
 
 	range q;
+
+	// concrete predicate
+	//
+	//
+
+	std::list<value_type> matches;
+	rule<value_type> child; 
+
+	// methods
+	//
+	//
 
 	predicate();
 
@@ -365,6 +380,18 @@ template <typename T> struct predicate {
 	predicate ge(unsigned int) const;
 	predicate le(unsigned int) const;
 	predicate eq(unsigned int) const;
+};
+
+template<typename T> struct ast {
+};
+
+template<typename T> struct parser {
+
+	typedef T value_type;
+
+	bool match(const symbol&, const grammar<T>&, const T&);
+	bool match(const rulelist<T>&, const grammar<T>&, const T&);
+	bool match(const rule<T>&, const grammar<T>&, const T&);
 };
 
 extern template struct rule<term>;

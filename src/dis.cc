@@ -187,10 +187,14 @@ void initialize_grammar(std::list<symbol>& s, std::list<symbol>& z, std::list<sy
 	// 
 
 	grammar<term> dga = {
-		{ L"unary", { RT() << DOT << END } },
-		{ L"n-ary", { RT() << DOT.plus() << END } },
-		{ L"matchpair", { RT() << DOT << MEM } },
-		{ L"literals", { RT() << L.ge(2) } }
+
+		{ L"unary"    , { RT() << DOT << END        } },
+
+		{ L"n-ary"    , { RT() << DOT.plus() << END } },
+
+		{ L"matchpair", { RT() << DOT << MEM        } },
+
+		{ L"literals" , { RT() << L.ge(2)           } }
 	};
 
 	for(const auto& r : dga)
