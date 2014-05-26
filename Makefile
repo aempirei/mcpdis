@@ -1,8 +1,10 @@
 CXX = g++
 CPPFLAGS = -Isrc -DUSE_COLOR -ggdb
-CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O2 -ggdb
+CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O1
 LIBFLAGS = -Llib -lmcpdis # -lcrypto -lpthread
 TARGETS = lib/libmcpdis.a bin/dis
+LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/function.cc src/predicate.cc src/rule.cc src/range.cc
+LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 
 .PHONY: all clean test
 
@@ -18,11 +20,11 @@ test: all
 	cat test.dis
 	md5sum test.dis
 
-src/mcpdis.o: src/mcpdis.hh src/operators.hh src/ansicolor.hh src/mcpdis.cc src/term.cc src/pic12f.cc src/parser.cc src/function.cc
+src/mcpdis.o: $(LIBCC) $(LIBHH)
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
-lib/libmcpdis.a: src/mcpdis.o src/term.o src/pic12f.o src/parser.o src/function.o
+lib/libmcpdis.a: $(LIBCC:.cc=.o)
 	if [ ! -d lib ]; then mkdir -vp lib; fi
 	ar crfv $@ $^ 
 
