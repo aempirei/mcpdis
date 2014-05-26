@@ -8,33 +8,33 @@
 
 #include <mcpdis.hh>
 
-function::function() : function(OP_LIST, {}) {
+template<typename T> function<T>::function() : function(OP_LIST, {}) {
 }
 
-function::function(op_t my_op) : function(my_op, {}) {
+template<typename T> function<T>::function(op_t my_op) : function(my_op, {}) {
 }
 
-function::function(op_t my_op, const arglist& my_args) : op(my_op), args(my_args) {
+template<typename T> function<T>::function(op_t my_op, const args_type& my_args) : op(my_op), args(my_args) {
 }
 
-function::function(const function&r) : function(r.op, r.args) {
+template<typename T> function<T>::function(const function&r) : function(r.op, r.args) {
 }
 
-function& function::operator=(const function& r) {
+template<typename T> function<T>& function<T>::operator=(const function& r) {
 
 	if(this != &r) {
 		op = r.op;
-		args = arglist(r.args);
+		args = args_type(r.args);
 	}
 
 	return *this;
 }
 
-bool function::operator==(const function& r) const {
+template<typename T> bool function<T>::operator==(const function& r) const {
 	return op == r.op && args == r.args;
 }
 
-bool function::operator<(const function& r) const {
+template<typename T> bool function<T>::operator<(const function& r) const {
 
 	if(op != r.op)
 		return op < r.op;
@@ -42,20 +42,22 @@ bool function::operator<(const function& r) const {
 	return args < r.args;
 }
 
-function& function::operator<<(const term& x) {
+template<typename T> function<T>& function<T>::operator<<(const T& x) {
 	args.push_back(x);
 	return *this;
 }
 
-size_t function::arity() const {
+template<typename T> size_t function<T>::arity() const {
 	return args.size();
 }
 
-void function::clear() {
+template<typename T> void function<T>::clear() {
 	op = OP_LIST;
 	args.clear();
 }
 
-void function::concat(const arglist& xs) {
+template<typename T> void function<T>::concat(const args_type& xs) {
 	args.insert(args.end(), xs.begin(), xs.end());
 }
+
+template struct function<term>;

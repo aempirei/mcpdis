@@ -23,7 +23,6 @@ struct operation;
 struct arguments;
 struct bitstream;
 struct dictionary;
-struct function;
 struct range;
 struct term;
 
@@ -31,6 +30,7 @@ typedef std::list<operation> sourcecode;
 typedef std::list<term> arglist;
 typedef std::wstring symbol;
 
+template<typename> struct function;
 template<typename> struct rule;
 template<typename> struct predicate;
 template<typename> struct grammar;
@@ -73,16 +73,17 @@ std::wstring str(const dictionary::value_type&);
 //
 // function
 
-// TODO: make this template<typename T> struct function so that function<term> is the current case
+template<typename T> struct function {
 
-struct function {
+	typedef T value_type;
+	typedef std::list<T> args_type;
 
 	op_t op;
-	arglist args;
+	args_type args;
 
 	function();
 	function(op_t);
-	function(op_t, const arglist&);
+	function(op_t, const args_type&);
 	function(const function&);
 
 	function& operator=(const function&);
@@ -90,13 +91,13 @@ struct function {
 	bool operator==(const function&) const;
 	bool operator<(const function&) const;
 
-	function& operator<<(const term&);
+	function& operator<<(const T&);
 
 	size_t arity() const;
 
 	void clear();
 
-	void concat(const arglist&);
+	void concat(const args_type&);
 };
 
 //
@@ -116,12 +117,12 @@ struct term {
 
 	literal_t l;
 	symbol s;
-	function f;
+	function<term> f;
 
 	term();
 	term(literal_t);
 	term(const symbol&);
-	term(const function&);
+	term(const function<term>&);
 	term(const term&);
 
 	std::wstring wstr() const;
@@ -408,3 +409,4 @@ template<typename T> struct grammar : _grammar<T> {
 extern template struct rule<term>;
 extern template struct predicate<term>;
 extern template struct grammar<term>;
+extern template struct function<term>;

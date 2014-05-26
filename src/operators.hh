@@ -7,7 +7,7 @@
 
 #define OP_MINUS	L'-'
 #define OP_COMPOSE	L'\u2218'
-#define OP_LIST		L','
+#define OP_LIST		L'\0'
 
 #define OP_SWAP		L'%'
 #define OP_NOT		L'\u00ac'

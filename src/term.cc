@@ -8,7 +8,7 @@
 
 #include <mcpdis.hh>
 
-term::term() : term(function(OP_LIST)) {
+term::term() : term(function<term>(OP_LIST)) {
 }
 
 term::term(const term& r) {
@@ -21,7 +21,7 @@ term::term(literal_t my_l) : type(term_type::literal), l(my_l) {
 term::term(const symbol& my_s) : type(term_type::symbol), s(my_s) {
 }
 
-term::term(const function& my_f) : type(term_type::function), f(my_f) {
+term::term(const function<term>& my_f) : type(term_type::function), f(my_f) {
 }
 
 term& term::operator=(const term& r) {

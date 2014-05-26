@@ -41,6 +41,4 @@ template<typename T> template<typename U> bool grammar<T>::match(const rule<T>& 
 	return false;
 }
 
-
-
 template struct grammar<term>;
