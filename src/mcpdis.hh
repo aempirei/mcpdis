@@ -32,8 +32,6 @@ typedef wchar_t op_t;
 
 using accumulation_function = void (operation&, dictionary&);
 
-// parser
-
 template <typename> struct rule;
 template <typename> struct predicate;
 
