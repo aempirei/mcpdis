@@ -69,6 +69,7 @@ void initialize_grammar(grammar<term> &g) {
 	auto& OR = g[L"OR"];
 	auto& XOR = g[L"XOR"];
 	auto& PLUS = g[L"PLUS"];
+
 	auto& MINUS = g[L"MINUS"];
 	auto& COMPOSE = g[L"COMPOSE"];
 	auto& LIST = g[L"LIST"];
@@ -100,9 +101,19 @@ void initialize_grammar(grammar<term> &g) {
 	lift_rule.push_back( rule<term>(OP_COMPOSE) << L"COMPOSE" );
 	lift_rule.push_back( rule<term>(OP_LIST) << L"LIST" );
 
-	auto& literals_rule = g[L"literals"];
+	auto& aggregate_rule = g[L"aggregate"];
 
-	literals_rule.push_back( rule<term>() << L.ge(2) );
+	aggregate_rule.push_back( rule<term>(OP_AND) << L.ge(2) );
+	aggregate_rule.push_back( rule<term>(OP_OR) << L.ge(2) );
+	aggregate_rule.push_back( rule<term>(OP_XOR) << L.ge(2) );
+	aggregate_rule.push_back( rule<term>(OP_PLUS) << L.ge(2) );
+
+	auto& compute_rule = g[L"compute"];
+
+	compute_rule.push_back( rule<term>(OP_SWAP) << L );
+	compute_rule.push_back( rule<term>(OP_NOT) << L );
+	compute_rule.push_back( rule<term>(OP_ROTL) << L );
+	compute_rule.push_back( rule<term>(OP_ROTR) << L );
 
 	auto& distribute_rule = g[L"distribute"];
 
@@ -117,17 +128,16 @@ void initialize_grammar(grammar<term> &g) {
 	auto& nilpotent_rule = g[L"nilpotent"];
 
 	nilpotent_rule.push_back( rule<term>(OP_XOR) << DOT << MEM );
-	nilpotent_rule.push_back( rule<term>(OP_MINUS) << DOT << MEM );
 
 	auto& involution_rule = g[L"involution"];
 
-	involution_rule.push_back( rule<term>(OP_NOT) << L"NOT" << END);
-	involution_rule.push_back( rule<term>(OP_SWAP) << L"SWAP" << END );
+	involution_rule.push_back( rule<term>(OP_NOT) << L"NOT" );
+	involution_rule.push_back( rule<term>(OP_SWAP) << L"SWAP" );
 
 	auto& inverse_rule = g[L"inverse"];
 
-	inverse_rule.push_back( rule<term>(OP_ROTL) << L"ROTR" << END );
-	inverse_rule.push_back( rule<term>(OP_ROTR) << L"ROTL" << END );
+	inverse_rule.push_back( rule<term>(OP_ROTL) << L"ROTR" );
+	inverse_rule.push_back( rule<term>(OP_ROTR) << L"ROTL" );
 
 	auto& nop_rule = g[L"nop"];
 
