@@ -29,11 +29,11 @@ struct term;
 typedef std::list<operation> sourcecode;
 typedef std::wstring symbol;
 
-template<typename> struct function;
+template<typename> struct fn;
 template<typename> struct predicate;
 template<typename> struct grammar;
 
-template<typename T> using rule = function<predicate<T>>;
+template<typename T> using rule = fn<predicate<T>>;
 template<typename T> using rules = std::list<rule<T>>;
 
 typedef void accumulation_function(operation&, dictionary&);
@@ -70,9 +70,9 @@ struct dictionary : _dictionary {
 std::wstring str(const dictionary::value_type&);
 
 //
-// function
+// fn
 
-template<typename T> struct function {
+template<typename T> struct fn {
 
 	typedef T value_type;
 	typedef std::list<T> args_type;
@@ -80,17 +80,17 @@ template<typename T> struct function {
 	op_t op;
 	args_type args;
 
-	function();
-	function(op_t);
-	function(op_t, const args_type&);
-	function(const function&);
+	fn();
+	fn(op_t);
+	fn(op_t, const args_type&);
+	fn(const fn&);
 
-	function& operator=(const function&);
+	fn& operator=(const fn&);
 
-	//bool operator==(const function&) const;
-	//bool operator<(const function&) const;
+	bool operator==(const fn&) const;
+	bool operator<(const fn&) const;
 
-	function& operator<<(const T&);
+	fn& operator<<(const T&);
 
 	size_t arity() const;
 
@@ -118,12 +118,12 @@ struct term {
 
 	literal_t l;
 	symbol s;
-	function<term> f;
+	fn<term> f;
 
 	term();
 	term(literal_t);
 	term(const symbol&);
-	term(const function<term>&);
+	term(const fn<term>&);
 	term(const term&);
 
 	std::wstring wstr() const;
@@ -350,6 +350,9 @@ template <typename T> struct predicate {
 
 	predicate& operator=(const predicate&);
 
+	bool operator==(const predicate&) const;
+	bool operator<(const predicate&) const;
+
 	std::wstring str() const;
 
 	predicate star() const;
@@ -373,5 +376,5 @@ template<typename T> struct grammar : _grammar<T> {
 
 extern template struct predicate<term>;
 extern template struct grammar<term>;
-extern template struct function<term>;
-extern template struct function<predicate<term>>;
+extern template struct fn<term>;
+extern template struct fn<predicate<term>>;

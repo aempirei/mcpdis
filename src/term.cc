@@ -8,7 +8,7 @@
 
 #include <mcpdis.hh>
 
-term::term() : term(function<term>(OP_LIST)) {
+term::term() : term(fn<term>(OP_LIST)) {
 }
 
 term::term(const term& r) {
@@ -21,7 +21,7 @@ term::term(literal_t my_l) : type(term_type::literal), l(my_l) {
 term::term(const symbol& my_s) : type(term_type::symbol), s(my_s) {
 }
 
-term::term(const function<term>& my_f) : type(term_type::function), f(my_f) {
+term::term(const fn<term>& my_f) : type(term_type::function), f(my_f) {
 }
 
 term& term::operator=(const term& r) {
@@ -66,7 +66,7 @@ bool term::operator==(const term& r) const {
 	switch(type) {
 		case term_type::literal : return l == r.l;
 		case term_type::symbol  : return s == r.s;
-		case term_type::function: return f.op == r.f.op && f.args == r.f.args;
+		case term_type::function: return f == r.f;
 	}
 
 	return false;
@@ -80,7 +80,7 @@ bool term::operator<(const term& r) const {
 	switch(type) {
 		case term_type::literal : return l < r.l;
 		case term_type::symbol  : return s < r.s;
-		case term_type::function: return (f.op < r.f.op) ? true : ((f.op == r.f.op) && (f.args < r.f.args)) ? true : false;
+		case term_type::function: return f < r.f;
 	}
 
 	return false;

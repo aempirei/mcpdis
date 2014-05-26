@@ -49,10 +49,24 @@ template<typename T> predicate<T>::predicate(const value_type& my_value) : type(
 template<typename T> predicate<T>::predicate(const filter_type& my_filter) : type(predicate_type::type), filter(my_filter), q(range::one) {
 }
 
-template<typename T> predicate<T>& predicate<T>::operator=(const predicate<T>& x) {
+template<typename T> predicate<T>& predicate<T>::operator=(const predicate& x) {
 	if(this != &x) {
 	}
 	return *this;
+}
+
+template<typename T> bool predicate<T>::operator==(const predicate& r) const {
+	if(type != r.type)
+		return false;
+	return true;
+	// FIXME: fix predicate comparison, although im not sure why
+}
+
+template<typename T> bool predicate<T>::operator<(const predicate& r) const {
+	if(type != r.type)
+		return type < r.type;
+	return false;
+	// FIXME: fix predicate comparison, although im not sure why
 }
 
 template<typename T> std::wstring predicate<T>::str() const {

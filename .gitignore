@@ -2,4 +2,4 @@
 *.o
 bin
 lib
-src/ignore
+ignore

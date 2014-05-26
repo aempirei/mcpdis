@@ -3,7 +3,7 @@ CPPFLAGS = -Isrc -DUSE_COLOR -ggdb
 CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O1
 LIBFLAGS = -Llib -lmcpdis
 TARGETS = lib/libmcpdis.a bin/dis
-LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/function.cc src/predicate.cc src/range.cc src/grammar.cc
+LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/fn.cc src/predicate.cc src/range.cc src/grammar.cc
 LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 
 .PHONY: all clean test
