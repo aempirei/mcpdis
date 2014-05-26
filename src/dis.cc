@@ -54,7 +54,7 @@ void usage(const char *arg0) {
 	std::wcerr << std::endl;
 }
 
-void initialize_grammar(std::list<symbol> &s, std::list<symbol> &z, grammar<term> &g) {
+void initialize_grammar(std::list<symbol>& s, std::list<symbol>& z, std::list<symbol>& a, grammar<term>& g) {
 
 	typedef predicate<term> PT;
 	typedef const PT CPT;
@@ -84,20 +84,25 @@ void initialize_grammar(std::list<symbol> &s, std::list<symbol> &z, grammar<term
 
 	grammar<term> dgs = {
 
-		{ L"AND"    , { RT(OP_AND    ) << DOT.plus() << END } },
-		{ L"OR"     , { RT(OP_OR     ) << DOT.plus() << END } },
-		{ L"XOR"    , { RT(OP_XOR    ) << DOT.plus() << END } },
-		{ L"PLUS"   , { RT(OP_PLUS   ) << DOT.plus() << END } },
-		{ L"MINUS"  , { RT(OP_MINUS  ) << DOT.plus() << END } },
-		{ L"COMPOSE", { RT(OP_COMPOSE) << DOT.plus() << END } },
-		{ L"LIST"   , { RT(OP_LIST   ) << DOT.plus() << END } },
+		{ L"AND"    , { RT(OP_AND    ) << L"n-ary" } },
+		{ L"OR"     , { RT(OP_OR     ) << L"n-ary" } },
+		{ L"XOR"    , { RT(OP_XOR    ) << L"n-ary" } },
+		{ L"PLUS"   , { RT(OP_PLUS   ) << L"n-ary" } },
+		{ L"MINUS"  , { RT(OP_MINUS  ) << L"n-ary" } },
+		{ L"COMPOSE", { RT(OP_COMPOSE) << L"n-ary" } },
+		{ L"LIST"   , { RT(OP_LIST   ) << L"n-ary" } },
 
-		{ L"SWAP"   , { RT(OP_SWAP) << DOT << END } },
-		{ L"NOT"    , { RT(OP_NOT ) << DOT << END } },
-		{ L"ROTL"   , { RT(OP_ROTL) << DOT << END } },
-		{ L"ROTR"   , { RT(OP_ROTR) << DOT << END } }
+		{ L"SWAP"   , { RT(OP_SWAP) << L"unary" } },
+		{ L"NOT"    , { RT(OP_NOT ) << L"unary" } },
+		{ L"ROTL"   , { RT(OP_ROTL) << L"unary" } },
+		{ L"ROTR"   , { RT(OP_ROTR) << L"unary" } },
 
 	};
+
+	for(const auto& r : dgs)
+		s.push_back(r.first);
+
+	g.insert(dgs.begin(), dgs.end());
 
 	// optimization rules
 	//
@@ -105,82 +110,93 @@ void initialize_grammar(std::list<symbol> &s, std::list<symbol> &z, grammar<term
 
 	grammar<term> dgz = {
 
-		{ L"lift", {
-				   RT(OP_AND    ) << L"AND",
-				   RT(OP_OR     ) << L"OR",
-				   RT(OP_XOR    ) << L"XOR",
-				   RT(OP_PLUS   ) << L"PLUS",
-				   RT(OP_COMPOSE) << L"COMPOSE",
-				   RT(OP_LIST   ) << L"LIST"
-			   }
-		},
+		{ L"lift",
+			{
+				RT(OP_AND    ) << L"AND",
+				RT(OP_OR     ) << L"OR",
+				RT(OP_XOR    ) << L"XOR",
+				RT(OP_PLUS   ) << L"PLUS",
+				RT(OP_COMPOSE) << L"COMPOSE",
+				RT(OP_LIST   ) << L"LIST"
+			} },
 
-		{ L"aggregate", {
-					RT(OP_AND ) << L.ge(2),
-					RT(OP_OR  ) << L.ge(2),
-					RT(OP_XOR ) << L.ge(2),
-					RT(OP_PLUS) << L.ge(2)
-				}
-		},
+		{ L"aggregate",
+			{
+				RT(OP_AND ) << L"literals",
+				RT(OP_OR  ) << L"literals",
+				RT(OP_XOR ) << L"literals",
+				RT(OP_PLUS) << L"literals"
+			} },
 
-		{ L"compute", {
-				      RT(OP_SWAP) << L,
-				      RT(OP_NOT ) << L,
-				      RT(OP_ROTL) << L,
-				      RT(OP_ROTR) << L
-			      }
-		},
+		{ L"compute",
+			{
+				RT(OP_SWAP) << L,
+				RT(OP_NOT ) << L,
+				RT(OP_ROTL) << L,
+				RT(OP_ROTR) << L
+			} },
 
-		{ L"distribute", {
-					 RT(OP_AND) << DOT << L"OR",
-					 RT(OP_OR) << DOT << L"AND"
-				 }
-		},
+		{ L"distribute",
+			{
+				RT(OP_AND) << DOT << L"OR",
+				RT(OP_OR) << DOT << L"AND"
+			} },
 
-		{ L"idempotent", {
-					 RT(OP_AND) << DOT << MEM,
-					 RT(OP_OR ) << DOT << MEM
-				 }
-		},
+		{ L"idempotent",
+			{
+				RT(OP_AND) << L"matchpair",
+				RT(OP_OR ) << L"matchpair"
+			} },
 
-		{ L"nilpotent", {
-					RT(OP_XOR) << DOT << MEM
-				}
-		},
+		{ L"nilpotent",
+			{
+				RT(OP_XOR) << L"matchpair"
+			} },
 
-		{ L"involution", {
-					 RT(OP_NOT ) << L"NOT",
-					 RT(OP_SWAP) << L"SWAP"
-				 }
-		},
+		{ L"involution",
+			{
+				RT(OP_NOT ) << L"NOT",
+				RT(OP_SWAP) << L"SWAP"
+			} },
 
-		{ L"inverse", {
-				      RT(OP_ROTL) << L"ROTR",
-				      RT(OP_ROTR) << L"ROTL"
-			      }
-		},
+		{ L"inverse",
+			{
+				RT(OP_ROTL) << L"ROTR",
+				RT(OP_ROTR) << L"ROTL"
+			} },
 
-		{ L"nop", {
-				  RT(OP_AND    ) << DOT << END,
-				  RT(OP_OR     ) << DOT << END,
-				  RT(OP_XOR    ) << DOT << END,
-				  RT(OP_PLUS   ) << DOT << END,
-				  RT(OP_MINUS  ) << DOT << END,
-				  RT(OP_COMPOSE) << DOT << END,
-				  RT(OP_LIST   ) << DOT << END << term(5)
-			  }
-		}
+		{ L"nop",
+			{
+				RT(OP_AND    ) << L"unary",
+				RT(OP_OR     ) << L"unary",
+				RT(OP_XOR    ) << L"unary",
+				RT(OP_PLUS   ) << L"unary",
+				RT(OP_MINUS  ) << L"unary",
+				RT(OP_COMPOSE) << L"unary",
+				RT(OP_LIST   ) << L"unary"
+			} }
 	};
 
 	for(const auto& r : dgz)
 		z.push_back(r.first);
 
-	for(const auto& r : dgs)
-		s.push_back(r.first);
-
-	g.insert(dgs.begin(), dgs.end());
-
 	g.insert(dgz.begin(), dgz.end());
+
+	// auxiliary rules
+	//
+	// 
+
+	grammar<term> dga = {
+		{ L"unary", { RT() << DOT << END } },
+		{ L"n-ary", { RT() << DOT.plus() << END } },
+		{ L"matchpair", { RT() << DOT << MEM } },
+		{ L"literals", { RT() << L.ge(2) } }
+	};
+
+	for(const auto& r : dga)
+		a.push_back(r.first);
+
+	g.insert(dga.begin(), dga.end());
 }
 
 void print_rules(const configuration& config, const std::wstring& name, const std::list<symbol> ks, grammar<term>& g) {
@@ -227,11 +243,13 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_CTYPE, "");
 
-	grammar<term> g;
 	std::list<symbol> s;
 	std::list<symbol> z;
+	std::list<symbol> a;
 
-	initialize_grammar(s, z, g);
+	grammar<term> g;
+
+	initialize_grammar(s, z, a, g);
 
 	while ((opt = getopt(argc, argv, "hvx:m")) != -1) {
 		switch (opt) {
@@ -274,6 +292,7 @@ int main(int argc, char **argv) {
 	if(config.print_model) {
 		print_rules(config, L"root", s, g);
 		print_rules(config, L"optimization", z, g);
+		print_rules(config, L"auxiliary", a, g);
 		return 0;
 	}
 
