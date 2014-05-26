@@ -25,6 +25,7 @@ void handler(const configuration&, bitstream&, const instruction_set&, stream_pr
 
 struct configuration {
 	bool verbose = false;
+	bool print_model = false;
 	stream_processor_fn *stream_processor = be14;
 };
 
@@ -43,16 +44,17 @@ std::wstring arg_string(wchar_t wc, std::wstring message) {
 
 void usage(const char *arg0) {
 
-	std::wcerr << std::endl << L"usage: " << arg0 << L" [-{hv}] [-x {le16|be14}]" << std::endl << std::endl;
+	std::wcerr << std::endl << L"usage: " << arg0 << L" [-{mvh}] [-x {le16|be14}]" << std::endl << std::endl;
 
-	std::wcerr << arg_string(L'h', L"show help");
-	std::wcerr << arg_string(L'v', L"verbose");
 	std::wcerr << arg_string(L'x', L"format", L"stream type (default: be14)");
+	std::wcerr << arg_string(L'm', L"show model");
+	std::wcerr << arg_string(L'v', L"verbose");
+	std::wcerr << arg_string(L'h', L"show help");
 
 	std::wcerr << std::endl;
 }
 
-void initialize_grammar(grammar<term> &g) {
+void initialize_grammar(std::list<symbol> &s, std::list<symbol> &z, grammar<term> &g) {
 
 	typedef predicate<term> PT;
 	typedef const PT CPT;
@@ -70,80 +72,154 @@ void initialize_grammar(grammar<term> &g) {
 	CPT END = PT::predicate_type::end;
 	CPT MEM = PT::predicate_type::mem;
 
-	g[L"AND"    ].push_back( RT(OP_AND    ) << DOT.plus() << END );
-	g[L"OR"     ].push_back( RT(OP_OR     ) << DOT.plus() << END );
-	g[L"XOR"    ].push_back( RT(OP_XOR    ) << DOT.plus() << END );
-	g[L"PLUS"   ].push_back( RT(OP_PLUS   ) << DOT.plus() << END );
-	g[L"MINUS"  ].push_back( RT(OP_MINUS  ) << DOT.plus() << END );
-	g[L"COMPOSE"].push_back( RT(OP_COMPOSE) << DOT.plus() << END );
-	g[L"LIST"   ].push_back( RT(OP_LIST   ) << DOT.plus() << END );
+	// init
 
-	g[L"SWAP"].push_back( RT(OP_SWAP) << DOT << END );
-	g[L"NOT" ].push_back( RT(OP_NOT ) << DOT << END );
-	g[L"ROTL"].push_back( RT(OP_ROTL) << DOT << END );
-	g[L"ROTR"].push_back( RT(OP_ROTR) << DOT << END );
+	g.clear();
+	s.clear();
+	z.clear();
+	
+	// root rules
+	//
+	//
 
-	g[L"lift"].assign({
-			 RT(OP_AND    ) << L"AND",
-			 RT(OP_OR     ) << L"OR",
-			 RT(OP_XOR    ) << L"XOR",
-			 RT(OP_PLUS   ) << L"PLUS",
-			 RT(OP_COMPOSE) << L"COMPOSE",
-			 RT(OP_LIST   ) << L"LIST"
-			});
+	grammar<term> dgs = {
 
-	g[L"aggregate"].assign({
-			RT(OP_AND ) << L.ge(2),
-			RT(OP_OR  ) << L.ge(2),
-			RT(OP_XOR ) << L.ge(2),
-			RT(OP_PLUS) << L.ge(2)
-			});
+		{ L"AND"    , { RT(OP_AND    ) << DOT.plus() << END } },
+		{ L"OR"     , { RT(OP_OR     ) << DOT.plus() << END } },
+		{ L"XOR"    , { RT(OP_XOR    ) << DOT.plus() << END } },
+		{ L"PLUS"   , { RT(OP_PLUS   ) << DOT.plus() << END } },
+		{ L"MINUS"  , { RT(OP_MINUS  ) << DOT.plus() << END } },
+		{ L"COMPOSE", { RT(OP_COMPOSE) << DOT.plus() << END } },
+		{ L"LIST"   , { RT(OP_LIST   ) << DOT.plus() << END } },
 
-	g[L"compute"].assign({
-			RT(OP_SWAP) << L,
-			RT(OP_NOT ) << L,
-			RT(OP_ROTL) << L,
-			RT(OP_ROTR) << L
-			});
+		{ L"SWAP"   , { RT(OP_SWAP) << DOT << END } },
+		{ L"NOT"    , { RT(OP_NOT ) << DOT << END } },
+		{ L"ROTL"   , { RT(OP_ROTL) << DOT << END } },
+		{ L"ROTR"   , { RT(OP_ROTR) << DOT << END } }
 
-	g[L"distribute"].assign({
-			RT(OP_AND) << DOT << L"OR",
-			RT(OP_OR) << DOT << L"AND"
-			});
+	};
 
-	g[L"idempotent"].assign({
-			RT(OP_AND) << DOT << MEM,
-			RT(OP_OR ) << DOT << MEM
-			});
+	// optimization rules
+	//
+	//
 
-	g[L"nilpotent"].assign({
-			RT(OP_XOR) << DOT << MEM
-			});
+	grammar<term> dgz = {
 
-	g[L"involution"].assign({
-			RT(OP_NOT ) << L"NOT",
-			RT(OP_SWAP) << L"SWAP"
-			});
+		{ L"lift", {
+				   RT(OP_AND    ) << L"AND",
+				   RT(OP_OR     ) << L"OR",
+				   RT(OP_XOR    ) << L"XOR",
+				   RT(OP_PLUS   ) << L"PLUS",
+				   RT(OP_COMPOSE) << L"COMPOSE",
+				   RT(OP_LIST   ) << L"LIST"
+			   }
+		},
 
-	g[L"inverse"].assign({
-			RT(OP_ROTL) << L"ROTR",
-			RT(OP_ROTR) << L"ROTL"
-			});
+		{ L"aggregate", {
+					RT(OP_AND ) << L.ge(2),
+					RT(OP_OR  ) << L.ge(2),
+					RT(OP_XOR ) << L.ge(2),
+					RT(OP_PLUS) << L.ge(2)
+				}
+		},
 
-	g[L"nop"].assign({
-			RT(OP_AND    ) << DOT << END,
-			RT(OP_OR     ) << DOT << END,
-			RT(OP_XOR    ) << DOT << END,
-			RT(OP_PLUS   ) << DOT << END,
-			RT(OP_MINUS  ) << DOT << END,
-			RT(OP_COMPOSE) << DOT << END,
-			RT(OP_LIST   ) << DOT << END << term(5)
-			});
+		{ L"compute", {
+				      RT(OP_SWAP) << L,
+				      RT(OP_NOT ) << L,
+				      RT(OP_ROTL) << L,
+				      RT(OP_ROTR) << L
+			      }
+		},
+
+		{ L"distribute", {
+					 RT(OP_AND) << DOT << L"OR",
+					 RT(OP_OR) << DOT << L"AND"
+				 }
+		},
+
+		{ L"idempotent", {
+					 RT(OP_AND) << DOT << MEM,
+					 RT(OP_OR ) << DOT << MEM
+				 }
+		},
+
+		{ L"nilpotent", {
+					RT(OP_XOR) << DOT << MEM
+				}
+		},
+
+		{ L"involution", {
+					 RT(OP_NOT ) << L"NOT",
+					 RT(OP_SWAP) << L"SWAP"
+				 }
+		},
+
+		{ L"inverse", {
+				      RT(OP_ROTL) << L"ROTR",
+				      RT(OP_ROTR) << L"ROTL"
+			      }
+		},
+
+		{ L"nop", {
+				  RT(OP_AND    ) << DOT << END,
+				  RT(OP_OR     ) << DOT << END,
+				  RT(OP_XOR    ) << DOT << END,
+				  RT(OP_PLUS   ) << DOT << END,
+				  RT(OP_MINUS  ) << DOT << END,
+				  RT(OP_COMPOSE) << DOT << END,
+				  RT(OP_LIST   ) << DOT << END << term(5)
+			  }
+		}
+	};
+
+	for(const auto& r : dgz)
+		z.push_back(r.first);
+
+	for(const auto& r : dgs)
+		s.push_back(r.first);
+
+	g.insert(dgs.begin(), dgs.end());
+
+	g.insert(dgz.begin(), dgz.end());
+}
+
+void print_rules(const configuration& config, const std::wstring& name, const std::list<symbol> ks, grammar<term>& g) {
+
+	std::wcout << L"[:" << name << L":]" << std::endl << std::endl;
+
+	for(const auto& k : ks) {
+
+		const auto& rs = g[k];
+		auto iter = rs.begin();
+
+		if(config.verbose) {
+
+			if(iter != rs.end())
+				std::wcout << k << L" := " << iter->str() << std::endl;
+
+			while(++iter != rs.end())
+				std::wcout << std::setw(k.length()) << L"" << L" := " << iter->str() << std::endl;
+
+			std::wcout << std::endl;
+
+		} else {
+
+			if(iter != rs.end())
+				std::wcout << std::setw(10) << std::left << k << ANSI_HIRED << L" := " << ANSI_CLR << iter->str();
+
+			while(++iter != rs.end())
+				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
+
+			std::wcout << std::endl;
+
+		}
+
+	}
+
+	std::wcout << std::endl;
 }
 
 int main(int argc, char **argv) {
-
-	grammar<term> g;
 
 	configuration config;
 	bitstream b(stdin);
@@ -151,18 +227,13 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_CTYPE, "");
 
-	initialize_grammar(g);
+	grammar<term> g;
+	std::list<symbol> s;
+	std::list<symbol> z;
 
-	for(const auto& x : g) {
-		for(const auto& y : x.second) {
-			std::wcout << x.first << L" := " << y.str() << std::endl;
-		}
-		// std::wcout << std::endl;
-	}
+	initialize_grammar(s, z, g);
 
-	return 0;
-
-	while ((opt = getopt(argc, argv, "hvx:")) != -1) {
+	while ((opt = getopt(argc, argv, "hvx:m")) != -1) {
 		switch (opt) {
 
 			case 'v':
@@ -187,12 +258,23 @@ int main(int argc, char **argv) {
 
 				break;
 
+			case 'm':
+
+				config.print_model = true;
+				break;
+
 			case 'h':
 			default:
 
 				usage(*argv);
 				return -1;
 		}
+	}
+
+	if(config.print_model) {
+		print_rules(config, L"root", s, g);
+		print_rules(config, L"optimization", z, g);
+		return 0;
 	}
 
 	pic12f::pic12f675.sort();
