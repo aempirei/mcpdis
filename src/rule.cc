@@ -12,7 +12,7 @@
 template<typename T> rule<T>::rule(const rule& r) : op(r.op), type(r.type), predicates(r.predicates) {
 }
 
-template<typename T> rule<T>::rule() : rule(L'\0', rule_type::unordered) {
+template<typename T> rule<T>::rule() : rule(OP_LIST, rule_type::unordered) {
 }
 
 template<typename T> rule<T>::rule(op_t my_op) : rule(my_op, rule_type::unordered) {
@@ -36,7 +36,7 @@ template<typename T> std::wstring rule<T>::str() const {
 
 	std::wstringstream ss;
 
-	if(op != L'\0')
+	if(op != OP_LIST)
 		ss << '(' << ANSI_HIYELLOW << op << ANSI_CLR << ") ";
 
 	ss << (type == rule_type::ordered ? L'(' : L'{');

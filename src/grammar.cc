@@ -22,7 +22,7 @@ template<typename T> template<typename U> bool grammar<T>::match(const symbol& r
 
 template<typename T> template<typename U> bool grammar<T>::match(const rule<T>& r, U& x, rule<T> *rptr) {
 
-	if(r.op != L'\0' && r.op != x.op)
+	if(r.op != OP_LIST && r.op != x.op)
 		return false;
 
 	rule<T> dr(r);

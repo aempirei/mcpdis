@@ -30,6 +30,7 @@ template<typename T> function<T>& function<T>::operator=(const function& r) {
 	return *this;
 }
 
+/*
 template<typename T> bool function<T>::operator==(const function& r) const {
 	return op == r.op && args == r.args;
 }
@@ -41,6 +42,7 @@ template<typename T> bool function<T>::operator<(const function& r) const {
 
 	return args < r.args;
 }
+*/
 
 template<typename T> function<T>& function<T>::operator<<(const T& x) {
 	args.push_back(x);
@@ -60,4 +62,22 @@ template<typename T> void function<T>::concat(const args_type& xs) {
 	args.insert(args.end(), xs.begin(), xs.end());
 }
 
+template<typename T> std::wstring function<T>::str() const {
+	std::wstringstream ss;
+
+	if(op != OP_LIST)
+		ss << '(' << ANSI_HIYELLOW << op << ANSI_CLR << ") ";
+
+	ss << L"{ ";
+
+	for(const auto& arg : args)
+		ss << arg.str() << L' ';
+
+	ss << L'}';
+
+	return ss.str();
+
+}
+
 template struct function<term>;
+template struct function<predicate<term>>;

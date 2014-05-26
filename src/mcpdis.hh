@@ -27,14 +27,13 @@ struct range;
 struct term;
 
 typedef std::list<operation> sourcecode;
-typedef std::list<term> arglist;
 typedef std::wstring symbol;
 
 template<typename> struct function;
-template<typename> struct rule;
 template<typename> struct predicate;
 template<typename> struct grammar;
 
+template<typename T> using rule = function<predicate<T>>;
 template<typename T> using rules = std::list<rule<T>>;
 
 typedef void accumulation_function(operation&, dictionary&);
@@ -88,8 +87,8 @@ template<typename T> struct function {
 
 	function& operator=(const function&);
 
-	bool operator==(const function&) const;
-	bool operator<(const function&) const;
+	//bool operator==(const function&) const;
+	//bool operator<(const function&) const;
 
 	function& operator<<(const T&);
 
@@ -98,6 +97,8 @@ template<typename T> struct function {
 	void clear();
 
 	void concat(const args_type&);
+
+	std::wstring str() const;
 };
 
 //
@@ -299,42 +300,6 @@ struct range : _range {
 	static const range zero;
 };
 
-template <typename T> struct rule {
-
-	// types
-	//
-
-	typedef T value_type;
-
-	enum class rule_type { ordered, unordered };
-
-	typedef rule_type types;
-
-	// variables
-	//
-
-	op_t op;
-	rule_type type;
-
-	std::list<predicate<value_type>> predicates;
-
-	// methods
-	//
-
-	rule();
-
-	rule(const rule&);
-
-	rule(op_t);
-	rule(op_t, rule_type);
-
-	rule& operator<<(const predicate<value_type>&);
-
-	rule& operator=(const rule<value_type>&);
-
-	std::wstring str() const;
-};
-
 template <typename T> struct predicate {
 
 	// types
@@ -383,7 +348,7 @@ template <typename T> struct predicate {
 	predicate(const filter_type&);
 	predicate(const value_type&);
 
-	predicate& operator=(const predicate<value_type>&);
+	predicate& operator=(const predicate&);
 
 	std::wstring str() const;
 
@@ -406,7 +371,7 @@ template<typename T> struct grammar : _grammar<T> {
 	template<typename U> bool match(const rule<T>&, U&, rule<T> *);
 };
 
-extern template struct rule<term>;
 extern template struct predicate<term>;
 extern template struct grammar<term>;
 extern template struct function<term>;
+extern template struct function<predicate<term>>;

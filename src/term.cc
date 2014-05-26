@@ -66,7 +66,7 @@ bool term::operator==(const term& r) const {
 	switch(type) {
 		case term_type::literal : return l == r.l;
 		case term_type::symbol  : return s == r.s;
-		case term_type::function: return f == r.f;
+		case term_type::function: return f.op == r.f.op && f.args == r.f.args;
 	}
 
 	return false;
@@ -80,7 +80,7 @@ bool term::operator<(const term& r) const {
 	switch(type) {
 		case term_type::literal : return l < r.l;
 		case term_type::symbol  : return s < r.s;
-		case term_type::function: return f < r.f;
+		case term_type::function: return (f.op < r.f.op) ? true : ((f.op == r.f.op) && (f.args < r.f.args)) ? true : false;
 	}
 
 	return false;
