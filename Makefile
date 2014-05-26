@@ -18,11 +18,11 @@ test: all
 	cat test.dis
 	md5sum test.dis
 
-src/mcpdis.o: src/mcpdis.hh src/operators.hh src/ansicolor.hh src/mcpdis.cc src/mcpdis/term.cc src/mcpdis/pic12f.cc src/mcpdis/parser.cc
+src/mcpdis.o: src/mcpdis.hh src/operators.hh src/ansicolor.hh src/mcpdis.cc src/term.cc src/pic12f.cc src/parser.cc
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
-lib/libmcpdis.a: src/mcpdis.o src/mcpdis/term.o src/mcpdis/pic12f.o src/mcpdis/parser.o
+lib/libmcpdis.a: src/mcpdis.o src/term.o src/pic12f.o src/parser.o
 	if [ ! -d lib ]; then mkdir -vp lib; fi
 	ar crfv $@ $^ 
 
