@@ -37,7 +37,7 @@ template<typename T> std::wstring rule<T>::str() const {
 	std::wstringstream ss;
 
 	if(op != L'\0')
-		ss << '(' << op << ") ";
+		ss << '(' << ANSI_HIYELLOW << op << ANSI_CLR << ") ";
 
 	ss << (type == rule_type::ordered ? L'(' : L'{');
 

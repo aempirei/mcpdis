@@ -84,24 +84,24 @@ void initialize_grammar(grammar<term> &g) {
 	g[L"ROTR"].push_back( RT(OP_ROTR) << DOT << END );
 
 	g[L"lift"].assign({
-			 RT(OP_AND) << L"AND",
-			 RT(OP_OR) << L"OR",
-			 RT(OP_XOR) << L"XOR",
-			 RT(OP_PLUS) << L"PLUS",
+			 RT(OP_AND    ) << L"AND",
+			 RT(OP_OR     ) << L"OR",
+			 RT(OP_XOR    ) << L"XOR",
+			 RT(OP_PLUS   ) << L"PLUS",
 			 RT(OP_COMPOSE) << L"COMPOSE",
-			 RT(OP_LIST) << L"LIST"
+			 RT(OP_LIST   ) << L"LIST"
 			});
 
 	g[L"aggregate"].assign({
-			RT(OP_AND) << L.ge(2),
-			RT(OP_OR) << L.ge(2),
-			RT(OP_XOR) << L.ge(2),
+			RT(OP_AND ) << L.ge(2),
+			RT(OP_OR  ) << L.ge(2),
+			RT(OP_XOR ) << L.ge(2),
 			RT(OP_PLUS) << L.ge(2)
 			});
 
 	g[L"compute"].assign({
 			RT(OP_SWAP) << L,
-			RT(OP_NOT) << L,
+			RT(OP_NOT ) << L,
 			RT(OP_ROTL) << L,
 			RT(OP_ROTR) << L
 			});
@@ -113,7 +113,7 @@ void initialize_grammar(grammar<term> &g) {
 
 	g[L"idempotent"].assign({
 			RT(OP_AND) << DOT << MEM,
-			RT(OP_OR) << DOT << MEM
+			RT(OP_OR ) << DOT << MEM
 			});
 
 	g[L"nilpotent"].assign({
@@ -121,7 +121,7 @@ void initialize_grammar(grammar<term> &g) {
 			});
 
 	g[L"involution"].assign({
-			RT(OP_NOT) << L"NOT",
+			RT(OP_NOT ) << L"NOT",
 			RT(OP_SWAP) << L"SWAP"
 			});
 
@@ -131,13 +131,13 @@ void initialize_grammar(grammar<term> &g) {
 			});
 
 	g[L"nop"].assign({
-			RT(OP_AND) << DOT << END,
-			RT(OP_OR) << DOT << END,
-			RT(OP_XOR) << DOT << END,
-			RT(OP_PLUS) << DOT << END,
-			RT(OP_MINUS) << DOT << END,
+			RT(OP_AND    ) << DOT << END,
+			RT(OP_OR     ) << DOT << END,
+			RT(OP_XOR    ) << DOT << END,
+			RT(OP_PLUS   ) << DOT << END,
+			RT(OP_MINUS  ) << DOT << END,
 			RT(OP_COMPOSE) << DOT << END,
-			RT(OP_LIST) << DOT << END
+			RT(OP_LIST   ) << DOT << END << term(5)
 			});
 }
 

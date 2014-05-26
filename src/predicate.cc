@@ -62,31 +62,32 @@ template<typename T> std::wstring predicate<T>::str() const {
 	switch(type) {
 		case predicate_type::type:
 
-				ss << L'[';
+				ss << ANSI_HIMAGENTA << L'[' << ANSI_LOMAGENTA;
 
 			for(const auto& t : filter)
 				ss << (wchar_t)t;
 
-				ss << L']';
+				ss << ANSI_HIMAGENTA << L']' << ANSI_CLR;
 
 			break;
 		case predicate_type::value:
-			ss << (int)value.type;
-			ss << L':' << value.str();
+			ss << ANSI_LOMAGENTA << (wchar_t)value.type << ANSI_CLR << L':'  << value.str();
 			break;
 		case predicate_type::ref:
-			ss << ref;
+			ss << ANSI_LOGREEN << ref << ANSI_CLR;
 			break;
 		case predicate_type::mem:
-			ss << L'#';
+			ss << ANSI_HIBLUE << L'#' << ANSI_CLR;
 			break;
 		case predicate_type::any:
-			ss << L'.';
+			ss << ANSI_HIBLACK << L'.' << ANSI_CLR;
 			break;
 		case predicate_type::end:
-			ss << L'$';
+			ss << ANSI_HIBLACK << L'$' << ANSI_CLR;
 			break;
 	}
+
+	ss << ANSI_HIWHITE;
 
 	if(q == range::star) {
 		ss << L'*';
@@ -103,6 +104,8 @@ template<typename T> std::wstring predicate<T>::str() const {
 	} else if(q.second == UINT_MAX) {
 		ss <<  L'{' << q.first << L",}";
 	}
+
+	ss << ANSI_CLR;
 
 	return ss.str();
 }
