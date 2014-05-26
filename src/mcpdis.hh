@@ -111,6 +111,8 @@ struct term {
 		function
 	};
 
+	typedef term_type types;
+
 	term_type type;
 
 	literal_t l;
@@ -124,6 +126,7 @@ struct term {
 	term(const term&);
 
 	std::wstring wstr() const;
+	std::wstring str() const;
 
 	bool is_function(op_t) const;
 	bool is_literal(literal_t) const;
@@ -328,7 +331,7 @@ template <typename T> struct predicate {
 	typedef T value_type;
 	typedef decltype(value_type::type) value_type_type;
 
-	enum class predicate_type { type, value, ref, any, end };
+	enum class predicate_type { type, value, ref, mem, any, end };
 
 	typedef predicate_type types;
 	typedef std::set<value_type_type> filter_type;
@@ -360,6 +363,10 @@ template <typename T> struct predicate {
 	predicate star() const;
 	predicate plus() const;
 	predicate qm() const;
+
+	predicate ge(unsigned int) const;
+	predicate le(unsigned int) const;
+	predicate eq(unsigned int) const;
 };
 
 extern template struct rule<term>;

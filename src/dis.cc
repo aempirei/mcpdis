@@ -54,10 +54,90 @@ void usage(const char *arg0) {
 
 void initialize_grammar(grammar<term> &g) {
 
+	
+	const predicate<term> L(predicate<term>::filter_type { term::term_type::literal });
+	const predicate<term> S(predicate<term>::filter_type { term::term_type::symbol });
+	const predicate<term> F(predicate<term>::filter_type { term::term_type::function });
+	const predicate<term> LS(predicate<term>::filter_type { term::term_type::literal, term::term_type::symbol });
 
-	auto& add_rule = g[L"add"];
+	const predicate<term> DOT = predicate<term>();
+	const predicate<term> TAIL = predicate<term>().star();
+	const predicate<term> END = predicate<term>::predicate_type::end;
+	const predicate<term> MEM = predicate<term>::predicate_type::mem;
 
-	add_rule.push_back( rule<term>(OP_PLUS) << L"literal" << predicate<term>().star() << predicate<term>::predicate_type::end );
+	auto& AND = g[L"AND"];
+	auto& OR = g[L"OR"];
+	auto& XOR = g[L"XOR"];
+	auto& PLUS = g[L"PLUS"];
+	auto& MINUS = g[L"MINUS"];
+	auto& COMPOSE = g[L"COMPOSE"];
+	auto& LIST = g[L"LIST"];
+
+	auto& SWAP = g[L"SWAP"];
+	auto& NOT = g[L"NOT"];
+	auto& ROTL = g[L"ROTL"];
+	auto& ROTR = g[L"ROTR"];
+
+	AND.push_back( rule<term>(OP_AND) << DOT.plus() << END );
+	OR.push_back( rule<term>(OP_OR) << DOT.plus() << END );
+	XOR.push_back( rule<term>(OP_XOR) << DOT.plus() << END );
+	PLUS.push_back( rule<term>(OP_PLUS) << DOT.plus() << END );
+	MINUS.push_back( rule<term>(OP_MINUS) << DOT.plus() << END );
+	COMPOSE.push_back( rule<term>(OP_COMPOSE) << DOT.plus() << END );
+	LIST.push_back( rule<term>(OP_LIST) << DOT.plus() << END );
+
+	SWAP.push_back( rule<term>(OP_SWAP) << DOT << END );
+	NOT.push_back( rule<term>(OP_NOT) << DOT << END );
+	ROTL.push_back( rule<term>(OP_ROTL) << DOT << END );
+	ROTR.push_back( rule<term>(OP_ROTR) << DOT << END );
+
+	auto& lift_rule = g[L"lift"];
+
+	lift_rule.push_back( rule<term>(OP_AND) << L"AND" );
+	lift_rule.push_back( rule<term>(OP_OR) << L"OR" );
+	lift_rule.push_back( rule<term>(OP_XOR) << L"XOR" );
+	lift_rule.push_back( rule<term>(OP_PLUS) << L"PLUS" );
+	lift_rule.push_back( rule<term>(OP_COMPOSE) << L"COMPOSE" );
+	lift_rule.push_back( rule<term>(OP_LIST) << L"LIST" );
+
+	auto& literals_rule = g[L"literals"];
+
+	literals_rule.push_back( rule<term>() << L.ge(2) );
+
+	auto& distribute_rule = g[L"distribute"];
+
+	distribute_rule.push_back( rule<term>(OP_AND) << DOT << L"OR" );
+	distribute_rule.push_back( rule<term>(OP_OR) << DOT << L"AND" );
+
+	auto& idempotent_rule = g[L"idempotent"];
+
+	idempotent_rule.push_back( rule<term>(OP_AND) << DOT << MEM );
+	idempotent_rule.push_back( rule<term>(OP_OR) << DOT << MEM );
+
+	auto& nilpotent_rule = g[L"nilpotent"];
+
+	nilpotent_rule.push_back( rule<term>(OP_XOR) << DOT << MEM );
+	nilpotent_rule.push_back( rule<term>(OP_MINUS) << DOT << MEM );
+
+	auto& involution_rule = g[L"involution"];
+
+	involution_rule.push_back( rule<term>(OP_NOT) << L"NOT" << END);
+	involution_rule.push_back( rule<term>(OP_SWAP) << L"SWAP" << END );
+
+	auto& inverse_rule = g[L"inverse"];
+
+	inverse_rule.push_back( rule<term>(OP_ROTL) << L"ROTR" << END );
+	inverse_rule.push_back( rule<term>(OP_ROTR) << L"ROTL" << END );
+
+	auto& nop_rule = g[L"nop"];
+
+	nop_rule.push_back( rule<term>(OP_AND) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_OR) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_XOR) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_PLUS) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_MINUS) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_COMPOSE) << DOT << END );
+	nop_rule.push_back( rule<term>(OP_LIST) << DOT << END );
 }
 
 int main(int argc, char **argv) {
@@ -76,6 +156,7 @@ int main(int argc, char **argv) {
 		for(const auto& y : x.second) {
 			std::wcout << x.first << L" := " << y.str() << std::endl;
 		}
+		// std::wcout << std::endl;
 	}
 
 	return 0;

@@ -159,6 +159,10 @@ bool term::operator<(const term& r) const {
 	return false;
 }
 
+std::wstring term::str() const {
+	return wstr();
+}
+
 std::wstring term::wstr() const {
 
 	std::wstringstream ws;
