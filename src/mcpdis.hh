@@ -103,10 +103,10 @@ struct function {
 
 struct term {
 
-	enum class term_type {
-		literal,
-		symbol,
-		function
+	enum class term_type : op_t {
+		literal = L'L',
+		symbol = L'S',
+		function = L'F'
 	};
 
 	typedef term_type types;

@@ -61,10 +61,14 @@ template<typename T> std::wstring predicate<T>::str() const {
 
 	switch(type) {
 		case predicate_type::type:
-			ss << L'[';
-			for(auto t : filter)
-				ss << (int)t;
-			ss << L']';
+
+				ss << L'[';
+
+			for(const auto& t : filter)
+				ss << (wchar_t)t;
+
+				ss << L']';
+
 			break;
 		case predicate_type::value:
 			ss << (int)value.type;
