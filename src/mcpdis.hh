@@ -12,6 +12,7 @@
 
 #include <operators.hh>
 #include <ansicolor.hh>
+#include <yyy.hh>
 
 typedef unsigned long literal_t;
 typedef uint8_t reg_t;
