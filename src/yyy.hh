@@ -23,13 +23,13 @@ namespace yyy {
 	using symbol = std::wstring;
 	using range = std::pair<size_t,size_t>;
 
+	template<typename,typename> struct either;
+
 	template<typename> struct predicate;
 	template<typename> struct function;
 	template<typename> struct binding;
 	template<typename> struct grammar;
 	template<typename> struct maybe;
-
-	template<typename T, typename U> using either = std::pair<maybe<T>,maybe<U>>;
 
 	template<typename T> using argument = either<T,function<T>>;
 	template<typename T> using rule = function<predicate<T>>;
@@ -38,6 +38,13 @@ namespace yyy {
 	template<typename T> using rules = std::list<rule<T>>;
 
 	using term = either<symbol,literal_t>;
+
+	template<typename T, typename U> using _either = std::pair<maybe<T>,maybe<U>>;
+
+	template<typename T, typename U> struct either : _either<T,U> {
+
+		using _either<T,U>::_either;
+	};
 
 	template<typename T> struct maybe {
 
