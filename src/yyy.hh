@@ -31,40 +31,51 @@ namespace yyy {
 	template<typename> struct grammar;
 	template<typename> struct maybe;
 
-	template<typename T> using argument = either<T,function<T>>;
-	template<typename T> using rule = function<predicate<T>>;
+	template<typename X> using argument = either<X,function<X>>;
+	template<typename X> using rule = function<predicate<X>>;
 
-	template<typename T> using arguments = std::list<argument<T>>;
-	template<typename T> using rules = std::list<rule<T>>;
+	template<typename X> using arguments = std::list<argument<X>>;
+	template<typename X> using rules = std::list<rule<X>>;
 
 	using term = either<symbol,literal_t>;
 
-	template<typename T, typename U> using _either = std::pair<maybe<T>,maybe<U>>;
+	template<typename A, typename B> struct either {
 
-	template<typename T, typename U> struct either : _either<T,U> {
+		maybe<A> a;
+		maybe<B> b;
 
-		using _either<T,U>::_either;
+		either();
+		either(const either&);
 
-		operator const T& () const;
-		operator T& ();
+		either(const maybe<A>&);
+		either(const maybe<B>&);
 
-		operator const U& () const;
-		operator U& ();
+		either& operator=(const maybe<A>&);
+		either& operator=(const maybe<B>&);
+
+		bool operator==(const either&);
+		bool operator<(const either&);
+
+		operator const maybe<A>& () const;
+		operator maybe<A>& ();
+
+		operator const maybe<B>& () const;
+		operator maybe<B>& ();
 	};
 
-	template<typename T> struct maybe {
+	template<typename X> struct maybe {
 
-		typedef T value_type;
+		typedef X value_type;
 
-		T *x = NULL;
+		X *x = NULL;
 
 		maybe();
 		maybe(const maybe&);
-		maybe(const T&);
+		maybe(const X&);
 
 		~maybe();
 
-		maybe& operator=(const T&);
+		maybe& operator=(const X&);
 		maybe& operator=(const maybe&);
 
 		bool operator==(const maybe&);
@@ -75,48 +86,51 @@ namespace yyy {
 
 		void clear();
 
-		operator const T& () const;
-		operator T& ();
+		operator const X& () const;
+		operator X ();
 	};
 
-	template<typename T> struct function {
+	template<typename X> struct function {
 
-		typedef T value_type;
+		typedef X value_type;
 
 		operator_t op;
-		arguments<T> args;
+		arguments<X> args;
 	};
 
-	template<typename T> struct predicate {
+	template<typename X> struct predicate {
 
-		typedef T value_type;
+		typedef X value_type;
 
 		enum class modifier { push, pop, lift, drop, bind, reject };
 		enum class types { end, any, mem, ref, type, op, value };
 
-		either<argument<T>,symbol> arg;
+		either<argument<X>,symbol> arg;
 	};
 
-	template<typename T> using _grammar = std::map<symbol,rules<T>>;
+	template<typename X> using _grammar = std::map<symbol,rules<X>>;
 
-	template<typename T> struct grammar : _grammar<T> {
+	template<typename X> struct grammar : _grammar<X> {
 
-		using _grammar<T>::_grammar;
+		using _grammar<X>::_grammar;
 	};
 
-	template<typename T> struct binding {
+	template<typename X> struct binding {
 
-		typedef T value_type;
+		typedef X value_type;
 
-		predicate<T> clause;
-		std::list<either<argument<T>,binding<T>>> closure;
+		predicate<X> clause;
+		std::list<either<argument<X>,binding<X>>> closure;
 	};
+
+	extern template struct maybe<symbol>;
+	extern template struct maybe<literal_t>;
+
+	extern template struct either<symbol,literal_t>;
 
 	extern template struct predicate<term>;
 	extern template struct function<term>;
 	extern template struct binding<term>;
 	extern template struct grammar<term>;
 
-	extern template struct maybe<symbol>;
-	extern template struct maybe<literal_t>;
 }
