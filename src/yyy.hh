@@ -44,6 +44,12 @@ namespace yyy {
 	template<typename T, typename U> struct either : _either<T,U> {
 
 		using _either<T,U>::_either;
+
+		operator const T& () const;
+		operator T& ();
+
+		operator const U& () const;
+		operator U& ();
 	};
 
 	template<typename T> struct maybe {
