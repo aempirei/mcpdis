@@ -99,7 +99,7 @@ template<typename T> struct fn {
 
 	void concat(const args_type&);
 
-	std::wstring str() const;
+	explicit operator std::wstring () const;
 };
 
 //
@@ -127,9 +127,6 @@ struct term {
 	term(const fn<term>&);
 	term(const term&);
 
-	std::wstring wstr() const;
-	std::wstring str() const;
-
 	bool is_function(op_t) const;
 	bool is_literal(literal_t) const;
 	bool is_symbol(const symbol&) const;
@@ -148,6 +145,9 @@ struct term {
 	bool operator<(const term&) const;
 
 	term& operator=(const term&);
+
+	explicit operator std::wstring () const;
+	explicit operator std::string () const;
 };
 
 //
