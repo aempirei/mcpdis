@@ -351,7 +351,7 @@ template <typename T> struct predicate {
 	//
 
 	std::list<value_type> matches;
-	rule<value_type> child; 
+	rule<value_type> child;
 
 	// methods
 	//
@@ -392,6 +392,10 @@ template<typename T> struct parser {
 	bool match(const symbol&, const grammar<T>&, const T&);
 	bool match(const rulelist<T>&, const grammar<T>&, const T&);
 	bool match(const rule<T>&, const grammar<T>&, const T&);
+
+	rule<T> parse(const symbol&, const grammar<T>&, const T&);
+	rule<T> parse(const rulelist<T>&, const grammar<T>&, const T&);
+	rule<T> parse(const rule<T>&, const grammar<T>&, const T&);
 };
 
 extern template struct rule<term>;
