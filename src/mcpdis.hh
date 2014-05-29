@@ -13,6 +13,10 @@
 #include <operators.hh>
 #include <ansicolor.hh>
 
+typedef unsigned long literal_t;
+typedef uint8_t reg_t;
+typedef wchar_t op_t;
+
 struct instruction_set;
 struct instruction;
 struct operation;
@@ -20,25 +24,20 @@ struct arguments;
 struct bitstream;
 struct dictionary;
 struct function;
+struct range;
 struct term;
 
 typedef std::list<operation> sourcecode;
 typedef std::list<term> arglist;
 typedef std::wstring symbol;
 
-typedef unsigned long literal_t;
-typedef uint8_t reg_t;
-typedef wchar_t op_t;
+template<typename> struct rule;
+template<typename> struct predicate;
+template<typename> struct grammar;
 
-using accumulation_function = void (operation&, dictionary&);
+template<typename T> using rules = std::list<rule<T>>;
 
-template <typename> struct rule;
-template <typename> struct predicate;
-
-struct range;
-
-template<typename T> using rulelist = std::list<rule<T>>;
-template<typename T> using grammar = std::map<symbol,rulelist<T>>;
+typedef void accumulation_function(operation&, dictionary&);
 
 //
 // globals
@@ -73,6 +72,8 @@ std::wstring str(const dictionary::value_type&);
 
 //
 // function
+
+// TODO: make this template<typename T> struct function so that function<term> is the current case
 
 struct function {
 
@@ -299,16 +300,25 @@ struct range : _range {
 
 template <typename T> struct rule {
 
+	// types
+	//
+
 	typedef T value_type;
 
 	enum class rule_type { ordered, unordered };
 
 	typedef rule_type types;
 
+	// variables
+	//
+
 	op_t op;
 	rule_type type;
 
 	std::list<predicate<value_type>> predicates;
+
+	// methods
+	//
 
 	rule();
 
@@ -325,6 +335,9 @@ template <typename T> struct rule {
 };
 
 template <typename T> struct predicate {
+
+	// types
+	//
 	
 	typedef T value_type;
 	typedef decltype(value_type::type) value_type_type;
@@ -350,7 +363,7 @@ template <typename T> struct predicate {
 	//
 	//
 
-	std::list<value_type> matches;
+	std::list<value_type> args;
 	rule<value_type> child;
 
 	// methods
@@ -382,21 +395,16 @@ template <typename T> struct predicate {
 	predicate eq(unsigned int) const;
 };
 
-template<typename T> struct ast {
-};
+template<typename T> using _grammar = std::map<symbol,rules<T>>;
 
-template<typename T> struct parser {
+template<typename T> struct grammar : _grammar<T> {
 
-	typedef T value_type;
+	using _grammar<T>::_grammar;
 
-	bool match(const symbol&, const grammar<T>&, const T&);
-	bool match(const rulelist<T>&, const grammar<T>&, const T&);
-	bool match(const rule<T>&, const grammar<T>&, const T&);
-
-	rule<T> parse(const symbol&, const grammar<T>&, const T&);
-	rule<T> parse(const rulelist<T>&, const grammar<T>&, const T&);
-	rule<T> parse(const rule<T>&, const grammar<T>&, const T&);
+	template<typename U> bool match(const symbol&, const U&, rule<T> *);
+	template<typename U> bool match(const rule<T>&, U&, rule<T> *);
 };
 
 extern template struct rule<term>;
 extern template struct predicate<term>;
+extern template struct grammar<term>;

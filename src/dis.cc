@@ -294,18 +294,16 @@ int main(int argc, char **argv) {
 	}
 
 	if(config.print_model) {
+
 		print_rules(config, L"root", s, g);
 		print_rules(config, L"optimization", z, g);
 		print_rules(config, L"auxiliary", a, g);
+
 	} else {
+
 		pic12f::pic12f675.sort();
 		handler(config, b, pic12f::pic12f675, config.stream_processor);
 	}
-
-	std::wcout << "term size: " << sizeof(term) << std::endl;
-	std::wcout << "rule<term> size: " << sizeof(rule<term>) << std::endl;
-	std::wcout << "predicate<term> size: " << sizeof(predicate<term>) << std::endl;
-	std::wcout << "std::list<term> size: " << sizeof(std::list<term>) << std::endl;
 
 	return 0;
 }

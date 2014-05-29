@@ -3,7 +3,7 @@ CPPFLAGS = -Isrc -DUSE_COLOR -ggdb
 CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O1
 LIBFLAGS = -Llib -lmcpdis # -lcrypto -lpthread
 TARGETS = lib/libmcpdis.a bin/dis
-LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/function.cc src/predicate.cc src/rule.cc src/range.cc
+LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/function.cc src/predicate.cc src/rule.cc src/range.cc src/grammar.cc
 LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 
 .PHONY: all clean test
@@ -19,8 +19,6 @@ test: all
 	./bin/dis -x le16 < test.bin > test.dis
 	cat test.dis
 	md5sum test.dis
-
-src/mcpdis.o: $(LIBCC) $(LIBHH)
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
