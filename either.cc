@@ -63,7 +63,6 @@ template<typename X, typename T> T *maybe_aux<X,T>::ptr_to(const maybe<X>&) {
 
 template<typename X, typename T> bool maybe_aux<X,T>:: has(const maybe<X>& a) {
 	return ptr_to(a) != nullptr;
-	// return false;
 }
 
 template<typename X, typename T> bool maybe_aux<X,T>:: has_type(const maybe<X>&) {
@@ -82,7 +81,6 @@ template<typename X, typename T> std::string maybe_aux<X,T>::str(const maybe<X>&
 
 	return ss.str();
 }
-
 
 // maybe_aux <X,X>
 
@@ -155,7 +153,6 @@ template<typename X> std::string maybe_aux<X,std::nullptr_t>::str(const maybe<X>
 
 	return ss.str();
 }
-
 
 // maybe
 
