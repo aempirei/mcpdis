@@ -215,20 +215,20 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		if(config.verbose) {
 
 			if(iter != rs.end())
-				std::wcout << k << L" := " << iter->str() << std::endl;
+				std::wcout << k << L" := " << (std::wstring)*iter << std::endl;
 
 			while(++iter != rs.end())
-				std::wcout << std::setw(k.length()) << L"" << L" := " << iter->str() << std::endl;
+				std::wcout << std::setw(k.length()) << L"" << L" := " << (std::wstring)*iter << std::endl;
 
 			std::wcout << std::endl;
 
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(10) << std::left << k << ANSI_HIRED << L" := " << ANSI_CLR << iter->str();
+				std::wcout << std::setw(10) << std::left << k << ANSI_HIRED << L" := " << ANSI_CLR << (std::wstring)*iter;
 
 			while(++iter != rs.end())
-				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
+				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << (std::wstring)*iter;
 
 			std::wcout << std::endl;
 

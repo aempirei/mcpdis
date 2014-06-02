@@ -69,7 +69,7 @@ template<typename T> bool predicate<T>::operator<(const predicate& r) const {
 	// FIXME: fix predicate comparison, although im not sure why
 }
 
-template<typename T> std::wstring predicate<T>::str() const {
+template<typename T> predicate<T>::operator std::wstring () const {
 
 	std::wstringstream ss;
 
@@ -85,7 +85,7 @@ template<typename T> std::wstring predicate<T>::str() const {
 
 			break;
 		case predicate_type::value:
-			ss << ANSI_LOMAGENTA << (wchar_t)value.type << ANSI_CLR << L':'  << value.str();
+			ss << ANSI_LOMAGENTA << (wchar_t)value.type << ANSI_CLR << L':'  << (std::wstring)value;
 			break;
 		case predicate_type::ref:
 			ss << ANSI_LOGREEN << ref << ANSI_CLR;

@@ -173,7 +173,7 @@ dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
 
 std::wstring str(const dictionary::value_type& x) {
 	std::wstringstream ws;
-	ws << std::setw(6) << std::left << std::setfill(L' ') << x.first << L" := " << x.second.wstr();
+	ws << std::setw(6) << std::left << std::setfill(L' ') << x.first << L" := " << (std::wstring)x.second;
 	return ws.str();
 }
 

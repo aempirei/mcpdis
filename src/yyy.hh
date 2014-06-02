@@ -86,6 +86,8 @@ namespace yyy {
 
 		void clear();
 
+		template<typename Y> bool has() const;
+
 		operator const X& () const;
 		operator X ();
 	};

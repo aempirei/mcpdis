@@ -86,11 +86,7 @@ bool term::operator<(const term& r) const {
 	return false;
 }
 
-std::wstring term::str() const {
-	return wstr();
-}
-
-std::wstring term::wstr() const {
+term::operator std::wstring () const {
 
 	std::wstringstream ws;
 
@@ -107,7 +103,7 @@ std::wstring term::wstr() const {
 			ws << ANSI_HIBLACK << L'(' << ANSI_HIYELLOW << f.op << ANSI_CLR;
 
 			for(const auto& arg : f.args)
-				ws << L' ' << arg.wstr();
+				ws << L' ' << (std::wstring)arg;
 
 			ws << ANSI_HIBLACK << L')' << ANSI_CLR;
 

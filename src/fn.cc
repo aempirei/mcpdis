@@ -60,7 +60,7 @@ template<typename T> void fn<T>::concat(const args_type& xs) {
 	args.insert(args.end(), xs.begin(), xs.end());
 }
 
-template<typename T> std::wstring fn<T>::str() const {
+template<typename T> fn<T>::operator std::wstring () const {
 	std::wstringstream ss;
 
 	if(op != OP_LIST)
@@ -69,7 +69,7 @@ template<typename T> std::wstring fn<T>::str() const {
 	ss << L"{ ";
 
 	for(const auto& arg : args)
-		ss << arg.str() << L' ';
+		ss << (std::wstring)arg << L' ';
 
 	ss << L'}';
 

@@ -354,7 +354,7 @@ template <typename T> struct predicate {
 	bool operator==(const predicate&) const;
 	bool operator<(const predicate&) const;
 
-	std::wstring str() const;
+	operator std::wstring () const;
 
 	predicate star() const;
 	predicate plus() const;
