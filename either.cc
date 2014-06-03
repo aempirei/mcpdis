@@ -540,7 +540,7 @@ int main(int argc, char **argv) {
 	std::cout << "either<either<long,std::string>,bool> -> std::nullptr_t :: " << abc.str<std::nullptr_t>() << std::endl;
 	std::cout << std::endl;
 
-	std::cout << abc.find<std::string>().str<std::string>() << std::endl;
+	std::cout << *abc.find<std::string>().xptr << std::endl;
 
 	return 0;
 }

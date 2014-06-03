@@ -1,6 +1,6 @@
 CXX = g++
 CPPFLAGS = -Isrc -DUSE_COLOR
-CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O1
+CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O3
 LIBFLAGS = -Llib -lmcpdis
 TARGETS = lib/libmcpdis.a bin/dis
 LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/fn.cc src/predicate.cc src/range.cc src/grammar.cc
