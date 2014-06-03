@@ -91,14 +91,6 @@ template<typename A,typename B> struct either {
 	template<typename C> bool has_type() const;
 
 	template<typename C> std::string str() const;
-
-	template<typename C> maybe<C> find(const C*) const;
-
-	template<typename C> C *ptr_to(const C*) const;
-	template<typename C> bool has(const C*) const;
-	template<typename C> bool has_type(const C*) const;
-
-	template<typename C> std::string str(const C*) const;
 };
 
 // maybe_aux <X,T> 
@@ -140,16 +132,16 @@ template<typename A, typename B, typename T> struct maybe_aux<either<A,B>,T> {
 };
 
 template<typename A,typename B,typename T> T *maybe_aux<either<A,B>,T>::ptr_to(const maybe<value_type>& a) {
-	return (a.xptr == nullptr) ? nullptr : a.xptr->ptr_to((T *)nullptr);
+	return (a.xptr == nullptr) ? nullptr : a.xptr->template ptr_to<T>();
 }
 
 template<typename A,typename B,typename T> bool maybe_aux<either<A,B>,T>::has(const maybe<value_type>& a) {
-	return (a.xptr == nullptr) ? false : a.xptr->has((T *)nullptr);
+	return (a.xptr == nullptr) ? false : a.xptr->template has<T>();
 }
 
 template<typename A,typename B,typename T> bool maybe_aux<either<A,B>,T>::has_type(const maybe<value_type>& a) {
 	const auto& x  = a.xptr == nullptr ? value_type() : *a.xptr;
-	return x.has_type((T *)nullptr);
+	return x.template has_type<T>();
 }
 
 template<typename A,typename B,typename T> std::string maybe_aux<either<A,B>,T>::str(const maybe<value_type>& a) {
@@ -388,7 +380,7 @@ template<typename A, typename B> either<A,B>& either<A,B>::operator=(std::nullpt
 // either<A,B>::(<C>())
 
 template<typename A, typename B> template<typename C> either<A,B>::operator maybe<C> () const {
-	return this->find<C>();
+	return find<C>();
 }
 
 template<typename A, typename B> template<typename C> maybe<C> either<A,B>::find() const {
@@ -423,29 +415,6 @@ template<typename A, typename B> template<typename C> std::string either<A,B>::s
 
 	return ss.str();
 }
-
-// either<A,B>::(<C>(C*))
-
-template<typename A, typename B> template<typename C> maybe<C> either<A,B>::find(const C*) const {
-	return this->find<C>();
-}
-
-template<typename A, typename B> template<typename C> C *either<A,B>::ptr_to(const C*) const {
-	return this->ptr_to<C>();
-}
-
-template<typename A, typename B> template<typename C> bool either<A,B>::has(const C*) const {
-	return this->has<C>();
-}
-
-template<typename A, typename B> template<typename C> bool either<A,B>::has_type(const C*) const {
-	return this->has_type<C>();
-}
-
-template<typename A, typename B> template<typename C> std::string either<A,B>::str(const C*) const {
-	return this->str<C>();
-}
-
 
 // main
 
