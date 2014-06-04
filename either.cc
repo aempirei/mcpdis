@@ -19,6 +19,10 @@ template <typename> struct maybe;
 
 template <typename,typename> struct either;
 
+//template <typename A,typename B,typename T> struct either<either<A,B>,T>;
+//template <typename A,typename B,typename T> struct either<T,either<A,B>>;
+//template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>>;
+
 // aux classes
 
 template <typename,typename> struct maybe_aux;
@@ -364,19 +368,19 @@ template <typename X> maybe<X>& maybe<X>::operator=(const maybe&r) {
 // <Y> maybe<X>
 
 template <typename X> template <typename Y> Y *maybe<X>::ptr_to() const {
-	return maybe_aux<X,Y>(*this).ptr_to();
+	return aux<Y>(*this).ptr_to();
 }
 
 template <typename X> template <typename Y> bool maybe<X>::has() const {
-	return maybe_aux<X,Y>(*this).has();
+	return aux<Y>(*this).has();
 }
 
 template <typename X> template <typename Y> bool maybe<X>::has_type() const {
-	return maybe_aux<X,Y>(*this).has_type();
+	return aux<Y>(*this).has_type();
 }
 
 template <typename X> template <typename Y> std::string maybe<X>::str() const {
-	return maybe_aux<X,Y>(*this).str();
+	return aux<Y>(*this).str();
 }
 
 // either
@@ -545,6 +549,7 @@ int main(int argc, char **argv) {
 
 	do_abc(abc);
 
+	// abc = std::string("214;//long_or_string(a);");
 	abc = long_or_string(a);
 
 	do_abc(abc);
