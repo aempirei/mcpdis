@@ -19,7 +19,7 @@ template <typename> struct maybe;
 
 template <typename,typename> struct either;
 
-//template <typename A,typename B,typename T> struct either<either<A,B>,T>;
+template <typename A,typename B,typename T> struct either<either<A,B>,T>;
 //template <typename A,typename B,typename T> struct either<T,either<A,B>>;
 //template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>>;
 
@@ -71,8 +71,11 @@ template <typename T> struct maybe {
 
 template <typename A,typename B> struct either {
 
-	maybe<A> a;
-	maybe<B> b;
+	using first_type = A;
+	using second_type = B;
+
+	maybe<first_type> a;
+	maybe<second_type> b;
 
 	either();
 
@@ -80,27 +83,76 @@ template <typename A,typename B> struct either {
 
 	either(const either&);
 
-	either(const maybe<A>&, const maybe<B>&);
+	either(const maybe<first_type>&, const maybe<second_type>&);
 
-	either(const maybe<A>&);
-	either(const maybe<B>&);
+	either(const maybe<first_type>&);
+	either(const maybe<second_type>&);
 
 	void clear();
 
 	either& operator=(const either&);
-	either& operator=(const maybe<A>&);
-	either& operator=(const maybe<B>&);
+
+	either& operator=(const maybe<first_type>&);
+	either& operator=(const maybe<second_type>&);
+
 	either& operator=(std::nullptr_t);
 
-	template <typename C> maybe<C> find() const;
+	template <typename D> maybe<D> find() const;
 
-	template <typename C> C *ptr_to() const;
+	template <typename D> D *ptr_to() const;
 
 	template <typename> bool has() const;
 	template <typename> bool has_type() const;
 
 	template <typename> std::string str() const;
 };
+
+// either<either<A,B>,C>
+
+template <typename A,typename B,typename C> struct either<either<A,B>,C> {
+
+	using first_type = either<A,B>;
+	using second_type = C;
+
+	maybe<first_type> a;
+	maybe<second_type> b;
+
+	either();
+
+	either(std::nullptr_t);
+
+	either(const either&);
+
+	either(const maybe<first_type>&, const maybe<second_type>&);
+
+	either(const maybe<A>&);
+	either(const maybe<B>&);
+
+	either(const maybe<first_type>&);
+	either(const maybe<second_type>&);
+
+	void clear();
+
+	either& operator=(const either&);
+
+	either& operator=(const maybe<A>&);
+	either& operator=(const maybe<B>&);
+
+	either& operator=(const maybe<first_type>&);
+	either& operator=(const maybe<second_type>&);
+
+	either& operator=(std::nullptr_t);
+
+	template <typename D> maybe<D> find() const;
+
+	template <typename D> D *ptr_to() const;
+
+	template <typename> bool has() const;
+	template <typename> bool has_type() const;
+
+	template <typename> std::string str() const;
+};
+
 
 // maybe_aux <T,U> 
 
@@ -431,37 +483,37 @@ template <typename A,typename B> either<A,B>& either<A,B>::operator=(std::nullpt
 	return *this;
 }
 
-// either<A,B>::(<C>())
+// either<A,B>::(<D>())
 
-template <typename A,typename B> template <typename C> maybe<C> either<A,B>::find() const {
-	return has<C>() ? *ptr_to<C>() : maybe<C>();
+template <typename A,typename B> template <typename D> maybe<D> either<A,B>::find() const {
+	return has<D>() ? *ptr_to<D>() : maybe<D>();
 }
 
-template <typename A,typename B> template <typename C> C *either<A,B>::ptr_to() const {
+template <typename A,typename B> template <typename D> D *either<A,B>::ptr_to() const {
 
-	if(a.has<C>())
-		return a.ptr_to<C>();
+	if(a.has<D>())
+		return a.ptr_to<D>();
 
-	if(b.has<C>())
-		return b.ptr_to<C>();
+	if(b.has<D>())
+		return b.ptr_to<D>();
 
 	return nullptr;
 }
 
-template <typename A,typename B> template <typename C> bool either<A,B>::has() const {
-	return a.has<C>() | b.has<C>();
+template <typename A,typename B> template <typename D> bool either<A,B>::has() const {
+	return a.has<D>() | b.has<D>();
 }
 
-template <typename A,typename B> template <typename C> bool either<A,B>::has_type() const {
-	return a.has_type<C>() | b.has_type<C>();
+template <typename A,typename B> template <typename D> bool either<A,B>::has_type() const {
+	return a.has_type<D>() | b.has_type<D>();
 }
 
-template <typename A,typename B> template <typename C> std::string either<A,B>::str() const {
+template <typename A,typename B> template <typename D> std::string either<A,B>::str() const {
 
 	std::stringstream ss;
 
-	ss << "( a := " << a.str<C>() << " ) ";
-	ss << "( b := " << b.str<C>() << " )";
+	ss << "( a := " << a.str<D>() << " ) ";
+	ss << "( b := " << b.str<D>() << " )";
 
 	return ss.str();
 }
@@ -488,19 +540,16 @@ void do_abc(long_or_string_or_bool& abc) {
 
 int main(int argc, char **argv) {
 
-	maybe<long> a;
-	long_or_string ab;
-	long_or_string_or_bool abc;
-
-	if(argc == 2 && strcmp(argv[1], "-h") == 0) {
+	if(argc != 2 || (argc == 2 && strcmp(argv[1], "-h") == 0)) {
 		std::cerr << std::endl << "usage: " << argv[0] << " [options]" << std::endl << std::endl;
 		return -1;
 	}
 
-	if(argc == 2)
-		a = atol(argv[1]);
-
 	// maybe<long>
+	//
+	//
+
+	maybe<long> a = atol(argv[1]);
 
 	if(a.xptr)
 		std::cout << "x := " << *a.xptr << std::endl;
@@ -516,6 +565,10 @@ int main(int argc, char **argv) {
 	std::cout << "( ab )" << std::endl << std::endl;
 
 	// long_or_string
+	//
+	//
+
+	long_or_string ab;
 
 	std::cout << "either<long,std::string> -> long           :: " << ab.str<long>()           << std::endl;
 	std::cout << "either<long,std::string> -> std::string    :: " << ab.str<std::string>()    << std::endl;
@@ -540,17 +593,20 @@ int main(int argc, char **argv) {
 	std::cout << std::endl;
 
 	// long_or_string_or_bool
+	//
+	//
+
+	long_or_string_or_bool abc;
 
 	std::cout << "( abc )" << std::endl << std::endl;
 
 	do_abc(abc);
 
-	abc = true;
+	abc = maybe<bool>(true);
 
 	do_abc(abc);
 
-	// abc = std::string("214;//long_or_string(a);");
-	abc = long_or_string(a);
+	abc = maybe<long>(666);
 
 	do_abc(abc);
 
