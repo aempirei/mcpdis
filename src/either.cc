@@ -9,167 +9,11 @@
 #include <sstream>
 #include <string>
 
-#include <list>
-#include <map>
-#include <set>
-
-// primary classes
-
-template <typename> struct maybe;
-
-template <typename,typename> struct either;
-
-template <typename A,typename B,typename T> struct either<either<A,B>,T>;
-// template <typename A,typename B,typename T> struct either<T,either<A,B>>;
-// template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>>;
-
-// aux classes
-
-template <typename,typename> struct maybe_aux;
-
-template <typename X> struct maybe_aux<X,X>;
-
-template <typename X> struct maybe_aux<X,std::nullptr_t>;
-
-template <typename A,typename B,typename T> struct maybe_aux<either<A,B>,T>;
-
-template <typename A,typename B> struct maybe_aux<either<A,B>,std::nullptr_t>;
-
-// maybe
-
-template <typename T> struct maybe {
-
-	using value_type = T;
-
-	value_type *xptr;
-
-	maybe();
-	maybe(std::nullptr_t);
-
-	maybe(const maybe&);
-	maybe(const value_type&);
-
-	~maybe();
-
-	void clear();
-
-	maybe& operator=(const maybe&);
-
-	// aux
-
-	template <typename U> using aux = maybe_aux<T,U>;
-
-	template <typename U> U *ptr_to() const;
-
-	template <typename> bool has() const;
-	template <typename> bool has_type() const;
-
-	template <typename> std::string str() const;
-};
-
-// either
-
-template <typename A,typename B> struct either {
-
-	using first_type = A;
-	using second_type = B;
-
-	maybe<first_type> a;
-	maybe<second_type> b;
-
-	either();
-
-	either(std::nullptr_t);
-
-	either(const either&);
-
-	either(const maybe<first_type>&, const maybe<second_type>&);
-
-	either(const maybe<first_type>&);
-	either(const maybe<second_type>&);
-
-	void clear();
-
-	either& operator=(const either&);
-
-	either& operator=(const maybe<first_type>&);
-	either& operator=(const maybe<second_type>&);
-
-	either& operator=(std::nullptr_t);
-
-	template <typename D> maybe<D> find() const;
-
-	template <typename D> D *ptr_to() const;
-
-	template <typename> bool has() const;
-	template <typename> bool has_type() const;
-
-	template <typename> std::string str() const;
-};
-
-// either<either<A,B>,C>
-
-template <typename A,typename B,typename C> struct either<either<A,B>,C> {
-
-	using first_type = either<A,B>;
-	using second_type = C;
-
-	maybe<first_type> a;
-	maybe<second_type> b;
-
-	either();
-
-	either(std::nullptr_t);
-
-	either(const either&);
-
-	either(const maybe<first_type>&, const maybe<second_type>&);
-
-	either(const maybe<A>&);
-	either(const maybe<B>&);
-
-	either(const maybe<first_type>&);
-	either(const maybe<second_type>&);
-
-	void clear();
-
-	either& operator=(const either&);
-
-	either& operator=(const maybe<A>&);
-	either& operator=(const maybe<B>&);
-
-	either& operator=(const maybe<first_type>&);
-	either& operator=(const maybe<second_type>&);
-
-	either& operator=(std::nullptr_t);
-
-	template <typename D> maybe<D> find() const;
-
-	template <typename D> D *ptr_to() const;
-
-	template <typename> bool has() const;
-	template <typename> bool has_type() const;
-
-	template <typename> std::string str() const;
-};
-
+#include <either.hh>
 
 // maybe_aux <T,U> 
-
-template <typename T,typename U> struct maybe_aux {
-
-	using dom = T;
-	using cod = U;
-
-	using value_type = maybe<dom>;
-
-	maybe_aux(const value_type&);
-
-	cod *ptr_to() const;
-	bool has() const;
-	bool has_type() const;
-	std::string str() const;
-};
+//
+//
 
 template <typename T,typename U> maybe_aux<T,U>::maybe_aux(const value_type&) {
 }
@@ -191,23 +35,8 @@ template <typename T,typename U> std::string maybe_aux<T,U>::str() const {
 }
 
 // maybe_aux <either<A,B>,U> 
-
-template <typename A,typename B,typename U> struct maybe_aux<either<A,B>,U> {
-
-	using dom = either<A,B>;
-	using cod = U;
-
-	using value_type = maybe<dom>;
-
-	dom *xptr;
-
-	maybe_aux(const value_type&);
-
-	cod *ptr_to() const;
-	bool has() const;
-	bool has_type() const;
-	std::string str() const;
-};
+//
+//
 
 template <typename A,typename B,typename U> maybe_aux<either<A,B>,U>::maybe_aux(const value_type& a) : xptr(a.xptr) {
 }
@@ -243,25 +72,8 @@ template <typename A,typename B,typename U> std::string maybe_aux<either<A,B>,U>
 }
 
 // maybe_aux <either<A,B>,std::nullptr_t>
-
-template <typename A,typename B> struct maybe_aux<either<A,B>,std::nullptr_t> {
-
-	using dom = either<A,B>;
-	using cod = std::nullptr_t;
-
-	using value_type = maybe<dom>;
-
-	static cod y;
-
-	dom *xptr;
-
-	maybe_aux(const value_type&);
-
-	cod *ptr_to() const;
-	bool has() const;
-	bool has_type() const;
-	std::string str() const;
-};
+//
+//
 
 template <typename A,typename B> std::nullptr_t maybe_aux<either<A,B>,std::nullptr_t>::y = nullptr;
 
@@ -288,23 +100,8 @@ template <typename A,typename B> std::string maybe_aux<either<A,B>,std::nullptr_
 }
 
 // maybe_aux <X,X>
-
-template <typename X> struct maybe_aux<X,X> {
-
-	using dom = X;
-	using cod = X;
-
-	using value_type = maybe<dom>;
-
-	dom *xptr;
-
-	maybe_aux(const value_type&);
-
-	cod *ptr_to() const;
-	bool has() const;
-	bool has_type() const;
-	std::string str() const;
-};
+//
+//
 
 template <typename X> maybe_aux<X,X>::maybe_aux(const value_type& a) : xptr(a.xptr) {
 }
@@ -338,25 +135,8 @@ template <typename X> std::string maybe_aux<X,X>::str() const {
 }
 
 // maybe_aux <X,std::nullptr_t>
-
-template <typename X> struct maybe_aux<X,std::nullptr_t> {
-
-	using dom = X;
-	using cod = std::nullptr_t;
-
-	using value_type = maybe<dom>;
-
-	static cod y;
-
-	dom *xptr;
-
-	maybe_aux(const value_type&);
-
-	cod *ptr_to() const;
-	bool has() const;
-	bool has_type() const;
-	std::string str() const;
-};
+//
+//
 
 template <typename X> std::nullptr_t maybe_aux<X,std::nullptr_t>::y = nullptr;
 
@@ -383,6 +163,8 @@ template <typename X> std::string maybe_aux<X,std::nullptr_t>::str() const {
 }
 
 // maybe
+//
+//
 
 template <typename X> maybe<X>::maybe() : maybe(nullptr) {
 }
@@ -418,6 +200,8 @@ template <typename X> maybe<X>& maybe<X>::operator=(const maybe&r) {
 }
 
 // <Y> maybe<X>
+//
+//
 
 template <typename X> template <typename Y> Y *maybe<X>::ptr_to() const {
 	return aux<Y>(*this).ptr_to();
@@ -487,7 +271,9 @@ template <typename A,typename B> either<A,B>& either<A,B>::operator=(std::nullpt
 	return *this;
 }
 
-// either<A,B>::(<D>())
+// <D> either<A,B>
+//
+//
 
 template <typename A,typename B> template <typename D> maybe<D> either<A,B>::find() const {
 	return has<D>() ? *ptr_to<D>() : maybe<D>();
@@ -603,6 +389,10 @@ template <typename A,typename B,typename C> template <typename D> D *either<eith
 	return nullptr;
 }
 
+// <D> either<either<A,B>,C>
+//
+//
+
 template <typename A,typename B,typename C> template <typename D> bool either<either<A,B>,C>::has() const {
 	return a.has<D>() | b.has<D>();
 }
@@ -616,105 +406,4 @@ template <typename A,typename B,typename C> template <typename D> std::string ei
 	ss << "( a := " << a.str<D>() << " ) ";
 	ss << "( b := " << b.str<D>() << " )";
 	return ss.str();
-}
-
-// main
-
-typedef either<long,std::string> long_or_string;
-typedef either<long_or_string,bool> long_or_string_or_bool;
-
-void do_abc(long_or_string_or_bool& abc) {
-
-#define XXX(a,b,c,d) ((a).b<c>() ? d:' ')
-#define YYY(a,c) XXX(a,has_type,c,'*') << XXX(a,has,c,'#') << "either<either<long,std::string>,bool> -> " << std::setw(15) << #c << ":: " << abc.str<c>()
-
-	std::cout << YYY(abc,bool) << std::endl;
-	std::cout << YYY(abc,char) << std::endl;
-	std::cout << YYY(abc,long) << std::endl;
-	std::cout << YYY(abc,std::string) << std::endl;
-	std::cout << YYY(abc,std::nullptr_t) << std::endl;
-
-	std::cout << std::endl;
-}
-
-
-int main(int argc, char **argv) {
-
-	if(argc != 2 || (argc == 2 && strcmp(argv[1], "-h") == 0)) {
-		std::cerr << std::endl << "usage: " << argv[0] << " [options]" << std::endl << std::endl;
-		return -1;
-	}
-
-	// maybe<long>
-	//
-	//
-
-	maybe<long> a = atol(argv[1]);
-
-	if(a.xptr)
-		std::cout << "x := " << *a.xptr << std::endl;
-	else
-		std::cout << "x := nullptr" << std::endl;
-
-	std::cout << "maybe<long> -> std::string    :: " << a.str<std::string>()    << std::endl;
-	std::cout << "maybe<long> -> long           :: " << a.str<long>()           << std::endl;
-	std::cout << "maybe<long> -> bool           :: " << a.str<bool>()           << std::endl;
-	std::cout << "maybe<long> -> std::nullptr_t :: " << a.str<std::nullptr_t>() << std::endl;
-	std::cout << std::endl;
-
-	std::cout << "( ab )" << std::endl << std::endl;
-
-	// long_or_string
-	//
-	//
-
-	long_or_string ab;
-
-	std::cout << "either<long,std::string> -> long           :: " << ab.str<long>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::string    :: " << ab.str<std::string>()    << std::endl;
-	std::cout << "either<long,std::string> -> bool           :: " << ab.str<bool>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::nullptr_t :: " << ab.str<std::nullptr_t>() << std::endl;
-	std::cout << std::endl;
-	
-	ab = a;
-
-	std::cout << "either<long,std::string> -> long           :: " << ab.str<long>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::string    :: " << ab.str<std::string>()    << std::endl;
-	std::cout << "either<long,std::string> -> bool           :: " << ab.str<bool>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::nullptr_t :: " << ab.str<std::nullptr_t>() << std::endl;
-	std::cout << std::endl;
-
-	ab = std::string("DICK");
-
-	std::cout << "either<long,std::string> -> long           :: " << ab.str<long>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::string    :: " << ab.str<std::string>()    << std::endl;
-	std::cout << "either<long,std::string> -> bool           :: " << ab.str<bool>()           << std::endl;
-	std::cout << "either<long,std::string> -> std::nullptr_t :: " << ab.str<std::nullptr_t>() << std::endl;
-	std::cout << std::endl;
-
-	// long_or_string_or_bool
-	//
-	//
-
-	long_or_string_or_bool abc;
-
-	std::cout << "( abc )" << std::endl << std::endl;
-
-	do_abc(abc);
-
-	abc = maybe<bool>(true);
-
-	do_abc(abc);
-
-	abc = maybe<long>(666);
-
-	do_abc(abc);
-
-	abc = std::string("DICK");
-
-	do_abc(abc);
-
-	std::cout << *abc.find<std::string>().xptr << std::endl;
-
-	return 0;
 }
