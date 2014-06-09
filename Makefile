@@ -22,7 +22,7 @@ test: all
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
-src/either.demo.o: src/either.demo.cc src/either.cc src/either.hh src/either.template.hh
+src/either.demo.o: src/either.demo.cc src/either.cc src/either.hh src/either.template.hh src/maybe.cc src/maybe.hh src/maybe.template.hh
 
 lib/libmcpdis.a: $(LIBCC:.cc=.o)
 	if [ ! -d lib ]; then mkdir -vp lib; fi
