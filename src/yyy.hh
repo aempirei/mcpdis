@@ -11,8 +11,8 @@
 #include <set>
 #include <initializer_list>
 
-#include <operators.hh>
-#include <ansicolor.hh>
+#include <either.template.hh>
+#include <maybe.template.hh>
 
 namespace yyy {
 
@@ -23,13 +23,10 @@ namespace yyy {
 	using symbol = std::wstring;
 	using range = std::pair<size_t,size_t>;
 
-	template<typename,typename> struct either;
-
 	template<typename> struct predicate;
 	template<typename> struct function;
 	template<typename> struct binding;
 	template<typename> struct grammar;
-	template<typename> struct maybe;
 
 	template<typename X> using argument = either<X,function<X>>;
 	template<typename X> using rule = function<predicate<X>>;
@@ -38,59 +35,6 @@ namespace yyy {
 	template<typename X> using rules = std::list<rule<X>>;
 
 	using term = either<symbol,literal_t>;
-
-	template<typename A, typename B> struct either {
-
-		maybe<A> a;
-		maybe<B> b;
-
-		either();
-		either(const either&);
-
-		either(const maybe<A>&);
-		either(const maybe<B>&);
-
-		either& operator=(const maybe<A>&);
-		either& operator=(const maybe<B>&);
-
-		bool operator==(const either&);
-		bool operator<(const either&);
-
-		operator const maybe<A>& () const;
-		operator maybe<A>& ();
-
-		operator const maybe<B>& () const;
-		operator maybe<B>& ();
-	};
-
-	template<typename X> struct maybe {
-
-		typedef X value_type;
-
-		X *x = NULL;
-
-		maybe();
-		maybe(const maybe&);
-		maybe(const X&);
-
-		~maybe();
-
-		maybe& operator=(const X&);
-		maybe& operator=(const maybe&);
-
-		bool operator==(const maybe&);
-		bool operator<(const maybe&);
-
-		bool is_set() const;
-		bool is_null() const;
-
-		void clear();
-
-		template<typename Y> bool has() const;
-
-		operator const X& () const;
-		operator X ();
-	};
 
 	template<typename X> struct function {
 
@@ -125,14 +69,14 @@ namespace yyy {
 		std::list<either<argument<X>,binding<X>>> closure;
 	};
 
-	extern template struct maybe<symbol>;
-	extern template struct maybe<literal_t>;
-
-	extern template struct either<symbol,literal_t>;
-
 	extern template struct predicate<term>;
 	extern template struct function<term>;
 	extern template struct binding<term>;
 	extern template struct grammar<term>;
-
 }
+
+extern template struct maybe<yyy::symbol>;
+extern template struct maybe<yyy::literal_t>;
+
+extern template struct either<yyy::symbol,yyy::literal_t>;
+extern template struct either<yyy::term,yyy::function<yyy::term>>;

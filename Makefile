@@ -2,7 +2,7 @@ CXX = g++
 CPPFLAGS = -Isrc -DUSE_COLOR
 CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O3
 LIBFLAGS = -Llib -lmcpdis
-TARGETS = lib/libmcpdis.a bin/dis
+TARGETS = lib/libmcpdis.a bin/dis bin/either.demo
 LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/fn.cc src/predicate.cc src/range.cc src/grammar.cc
 LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 
@@ -22,9 +22,15 @@ test: all
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
+src/either.demo.o: src/either.demo.cc src/either.cc src/either.hh src/either.template.hh
+
 lib/libmcpdis.a: $(LIBCC:.cc=.o)
 	if [ ! -d lib ]; then mkdir -vp lib; fi
 	ar crfv $@ $^ 
+
+bin/either.demo: lib/libmcpdis.a src/either.demo.o
+	if [ ! -d bin ]; then mkdir -vp bin; fi
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBFLAGS)
 
 bin/dis: lib/libmcpdis.a src/dis.o
 	if [ ! -d bin ]; then mkdir -vp bin; fi
