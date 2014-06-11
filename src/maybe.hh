@@ -5,6 +5,7 @@
 #include <string>
 
 template <typename> struct maybe;
+template <typename T> struct maybe<std::basic_string<T>>;
 
 #include <either.hh>
 
@@ -38,7 +39,7 @@ template <typename T> struct maybe {
 
 	// aux
 
-	template <typename U> using aux = maybe_aux<T,U>;
+	template <typename U> using aux = maybe_aux<value_type,U>;
 
 	template <typename U> U *ptr_to() const;
 
@@ -47,6 +48,43 @@ template <typename T> struct maybe {
 
 	template <typename> std::string str() const;
 };
+
+// maybe<std::basic_string<T>>
+//
+//
+
+template <typename T> struct maybe<std::basic_string<T>> {
+
+	using char_type = T;
+	using value_type = std::basic_string<char_type>;
+
+	value_type *xptr;
+
+	maybe();
+	maybe(std::nullptr_t);
+
+	maybe(const maybe&);
+	maybe(const value_type&);
+	maybe(const char_type *);
+
+	~maybe();
+
+	void clear();
+
+	maybe& operator=(const maybe&);
+
+	// aux
+
+	template <typename U> using aux = maybe_aux<value_type,U>;
+
+	template <typename U> U *ptr_to() const;
+
+	template <typename> bool has() const;
+	template <typename> bool has_type() const;
+
+	template <typename> std::string str() const;
+};
+
 
 // maybe_aux <T,U> 
 //

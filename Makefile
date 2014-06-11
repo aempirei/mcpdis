@@ -34,11 +34,11 @@ lib/libmcpdis.a: $(LIBCC:.cc=.o)
 
 bin/either.demo: lib/libmcpdis.a src/either.demo.o
 	if [ ! -d bin ]; then mkdir -vp bin; fi
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 bin/yyy: src/yyy.o
 	if [ ! -d bin ]; then mkdir -vp bin; fi
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 bin/dis: lib/libmcpdis.a src/dis.o
 	if [ ! -d bin ]; then mkdir -vp bin; fi

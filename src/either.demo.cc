@@ -18,19 +18,24 @@
 typedef either<long,std::string> long_or_string;
 typedef either<long_or_string,bool> long_or_string_or_bool;
 
-#define XXX(a,b,c,d) \
+#define XXX(a,b,c,d)\
 	\
 	((a).b<c>() ? d:' ')
 
-#define YYY(a,c) \
+#define YYY(a,c)\
 	\
-	XXX(a,has_type,c,'*') \
-	<< XXX(a,has,c,'#') \
-	<< "either<either<long,std::string>,bool> -> " \
-	<< std::setw(15) \
-	<< #c \
-	<< ":: " \
+	XXX(a,has_type,c,'*')				\
+	<< XXX(a,has,c,'#')				\
+	<< "either<either<long,std::string>,bool> -> "	\
+	<< std::setw(15)				\
+	<< #c						\
+	<< ":: "					\
 	<< abc.str<c>()
+
+#define ZZZ(a,b)\
+	\
+	std::cout << YYY(a,b) << std::endl
+
 
 void do_abc(long_or_string_or_bool& abc) {
 	std::cout << YYY(abc,bool) << std::endl;
@@ -91,7 +96,7 @@ int main(int argc, char **argv) {
 	std::cout << "either<long,std::string> -> std::nullptr_t :: " << ab.str<std::nullptr_t>() << std::endl;
 	std::cout << std::endl;
 
-	ab = std::string("DICK");
+	ab = "DICK";
 
 	std::cout << "either<long,std::string> -> long           :: " << ab.str<long>()           << std::endl;
 	std::cout << "either<long,std::string> -> std::string    :: " << ab.str<std::string>()    << std::endl;
@@ -117,7 +122,7 @@ int main(int argc, char **argv) {
 
 	do_abc(abc);
 
-	abc = std::string("DICK");
+	abc = std::string("COCK");
 
 	do_abc(abc);
 

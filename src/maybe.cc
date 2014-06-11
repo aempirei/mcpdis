@@ -198,6 +198,8 @@ template <typename T> maybe<T>& maybe<T>::operator=(const maybe&r) {
 }
 
 // <Y> maybe
+//
+//
 
 template <typename T> template <typename Y> Y *maybe<T>::ptr_to() const {
 	return aux<Y>(*this).ptr_to();
@@ -212,5 +214,65 @@ template <typename T> template <typename Y> bool maybe<T>::has_type() const {
 }
 
 template <typename T> template <typename Y> std::string maybe<T>::str() const {
+	return aux<Y>(*this).str();
+}
+
+// maybe<std::basic_string<T>>
+//
+//
+
+template <typename T> maybe<std::basic_string<T>>::maybe() : maybe(nullptr) {
+}
+
+template <typename T> maybe<std::basic_string<T>>::maybe(std::nullptr_t) : xptr(nullptr) {
+}
+
+template <typename T> maybe<std::basic_string<T>>::maybe(const value_type& x0) : xptr(new value_type(x0)) {
+}
+
+template <typename T> maybe<std::basic_string<T>>::maybe(const char_type *str) : xptr(new value_type(str)) {
+}
+
+template <typename T> maybe<std::basic_string<T>>::maybe(const maybe& r) : xptr(r.xptr ? new value_type(*r.xptr) : nullptr) {
+}
+
+template <typename T> void maybe<std::basic_string<T>>::clear() {
+	if(xptr != nullptr) {
+		delete xptr;
+		xptr = nullptr;
+	}
+}	
+
+template <typename T> maybe<std::basic_string<T>>::~maybe() {
+	clear();
+}
+
+template <typename T> maybe<std::basic_string<T>>& maybe<std::basic_string<T>>::operator=(const maybe&r) {
+
+	clear();
+
+	if(r.xptr)
+		xptr = new value_type(*r.xptr);
+
+	return *this;
+}
+
+// <Y> maybe<std::basic_string<T>>
+//
+//
+
+template <typename T> template <typename Y> Y *maybe<std::basic_string<T>>::ptr_to() const {
+	return aux<Y>(*this).ptr_to();
+}
+
+template <typename T> template <typename Y> bool maybe<std::basic_string<T>>::has() const {
+	return aux<Y>(*this).has();
+}
+
+template <typename T> template <typename Y> bool maybe<std::basic_string<T>>::has_type() const {
+	return aux<Y>(*this).has_type();
+}
+
+template <typename T> template <typename Y> std::string maybe<std::basic_string<T>>::str() const {
 	return aux<Y>(*this).str();
 }
