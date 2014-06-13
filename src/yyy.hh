@@ -81,10 +81,10 @@ namespace yyy {
 
 		// properties
 
-		modifiers modifier;
 		types type;
 		argument<value_type> arg;
 		symbol reference;
+		modifiers modifier;
 		range quantifier;
 
 		// constructors
