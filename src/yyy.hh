@@ -39,8 +39,8 @@ namespace yyy {
 	// extern template struct grammar<term>;
 }
 
-#include "predicate.hh"
-#include "function.hh"
-#include "binding.hh"
-#include "grammar.hh"
+#include "yyy/predicate.hh"
+#include "yyy/function.hh"
+#include "yyy/binding.hh"
+#include "yyy/grammar.hh"
 
