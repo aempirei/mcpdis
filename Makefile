@@ -24,7 +24,7 @@ test: all
 	cat test.dis
 	md5sum test.dis
 
-yyy: bin/yyy.demo bin/either.demo
+demo: bin/yyy.demo bin/either.demo
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
