@@ -72,22 +72,61 @@ namespace yyy {
 
 	template <typename T> struct predicate {
 
+		// typedefs
+
 		using value_type = T;
 
+		enum class types { end, any, mem, by_ref, by_type, by_op, by_value };
 		enum class modifiers { push, pop, lift, drop, bind, reject };
-		enum class types { end, any, mem, ref, type, op, value };
+
+		// properties
 
 		modifiers modifier;
 		types type;
 		argument<value_type> arg;
-		symbol ref;
+		symbol reference;
 		range quantifier;
 
-		predicate(modifiers, types);
+		// constructors
+
+		predicate();
+
 		predicate(const predicate&);
-		predicate(modifiers, types, const range&);
-		predicate(modifiers, types, const symbol&, const range&);
-		predicate(modifiers, types, const argument<value_type>&, const range&);
+
+		predicate(const symbol&);
+		predicate(const argument<value_type>&);
+
+		// type
+
+		predicate end() const;
+		predicate any() const;
+		predicate mem() const;
+
+		predicate by_ref() const;
+
+		predicate by_op() const;
+		predicate by_type() const;
+		predicate by_value() const;
+
+		// modifier
+
+		predicate pop() const;
+		predicate push() const;
+		predicate lift() const;
+		predicate drop() const;
+		predicate bind() const;
+		predicate reject() const;
+
+		// quantifier
+
+		predicate q(const range&) const;
+
+		predicate max(size_t) const;
+		predicate min(size_t) const;
+
+		predicate star() const;
+		predicate plus() const;
+		predicate qm() const;
 	};
 
 	template <typename T> using _grammar = std::map<symbol,rules<T>>;
