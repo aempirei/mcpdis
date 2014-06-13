@@ -32,11 +32,7 @@ namespace yyy {
 	using register_t = uint8_t;
 	using operator_t = wchar_t;
 
-	//DISTINCT(symbol, std::wstring);
-	//DISTINCT(reference, std::wstring);
-
 	using symbol = std::wstring;
-	using reference = std::wstring;
 	using range = std::pair<size_t,size_t>;
 
 	template <typename> struct predicate;
@@ -76,14 +72,22 @@ namespace yyy {
 
 	template <typename T> struct predicate {
 
-		typedef T value_type;
+		using value_type = T;
 
 		enum class modifiers { push, pop, lift, drop, bind, reject };
 		enum class types { end, any, mem, ref, type, op, value };
 
 		modifiers modifier;
 		types type;
-		either<argument<value_type>,symbol> arg;
+		argument<value_type> arg;
+		symbol ref;
+		range quantifier;
+
+		predicate(modifiers, types);
+		predicate(const predicate&);
+		predicate(modifiers, types, const range&);
+		predicate(modifiers, types, const symbol&, const range&);
+		predicate(modifiers, types, const argument<value_type>&, const range&);
 	};
 
 	template <typename T> using _grammar = std::map<symbol,rules<T>>;
@@ -93,17 +97,17 @@ namespace yyy {
 		using _grammar<T>::_grammar;
 	};
 
-	template <typename T> using meta_argument = either<argument<T>,binding<T>>;
-
 	template <typename T> struct binding {
 
 		using value_type = T;
 
+		using argument_type = either<argument<T>,binding<T>>;
+
 		predicate<value_type> clause;
-		std::list<meta_argument<value_type>> closure;
+		std::list<argument_type> args;
 
 		binding(const predicate<value_type>&);
-		binding& operator<<(const meta_argument<value_type>&);
+		binding& operator<<(const argument_type&);
 	};
 
 	// extern template struct predicate<term>;

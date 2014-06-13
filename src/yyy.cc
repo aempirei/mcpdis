@@ -14,6 +14,10 @@
 
 namespace yyy {
 
+	// function
+	//
+	//
+
 	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
 	}
 
@@ -27,6 +31,10 @@ namespace yyy {
 		args.push_back(arg);
 		return *this;
 	}
+
+	// function.operator<<
+	//
+	//
 
 	template <typename T> function<T>& function<T>::operator<<(const value_type& arg) {
 		return operator<<(argument<value_type>(arg));
@@ -67,13 +75,17 @@ namespace yyy {
 		types type;
 		either<argument<X>,symbol> arg;
 	};
+	*/
 
+	/*
 	template <typename X> using _grammar = std::map<symbol,rules<X>>;
 
 	template <typename X> struct grammar : _grammar<X> {
 		using _grammar<X>::_grammar;
 	};
+	*/
 
+	/*
 	template <typename X> using bound_argument = either<argument<X>,binding<X>>;
 
 	template <typename X> struct binding {
