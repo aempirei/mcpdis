@@ -8,6 +8,8 @@
 #include <list>
 #include <map>
 
+#include <operators.hh>
+
 #include <either.template.hh>
 #include <maybe.template.hh>
 
