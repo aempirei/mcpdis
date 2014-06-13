@@ -45,6 +45,9 @@ template <typename A,typename B> struct either {
 
 	either& operator=(std::nullptr_t);
 
+	either& include(const maybe<first_type>&);
+	either& include(const maybe<second_type>&);
+
 	template <typename D> maybe<D> find() const;
 
 	template <typename D> D *ptr_to() const;
@@ -92,6 +95,12 @@ template <typename A,typename B,typename C> struct either<either<A,B>,C> {
 	either& operator=(const maybe<second_type>&);
 
 	either& operator=(std::nullptr_t);
+
+	either& include(const maybe<A>&);
+	either& include(const maybe<B>&);
+
+	either& include(const maybe<first_type>&);
+	either& include(const maybe<second_type>&);
 
 	template <typename D> maybe<D> find() const;
 
