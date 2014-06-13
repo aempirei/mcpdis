@@ -2,8 +2,10 @@
 
 using namespace yyy;
 
+/*
 template <typename T> void define_grammar(grammar<T>&) {
 }
+*/
 
 int main(int, char **) {
 
@@ -15,8 +17,8 @@ int main(int, char **) {
 
 	std::wcout << (std::wstring)f << std::endl;
 
-	grammar<term> g;
+	//grammar<term> g;
 
-	define_grammar(g);
+	//define_grammar(g);
 	return 0;
 }

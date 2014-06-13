@@ -32,10 +32,6 @@ namespace yyy {
 		return operator<<(argument<value_type>(arg));
 	}
 
-	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& arg) {
-		return operator<<(argument<value_type>(U(arg)));
-	}
-
 	template <typename T> function<T>::operator std::wstring () const {
 		std::wstringstream ss;
 		ss << op << '(';
@@ -53,4 +49,6 @@ namespace yyy {
 		ss << ')';
 		return ss.str();
 	}
+
+	template struct function<term>;
 }

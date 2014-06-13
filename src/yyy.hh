@@ -35,10 +35,6 @@ namespace yyy {
 
 	using term = either<symbol,literal_t>;
 
-	// extern template struct predicate<term>;
-	// extern template struct function<term>;
-	// extern template struct binding<term>;
-	// extern template struct grammar<term>;
 }
 
 #include "yyy/predicate.hh"
@@ -46,3 +42,11 @@ namespace yyy {
 #include "yyy/binding.hh"
 #include "yyy/grammar.hh"
 
+namespace yyy {
+
+	// extern template struct predicate<term>;
+	extern template struct function<term>;
+	// extern template struct binding<term>;
+	// extern template struct grammar<term>;
+
+}

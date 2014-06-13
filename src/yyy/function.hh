@@ -23,4 +23,8 @@ namespace yyy {
 
 		explicit operator std::wstring() const;
 	};
+
+	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& arg) {
+		return operator<<(argument<value_type>(U(arg)));
+	}
 }
