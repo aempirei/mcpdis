@@ -36,11 +36,14 @@ namespace yyy {
 	//
 	//
 
-	/*
 	template <typename T> function<T>::operator std::wstring () const {
 		std::wstringstream ss;
-		ss << op << '(';
+		ss << op << L"(";
 		for(const auto& arg: args) {
+
+			ss << L' ' << (std::wstring)arg;
+
+			/*
 			if(arg.template has<literal_t>()) {
 				ss << (int)*arg.template ptr_to<literal_t>();
 			} else if(arg.template has<symbol>()) {
@@ -50,12 +53,12 @@ namespace yyy {
 			} else {
 				ss << " <UNKNOWN>";
 			}
+			*/
 		}
-		ss << ')';
+		ss << L" )";
 		return ss.str();
 	}
-	*/
-
+	/*
 	template <> function<term>::operator std::wstring () const {
 
 		std::wstringstream ss;
@@ -83,5 +86,6 @@ namespace yyy {
 		return ss.str();
 	}
 
+	*/
 	template struct function<term>;
 }

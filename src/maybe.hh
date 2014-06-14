@@ -7,7 +7,11 @@
 template <typename> struct maybe;
 template <typename T> struct maybe<std::basic_string<T>>;
 
+template <template <typename> class V, typename T> struct maybe<V<T>>;
+
 #include <either.hh>
+
+template <typename A,typename B> struct maybe<either<A,B>>;
 
 template <typename,typename> struct maybe_aux;
 template <typename T> struct maybe_aux<T,T>;
@@ -51,6 +55,43 @@ template <typename T> struct maybe {
 	template <typename> std::string str() const;
 };
 
+// maybe<V<T>>
+//
+//
+
+template <template <typename> class V, typename T> struct maybe<V<T>> {
+
+	using value_type = V<T>;
+
+	value_type *xptr;
+
+	maybe();
+	maybe(std::nullptr_t);
+
+	maybe(const maybe&);
+	maybe(const value_type&);
+
+	~maybe();
+
+	void clear();
+
+	maybe& operator=(const maybe&);
+
+	explicit operator std::wstring () const;
+
+	// aux
+
+	template <typename U> using aux = maybe_aux<value_type,U>;
+
+	template <typename U> U *ptr_to() const;
+
+	template <typename> bool has() const;
+	template <typename> bool has_type() const;
+
+	template <typename> std::string str() const;
+
+};
+
 // maybe<std::basic_string<T>>
 //
 //
@@ -88,6 +129,43 @@ template <typename T> struct maybe<std::basic_string<T>> {
 
 	template <typename> std::string str() const;
 };
+
+// maybe<either<A,B>>
+//
+//
+
+template <typename A,typename B> struct maybe<either<A,B>> {
+
+	using value_type = either<A,B>;
+
+	value_type *xptr;
+
+	maybe();
+	maybe(std::nullptr_t);
+
+	maybe(const maybe&);
+	maybe(const value_type&);
+
+	~maybe();
+
+	void clear();
+
+	maybe& operator=(const maybe&);
+
+	explicit operator std::wstring () const;
+
+	// aux
+
+	template <typename U> using aux = maybe_aux<value_type,U>;
+
+	template <typename U> U *ptr_to() const;
+
+	template <typename> bool has() const;
+	template <typename> bool has_type() const;
+
+	template <typename> std::string str() const;
+};
+
 
 
 // maybe_aux <T,U> 
