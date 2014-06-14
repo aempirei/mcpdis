@@ -39,53 +39,11 @@ namespace yyy {
 	template <typename T> function<T>::operator std::wstring () const {
 		std::wstringstream ss;
 		ss << op << L"(";
-		for(const auto& arg: args) {
-
+		for(const auto& arg: args)
 			ss << L' ' << (std::wstring)arg;
-
-			/*
-			if(arg.template has<literal_t>()) {
-				ss << (int)*arg.template ptr_to<literal_t>();
-			} else if(arg.template has<symbol>()) {
-				ss << " \"" << *arg.template ptr_to<symbol>() << '"';
-			} else if(arg.template has<function<value_type>>()) {
-				ss << ' ' << (std::wstring)*arg.template ptr_to<function<value_type>>();
-			} else {
-				ss << " <UNKNOWN>";
-			}
-			*/
-		}
 		ss << L" )";
 		return ss.str();
 	}
-	/*
-	template <> function<term>::operator std::wstring () const {
 
-		std::wstringstream ss;
-
-		ss << op << '(';
-
-		for(const auto& arg: args) {
-
-			if(arg.template has<literal_t>()) {
-
-				ss << (int)*arg.template ptr_to<literal_t>();
-
-			} else if(arg.template has<symbol>()) {
-
-				ss << " \"" << *arg.template ptr_to<symbol>() << '"';
-
-			} else if(arg.template has<function<value_type>>()) {
-
-				ss << ' ' << (std::wstring)*arg.template ptr_to<function<value_type>>();
-			}
-		}
-
-		ss << ')';
-
-		return ss.str();
-	}
-
-	*/
 	template struct function<term>;
 }
