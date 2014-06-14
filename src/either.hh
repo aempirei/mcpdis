@@ -48,6 +48,8 @@ template <typename A,typename B> struct either {
 	either& include(const maybe<first_type>&);
 	either& include(const maybe<second_type>&);
 
+	explicit operator std::wstring () const;
+
 	template <typename D> maybe<D> find() const;
 
 	template <typename D> D *ptr_to() const;
@@ -101,6 +103,8 @@ template <typename A,typename B,typename C> struct either<either<A,B>,C> {
 
 	either& include(const maybe<first_type>&);
 	either& include(const maybe<second_type>&);
+
+	explicit operator std::wstring () const;
 
 	template <typename D> maybe<D> find() const;
 

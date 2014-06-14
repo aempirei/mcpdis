@@ -37,6 +37,8 @@ template <typename T> struct maybe {
 
 	maybe& operator=(const maybe&);
 
+	explicit operator std::wstring () const;
+
 	// aux
 
 	template <typename U> using aux = maybe_aux<value_type,U>;
@@ -72,6 +74,8 @@ template <typename T> struct maybe<std::basic_string<T>> {
 	void clear();
 
 	maybe& operator=(const maybe&);
+
+	explicit operator std::wstring () const;
 
 	// aux
 

@@ -32,6 +32,11 @@ namespace yyy {
 		return operator<<(argument<value_type>(arg));
 	}
 
+	// function.operator std::wstring ()
+	//
+	//
+
+	/*
 	template <typename T> function<T>::operator std::wstring () const {
 		std::wstringstream ss;
 		ss << op << '(';
@@ -40,13 +45,41 @@ namespace yyy {
 				ss << (int)*arg.template ptr_to<literal_t>();
 			} else if(arg.template has<symbol>()) {
 				ss << " \"" << *arg.template ptr_to<symbol>() << '"';
-			} else if(arg.template has<function<term>>()) {
-				ss << ' ' << (std::wstring)*arg.template ptr_to<function<term>>();
+			} else if(arg.template has<function<value_type>>()) {
+				ss << ' ' << (std::wstring)*arg.template ptr_to<function<value_type>>();
 			} else {
 				ss << " <UNKNOWN>";
 			}
 		}
 		ss << ')';
+		return ss.str();
+	}
+	*/
+
+	template <> function<term>::operator std::wstring () const {
+
+		std::wstringstream ss;
+
+		ss << op << '(';
+
+		for(const auto& arg: args) {
+
+			if(arg.template has<literal_t>()) {
+
+				ss << (int)*arg.template ptr_to<literal_t>();
+
+			} else if(arg.template has<symbol>()) {
+
+				ss << " \"" << *arg.template ptr_to<symbol>() << '"';
+
+			} else if(arg.template has<function<value_type>>()) {
+
+				ss << ' ' << (std::wstring)*arg.template ptr_to<function<value_type>>();
+			}
+		}
+
+		ss << ')';
+
 		return ss.str();
 	}
 

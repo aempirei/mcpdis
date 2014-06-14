@@ -177,7 +177,7 @@ template <typename T> maybe<T>::maybe(const maybe& r) : xptr(r.xptr ? new T(*r.x
 }
 
 template <typename T> void maybe<T>::clear() {
-	if(xptr != nullptr) {
+	if(xptr) {
 		delete xptr;
 		xptr = nullptr;
 	}
@@ -195,6 +195,42 @@ template <typename T> maybe<T>& maybe<T>::operator=(const maybe&r) {
 		xptr = new T(*r.xptr);
 
 	return *this;
+}
+
+// maybe<T>::operator std::wstring ()
+//
+//
+
+template <typename T> maybe<T>::operator std::wstring () const {
+	return xptr ? (std::wstring)*xptr : std::wstring();
+}
+
+template <> maybe<std::nullptr_t>::operator std::wstring () const {
+	return xptr ? L"NULL" : L"";
+}
+template <> maybe<char>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<unsigned char>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<wchar_t>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<bool>::operator std::wstring () const {
+	return xptr ? *xptr ? L"TRUE" : L"FALSE" : L"";
+}
+template <> maybe<short>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<long>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<unsigned short>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
+}
+template <> maybe<unsigned long>::operator std::wstring () const {
+	return xptr ? std::to_wstring(*xptr) : std::wstring();
 }
 
 // <Y> maybe
@@ -237,7 +273,7 @@ template <typename T> maybe<std::basic_string<T>>::maybe(const maybe& r) : xptr(
 }
 
 template <typename T> void maybe<std::basic_string<T>>::clear() {
-	if(xptr != nullptr) {
+	if(xptr) {
 		delete xptr;
 		xptr = nullptr;
 	}
@@ -256,6 +292,11 @@ template <typename T> maybe<std::basic_string<T>>& maybe<std::basic_string<T>>::
 
 	return *this;
 }
+
+template <typename T> maybe<std::basic_string<T>>::operator std::wstring () const {
+	return xptr ? std::wstring(xptr->begin(), xptr->end()) : std::wstring();
+}
+
 
 // <Y> maybe<std::basic_string<T>>
 //

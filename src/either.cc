@@ -59,6 +59,13 @@ template <typename A,typename B> either<A,B>& either<A,B>::operator=(std::nullpt
 	return *this;
 }
 
+template <typename A,typename B> either<A,B>::operator std::wstring () const {
+	std::wstringstream ss;
+	ss << L"a:(" << ((std::wstring)a) << L") ";
+	ss << L"b:(" << ((std::wstring)b) << L")";
+	return ss.str();
+}
+
 // <D> either
 //
 //
@@ -175,6 +182,13 @@ template <typename A,typename B,typename C> template <typename D> D *either<eith
 	if(b.has<D>())
 		return b.ptr_to<D>();
 	return nullptr;
+}
+
+template <typename A,typename B,typename C> either<either<A,B>,C>::operator std::wstring () const {
+	std::wstringstream ss;
+	ss << L"a:(" << ((std::wstring)a) << L") ";
+	ss << L"b:(" << ((std::wstring)b) << L")";
+	return ss.str();
 }
 
 // <D> either<either<A,B>,C>
