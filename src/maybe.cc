@@ -294,9 +294,8 @@ template <typename T> maybe<std::basic_string<T>>& maybe<std::basic_string<T>>::
 }
 
 template <typename T> maybe<std::basic_string<T>>::operator std::wstring () const {
-	return xptr ? std::wstring(xptr->begin(), xptr->end()) : std::wstring();
+	return xptr ? ( L'"' + std::wstring(xptr->begin(), xptr->end()) + L'"' ) : std::wstring();
 }
-
 
 // <Y> maybe<std::basic_string<T>>
 //

@@ -39,7 +39,7 @@ typedef either<long_or_string,bool> long_or_string_or_bool;
 
 void do_abc(long_or_string_or_bool& abc) {
 
-	std::wcout << L"(std::wstring)abc := \"" << (std::wstring)abc << L'"' << std::endl << std::endl;
+	std::wcout << L"(std::wstring)abc := " << (std::wstring)abc << std::endl << std::endl;
 
 	std::cout << YYY(abc,bool) << std::endl;
 	std::cout << YYY(abc,char) << std::endl;
@@ -129,6 +129,9 @@ int main(int argc, char **argv) {
 
 	do_abc(abc);
 
+	abc.include(maybe<long>(666));
+
+	std::wcout << "abc := " << (std::wstring)abc << std::endl;
 
 	return 0;
 }

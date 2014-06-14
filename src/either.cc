@@ -59,11 +59,23 @@ template <typename A,typename B> either<A,B>& either<A,B>::operator=(std::nullpt
 	return *this;
 }
 
+template <typename A,typename B> either<A,B>& either<A,B>::include(const maybe<A>& my_a) {
+	a = my_a;
+	return *this;
+}
+
+template <typename A,typename B> either<A,B>& either<A,B>::include(const maybe<B>& my_b) {
+	b = my_b;
+	return *this;
+}
+
+
 template <typename A,typename B> either<A,B>::operator std::wstring () const {
-	std::wstringstream ss;
-	ss << L"a:(" << ((std::wstring)a) << L") ";
-	ss << L"b:(" << ((std::wstring)b) << L")";
-	return ss.str();
+	if(a.xptr && b.xptr) {
+		return L'(' + (std::wstring)a + L' ' + (std::wstring)b + L')';
+	} else {
+		return a.xptr ? (std::wstring)a : b.xptr ? (std::wstring)b : L"NULL";
+	}
 }
 
 // <D> either
@@ -172,6 +184,32 @@ template <typename A,typename B,typename C> either<either<A,B>,C>& either<either
 	return *this;
 }
 
+template <typename A,typename B,typename C> either<either<A,B>,C>& either<either<A,B>,C>::include(const maybe<A>& my_a) {
+	if(a.xptr)
+		a.xptr->include(my_a);
+	else
+		a = either<A,B>(my_a);
+	return *this;
+}
+
+template <typename A,typename B,typename C> either<either<A,B>,C>& either<either<A,B>,C>::include(const maybe<B>& my_a) {
+	if(a.xptr)
+		a.xptr->include(my_a);
+	else
+		a = either<A,B>(my_a);
+	return *this;
+}
+
+template <typename A,typename B,typename C> either<either<A,B>,C>& either<either<A,B>,C>::include(const maybe<first_type>& my_a) {
+	a = my_a;
+	return *this;
+}
+
+template <typename A,typename B,typename C> either<either<A,B>,C>& either<either<A,B>,C>::include(const maybe<second_type>& my_b) {
+	b = my_b;
+	return *this;
+}
+
 template <typename A,typename B,typename C> template <typename D> maybe<D> either<either<A,B>,C>::find() const {
 	return has<D>() ? *ptr_to<D>() : maybe<D>();
 }
@@ -185,10 +223,12 @@ template <typename A,typename B,typename C> template <typename D> D *either<eith
 }
 
 template <typename A,typename B,typename C> either<either<A,B>,C>::operator std::wstring () const {
-	std::wstringstream ss;
-	ss << L"a:(" << ((std::wstring)a) << L") ";
-	ss << L"b:(" << ((std::wstring)b) << L")";
-	return ss.str();
+	if(a.xptr && b.xptr) {
+		return L'(' + (std::wstring)a + L' ' + (std::wstring)b + L')';
+	} else {
+		return a.xptr ? (std::wstring)a : b.xptr ? (std::wstring)b : L"NULL";
+	}
+
 }
 
 // <D> either<either<A,B>,C>
