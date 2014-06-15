@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
 	auto g = define_grammar<term>();
 	
-	std::wcout << predicate<term>().any().star() << std::endl;
+	std::wcout << (std::wstring)(predicate<term>().any().star()) << std::endl;
 
 	return 0;
 }

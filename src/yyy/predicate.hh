@@ -30,11 +30,11 @@ namespace yyy {
 
 		// operators
 
-		predicate operator-() const; /* drop */
-		predicate operator+() const; /* plus */
-		predicate operator*() const; /* star */
-		predicate operator!() const; /* reject */
-		predicate operator~() const; /* lift */
+		// predicate operator-() const; /* drop */
+		// predicate operator+() const; /* plus */
+		// predicate operator*() const; /* star */
+		// predicate operator!() const; /* reject */
+		// predicate operator~() const; /* lift */
 
 		// type
 
@@ -48,6 +48,8 @@ namespace yyy {
 		predicate by_type() const;
 		predicate by_value() const;
 
+		predicate set_type(const types&) const;
+
 		// modifier
 
 		predicate pop() const;
@@ -56,6 +58,8 @@ namespace yyy {
 		predicate drop() const;
 		predicate bind() const;
 		predicate reject() const;
+
+		predicate modify(const modifiers&) const;
 
 		// quantifier
 
