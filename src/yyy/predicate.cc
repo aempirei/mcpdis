@@ -65,9 +65,9 @@ namespace yyy {
 
 	// quantifier
 
-	template<typename T> predicate<T> predicate<T>::q(const range& q0) const {
+	template<typename T> predicate<T> predicate<T>::q(const range& my_quantifier) const {
 		auto that(*this);
-		that.q = q0;
+		that.quantifier = my_quantifier;
 		return that;
 	}
 

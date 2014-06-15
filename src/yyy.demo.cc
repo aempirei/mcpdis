@@ -6,6 +6,9 @@ using F = function<term>;
 using L = literal_t;
 using S = symbol;
 
+using R = rule<term>;
+using P = predicate<term>;
+
 template <typename T> grammar<T> define_grammar() {
 	grammar<T> g;
 	return g;
@@ -29,8 +32,10 @@ int main(int argc, char **argv) {
 	std::wcout << (std::wstring)f << std::endl;
 
 	auto g = define_grammar<term>();
-	
-	std::wcout << (std::wstring)(predicate<term>().any().star()) << std::endl;
+
+	std::wcout << (std::wstring)(P().any().star()) << std::endl;
+
+	R r = R(OP_AND) << P(argument<term>(666)).by_type().plus() << P().any().star() << P().end();
 
 	return 0;
 }

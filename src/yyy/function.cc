@@ -46,4 +46,5 @@ namespace yyy {
 	}
 
 	template struct function<term>;
+	template struct function<predicate<term>>;
 }
