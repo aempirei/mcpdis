@@ -8,6 +8,7 @@ using S = symbol;
 
 using R = rule<term>;
 using P = predicate<term>;
+using A = argument<term>;
 
 template <typename T> grammar<T> define_grammar() {
 	grammar<T> g;
@@ -35,7 +36,9 @@ int main(int argc, char **argv) {
 
 	std::wcout << (std::wstring)(P().any().star()) << std::endl;
 
-	R r = R(OP_AND) << P(argument<term>(666)).by_type().plus() << P().any().star() << P().end();
+	R r = R(OP_AND) << P(A(666)).by_type().plus() << P().any().star() << P().end();
+
+	std::wcout << "rule := " << (std::wstring)r << std::endl;
 
 	return 0;
 }
