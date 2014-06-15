@@ -8,7 +8,6 @@ using S = symbol;
 
 template <typename T> grammar<T> define_grammar() {
 	grammar<T> g;
-	predicate<T> p;
 	return g;
 }
 
@@ -30,6 +29,8 @@ int main(int argc, char **argv) {
 	std::wcout << (std::wstring)f << std::endl;
 
 	auto g = define_grammar<term>();
+	
+	std::wcout << predicate<term>().any().star() << std::endl;
 
 	return 0;
 }
