@@ -8,4 +8,5 @@ namespace yyy {
 		using _grammar<T>::_grammar;
 	};
 #endif
+	template struct grammar<term>;
 }

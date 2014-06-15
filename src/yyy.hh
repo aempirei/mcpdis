@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <climits>
 #include <clocale>
 #include <cstdlib>
 #include <cwchar>
@@ -8,6 +9,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
 
 #include <operators.hh>
 
@@ -45,8 +47,8 @@ namespace yyy {
 
 namespace yyy {
 
-	// extern template struct predicate<term>;
+	extern template struct predicate<term>;
 	extern template struct function<term>;
 	// extern template struct binding<term>;
-	// extern template struct grammar<term>;
+	extern template struct grammar<term>;
 }

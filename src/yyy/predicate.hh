@@ -16,7 +16,7 @@ namespace yyy {
 		types type;
 		argument<value_type> arg;
 		symbol reference;
-		modifiers modifier;
+		std::set<modifiers> mods;
 		range quantifier;
 
 		// constructors
