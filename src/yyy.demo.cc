@@ -33,6 +33,17 @@ void do_zzz() {
 	e_int i;
 	e_str s;
 	e_int_str is;
+
+	i = 5;
+	s = L"fag";
+
+	is.a = new e_int(i);
+	is.b = new e_str(s);
+
+	std::wcout << "nothing: '" << nope.str() << "'" << std::endl;
+	std::wcout << "    int: '" << i.str() << "'" << std::endl;
+	std::wcout << "    str: '" << s.str() << "'" << std::endl;
+	std::wcout << "int/str: '" << is.str() << "'" << std::endl;
 }
 
 int main(int argc, char **argv) {

@@ -146,17 +146,26 @@ namespace zzz {
 		a_type *a;
 		either();
 		either(const either&);
+		either(const A&);
 		~either();
 		void clear();
 		std::wstring str() const;
+		either& operator=(const A&);
 	};
 
 	template <typename A> either<A,null>::either() : a(nullptr) {
 	}
 
-	template <typename A> either<A,null>::either(const either&r) : a(r.a ? new a_type(*r.a) : nullptr) {
+	template <typename A> either<A,null>::either(const A& my_a) : a(new a_type(my_a)) {
 	}
 
+	template <typename A> either<A,null>::either(const either& r) : a(r.a ? new a_type(*r.a) : nullptr) {
+	}
+	template <typename A> either<A,null>& either<A,null>::operator=(const A&my_a) {
+		clear();
+		a = new a_type(my_a);
+		return *this;
+	}
 	template <typename A> either<A,null>::~either() {
 		clear();
 	}
@@ -171,7 +180,7 @@ namespace zzz {
 	template <typename A> std::wstring either<A,null>::str() const {
 		if(a) {
 			std::wstringstream ss;
-			ss << a;
+			ss << *a;
 			return ss.str();
 		} else {
 			return L"";
