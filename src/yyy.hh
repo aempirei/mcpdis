@@ -77,11 +77,15 @@ namespace zzz {
 
 	template <typename,typename> struct either;
 
-	//template <typename A> struct either<A, null>;
+	template <typename A> struct either<A, null>;
 	template <typename A> using maybe = either<A, null>;
 
-	//template <> struct either<null, null>;
+	template <> struct either<null, null>;
 	using nothing = maybe<null>;
+
+	//
+	// A,B
+	//
 
 	template <typename A, typename B> struct either {
 		using a_type = A;
@@ -92,6 +96,7 @@ namespace zzz {
 		either(const either&);
 		~either();
 		void clear();
+		std::wstring str() const;
 	};
 
 	template <typename A, typename B> either<A,B>::either() : a(nullptr), b(nullptr) {
@@ -118,7 +123,23 @@ namespace zzz {
 		}
 	}
 
-	/*
+	template <typename A, typename B> std::wstring either<A,B>::str() const {
+
+		if(a && b) {
+			return a->str() + L',' + b->str();
+		} else if(a) {
+			return a->str();
+		} else if(b) {
+			return b->str();
+		} else {
+			return L"";
+		}
+	}
+
+	//
+	// A
+	//
+
 	template <typename A> struct either<A,null> {
 		using a_type = A;
 		using b_type = null;
@@ -126,15 +147,54 @@ namespace zzz {
 		either();
 		either(const either&);
 		~either();
+		void clear();
+		std::wstring str() const;
 	};
-	*/
 
-	/*
+	template <typename A> either<A,null>::either() : a(nullptr) {
+	}
+
+	template <typename A> either<A,null>::either(const either&r) : a(r.a ? new a_type(*r.a) : nullptr) {
+	}
+
+	template <typename A> either<A,null>::~either() {
+		clear();
+	}
+
+	template <typename A> void either<A,null>::clear() {
+		if(a) {
+			delete a;
+			a = nullptr;
+		}
+	}
+
+	template <typename A> std::wstring either<A,null>::str() const {
+		if(a) {
+			std::wstringstream ss;
+			ss << a;
+			return ss.str();
+		} else {
+			return L"";
+		}
+	}
+
+	//
+	// null
+	//
+
 	template <> struct either<null,null> {
 		using a_type = null;
 		using b_type = null;
+		void clear();
+		std::wstring str() const;
 	};
-	*/
+
+	void either<null,null>::clear() {
+	}
+
+	std::wstring either<null,null>::str() const {
+		return L"";
+	}
 
 	//
 	//
