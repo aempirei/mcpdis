@@ -83,11 +83,16 @@ namespace zzz {
 	struct either<void,void>;
 	using nothing = maybe<void>;
 
+	using type_set = std::set<const std::type_info*>;
+
 	//
 	// nothing
 	//
 
 	template <> struct either<void,void> {
+		constexpr bool empty() const {
+			return true;
+		}
 		void clear() const {
 		}
 		std::wstring str() const {
@@ -102,38 +107,46 @@ namespace zzz {
 		template <typename T> constexpr bool contains_value(const T&) const {
 			return false;
 		}
+		type_set get_types() const {
+			return type_set();
+		}
+		type_set allowed_types() const {
+			return type_set();
+		}
 	};
 
 	//
 	//  native type or nothing
 	//
 
-	template <typename A,typename T> struct either_typing {
-		using either_type = either<A,void>;
-		using value_type = A;
-		using test_type = T;
-		static const bool allows_type = false;
-		static bool contains_type(const either_type&) {
-			return false;
-		}
-		static bool contains_value(const either_type&, const test_type&) {
-			return false;
-		}
-	};
+	namespace {
+		template <typename A,typename T> struct either_typing {
+			using either_type = either<A,void>;
+			using value_type = A;
+			using test_type = T;
+			static const bool allows_type = false;
+			static bool contains_type(const either_type&) {
+				return false;
+			}
+			static bool contains_value(const either_type&, const test_type&) {
+				return false;
+			}
+		};
 
-	template <typename A> struct either_typing<A,A> {
-		using either_type = either<A,void>;
-		using value_type = A;
-		using test_type = A;
-		static const bool allows_type = true;
-		static bool contains_type(const either_type& x) {
-			return x.a_ptr not_eq nullptr;
-		}
-		static bool contains_value(const either_type& x, const test_type& a) {
-			return contains_type(x) and ( a == *x.a_ptr );
-		}
+		template <typename A> struct either_typing<A,A> {
+			using either_type = either<A,void>;
+			using value_type = A;
+			using test_type = A;
+			static const bool allows_type = true;
+			static bool contains_type(const either_type& x) {
+				return x.a_ptr not_eq nullptr;
+			}
+			static bool contains_value(const either_type& x, const test_type& a) {
+				return contains_type(x) and ( a == *x.a_ptr );
+			}
 
-	};
+		};
+	}
 
 	template <typename A> struct either<A,void> {
 
@@ -148,6 +161,10 @@ namespace zzz {
 		}
 
 		either(const a_type& a) : a_ptr(new a_type(a)) {
+		}
+
+		constexpr bool empty() const {
+			return a_ptr == nullptr;
 		}
 
 		void clear() {
@@ -199,10 +216,35 @@ namespace zzz {
 		template <typename T> constexpr bool contains_value(const T& x) const {
 			return typing<T>::contains_value(*this,x);
 		}
+		type_set allowed_types() const {
+			return type_set({&typeid(a_type)});
+		}
+		type_set get_types() const {
+			return a_ptr ? allowed_types() : type_set();
+		}
 	};
+	
 	//
 	// recursive either<either,either>
 	//
+
+	namespace generic {
+		template <typename T> static constexpr bool empty(const T*const&ptr) {
+			return ( not ptr ) or ptr->empty();
+		}
+		template <typename T> static void clear(T *&ptr) {
+			if(ptr) {
+				delete ptr;
+				ptr = nullptr;
+			}
+		}
+		template <typename T> static constexpr T *update(T*&l_ptr, const T*const&r_ptr) {
+			clear(l_ptr);
+			if(r_ptr)
+				l_ptr = new T(*r_ptr);
+			return l_ptr;
+		}
+	}
 
 	template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>> {
 
@@ -216,25 +258,21 @@ namespace zzz {
 		}
 
 		either(const either& r) {
-			if(r.a_ptr)
-				a_ptr = new a_type(*r.a_ptr);
-			if(r.b_ptr)
-				b_ptr = new b_type(*r.b_ptr);
+			generic::update(a_ptr,r.a_ptr);
+			generic::update(b_ptr,r.b_ptr);
+		}
+
+		constexpr bool empty() const {
+			return generic::empty(a_ptr) and generic::empty(b_ptr);
 		}
 
 		void clear() {
-			if(a_ptr) {
-				delete a_ptr;
-				a_ptr = nullptr;
-			}
-			if(b_ptr) {
-				delete b_ptr;
-				b_ptr = nullptr;
-			}
+			generic::clear(a_ptr);
+			generic::clear(b_ptr);
 		}
 
 		std::wstring str() const {
-			if(a_ptr && b_ptr) {
+			if(a_ptr and b_ptr) {
 				return a_ptr->str() + L',' + b_ptr->str();
 			} else if(a_ptr) {
 				return a_ptr->str();
@@ -278,8 +316,8 @@ namespace zzz {
 		}
 
 		template <typename T> constexpr bool contains_type() const {
-			return ( a_ptr && a_ptr->template contains_type<T>() )
-				or ( b_ptr && b_ptr->template contains_type<T>() );
+			return ( a_ptr and a_ptr->template contains_type<T>() )
+				or ( b_ptr and b_ptr->template contains_type<T>() );
 		}
 
 		template <typename T> constexpr bool allows_type() const {
@@ -288,8 +326,50 @@ namespace zzz {
 		}
 
 		template <typename T> constexpr bool contains_value(const T& t) const {
-			return ( a_ptr && a_ptr->template contains_value<T>(t) )
-				or ( b_ptr && b_ptr->template contains_value<T>(t) ); 
+			return ( a_ptr and a_ptr->template contains_value<T>(t) )
+				or ( b_ptr and b_ptr->template contains_value<T>(t) ); 
+
+		}
+
+		template <typename T,typename U> bool contains_all(const either<T,U>& e) const {
+
+			if(e.empty())
+
+			return ((not a_ptr) or a_ptr->contains_all(e)) ? false :
+				((not b_ptr) or b_ptr->contains_all(e));
+		}
+
+		template <typename T,typename U> constexpr bool contains_any(const either<T,U>& e) const {
+			return ( a_ptr and a_ptr->template contains_value<T>(e) )
+				or ( b_ptr and b_ptr->template contains_value<T>(e) ); 
+
+		}
+
+		template <typename T,typename U> void span(const either<T,U>& r) const {
+			if(a_ptr) {
+				a_ptr->span(r);
+			}
+			if(b_ptr) {
+				b_ptr->span(r);
+			}
+		}
+
+		type_set get_types() const {
+			type_set types;
+			auto a_types( a_ptr ? a_ptr->get_types() : type_set() );
+			auto b_types( b_ptr ? b_ptr->get_types() : type_set() );
+			types.insert(a_types.begin(), a_types.end());
+			types.insert(b_types.begin(), b_types.end());
+			return types;
+		}
+
+		type_set allowed_types() const {
+			type_set types;
+			auto a_types( a_type().allowed_types() );
+			auto b_types( b_type().allowed_types() );
+			types.insert(a_types.begin(), a_types.end());
+			types.insert(b_types.begin(), b_types.end());
+			return types;
 
 		}
 	};

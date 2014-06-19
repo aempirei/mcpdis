@@ -1,5 +1,6 @@
 #include <yyy.hh>
 #include <typeinfo>
+#include <typeindex>
 
 namespace yyy {
 	template <typename T> grammar<T> define_grammar() {
@@ -10,6 +11,27 @@ namespace yyy {
 
 template <zzz::symbol::type S> void fu(zzz::basic_symbol<wchar_t,S> x) {
 	std::wcout << "basic_symbol<" << (int)decltype(x)::type_enum << "> := " << x << std::endl;
+}
+
+constexpr const wchar_t* boolstr (bool b) {
+	return b ? L"is" : L"isn't";
+}
+
+template <typename...Args> struct hand {
+	using codomain = hand<Args...>;
+};
+template <typename...Left,typename...Right> struct hand<hand<Left...>,hand<Right...>> {
+	using codomain = hand<Left...,Right...>;
+};
+
+template <typename Head> std::wstring freezy(hand<Head>) {
+	std::wstringstream ss;
+	ss << typeid(Head).name();
+	return ss.str();
+}
+
+template <typename Head,typename...Tail> std::wstring freezy(hand<Head,Tail...>) {
+	return freezy(hand<Head>()) + L' ' + freezy(hand<Tail...>());
 }
 
 void do_zzz() {
@@ -41,7 +63,6 @@ void do_zzz() {
 	i.assign(5);
 	s.assign(wstr(L"gay"));
 	isb.insert(5);
-	isb.insert(wstr(L"fag"));
 	isb.insert(false);
 
 	i.assign(int());
@@ -61,6 +82,29 @@ void do_zzz() {
 	std::wcout << ( s.contains_value(wstr(L"fag")) ) << std::endl;
 	std::wcout << ( i.contains_value(4) ) << std::endl;
 	std::wcout << ( i.contains_value(5) ) << std::endl;
+
+	std::wcout << "type is : " << typeid(const char*).name() << std::endl;
+	std::wcout << "type is : " << typeid(typeid(int).name()).name() << std::endl;
+
+	std::wstringstream types_s;
+	std::wstringstream types_a;
+
+	isb.clear();
+
+	for(const std::type_info* x : isb.get_types()) types_s << L' ' << x->name();
+	for(const std::type_info* x : isb.allowed_types()) types_a << L' ' << x->name();
+
+	std::wcout << "types set :" << types_s.str() << ' ' << boolstr(isb.empty()) << " empty" << std::endl;
+	std::wcout << "types allowed : " << types_a.str() << ' ' << boolstr(isb.allowed_types().empty()) << " empty" << std::endl;
+
+	using left_hand = hand<int,bool,void*>;
+	using right_hand = hand<wchar_t,const char **,float[16]>;
+	using both_hands = hand<left_hand,right_hand>;
+
+	std::wcout << "     left hand :: " << freezy(left_hand()) << std::endl;
+	std::wcout << "    right hand :: " << freezy(right_hand()) << std::endl;
+	std::wcout << "    both hands :: " << freezy(both_hands()) << std::endl;
+	std::wcout << "(co)both hands :: " << freezy(both_hands::codomain()) << std::endl;
 }
 
 int main(int argc, char **argv) {
