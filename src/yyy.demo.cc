@@ -44,6 +44,8 @@ void do_zzz() {
 	isb.insert(wstr(L"fag"));
 	isb.insert(false);
 
+	i.assign(int());
+
 	std::wcout << "nothing: '" << nope.str() << "'" << std::endl;
 	std::wcout << "    int: '" << i.str() << "'" << std::endl;
 	std::wcout << "    str: '" << s.str() << "'" << std::endl;

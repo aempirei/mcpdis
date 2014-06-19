@@ -319,11 +319,11 @@ namespace zzz {
 	using modifiers = std::set<modifier>;
 	using adjectives = std::pair<modifiers,range>;
 	using reference = symbol::reference;
-	using term = either<literal_t,symbol::variable>;
+	using term = either<maybe<literal_t>,maybe<symbol::variable>>;
 
 	template <typename T> using arguments = std::list<argument<T>>;
 	template <typename T> using function = std::pair<operator_t,arguments<T>>;
-	template <typename T> using meta = either<reference,T>;
+	template <typename T> using meta = either<maybe<reference>,T>;
 	template <typename T> using predicate = std::pair<adjectives,meta<argument<T>>>;
 	template <typename T> using rule = function<predicate<T>>;
 	template <typename T> using rules = std::list<rule<T>>;
@@ -338,9 +338,9 @@ namespace zzz {
 		using base_type::base_type;
 	};
 
-	template <typename T> struct argument : either<T,function<T>> {
+	template <typename T> struct argument : either<T,maybe<function<T>>> {
 		using unit_type = T;
-		using base_type = either<T,function<T>>;
+		using base_type = either<T,maybe<function<T>>>;
 		using base_type::base_type;
 	};
 }
