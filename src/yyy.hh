@@ -84,21 +84,72 @@ namespace zzz {
 	using nothing = maybe<null>;
 
 	//
-	// A,B
+	// either<either<...>,either<...>>
 	//
 
-	template <typename A, typename B> struct either {
-		using a_type = A;
-		using b_type = B;
+	template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>> {
+
+		using a_type = either<A,B>;
+		using b_type = either<C,D>;
+
 		a_type *a;
 		b_type *b;
+
 		either();
 		either(const either&);
+
 		~either();
+
 		void clear();
+
 		std::wstring str() const;
+
+		template <typename T> void assign(const T&);
+		template <typename T> void insert(const T&);
+
+		template <typename T> constexpr bool is() const;
+		template <typename T> constexpr bool allows() const;
+		template <typename T> bool equals(const T&) const;
 	};
 
+	template <typename A, typename B,typename C,typename D> either<either<A,B>,either<C,D>>::either() : a(nullptr), b(nullptr) {
+	}
+
+	template <typename A, typename B,typename C,typename D> either<either<A,B>,either<C,D>>::either(const either& r) :
+		a(r.a ? new a_type(*r.a) : nullptr),
+		b(r.b ? new b_type(*r.b) : nullptr)
+	{
+	}
+
+	template <typename A, typename B,typename C,typename D> either<either<A,B>,either<C,D>>::~either() {
+		clear();
+	}
+
+	template <typename A, typename B,typename C,typename D> void either<either<A,B>,either<C,D>>::clear() {
+		if(a) {
+			delete a;
+			a = nullptr;
+		}
+		if(b) {
+			delete b;
+			b = nullptr;
+		}
+	}
+
+	template <typename A, typename B,typename C,typename D> std::wstring either<either<A,B>,either<C,D>>::str() const {
+
+		if(a && b) {
+			return a->str() + L',' + b->str();
+		} else if(a) {
+			return a->str();
+		} else if(b) {
+			return b->str();
+		} else {
+			return L"";
+		}
+	}
+
+	/*
 	template <typename A, typename B> either<A,B>::either() : a(nullptr), b(nullptr) {
 	}
 
@@ -135,47 +186,57 @@ namespace zzz {
 			return L"";
 		}
 	}
+	*/
 
 	//
 	// A
 	//
 
 	template <typename A> struct either<A,null> {
+
 		using a_type = A;
 		using b_type = null;
-		a_type *a;
-		either();
-		either(const either&);
-		either(const A&);
-		~either();
-		void clear();
-		std::wstring str() const;
-		either& operator=(const A&);
-	};
 
-	template <typename A> either<A,null>::either() : a(nullptr) {
-	}
+		a_type *a = nullptr;
 
-	template <typename A> either<A,null>::either(const A& my_a) : a(new a_type(my_a)) {
-	}
-
-	template <typename A> either<A,null>::either(const either& r) : a(r.a ? new a_type(*r.a) : nullptr) {
-	}
-	template <typename A> either<A,null>& either<A,null>::operator=(const A&my_a) {
-		clear();
-		a = new a_type(my_a);
-		return *this;
-	}
-	template <typename A> either<A,null>::~either() {
-		clear();
-	}
-
-	template <typename A> void either<A,null>::clear() {
-		if(a) {
-			delete a;
-			a = nullptr;
+		either() {
 		}
-	}
+
+		either(const either& r) {
+			if(r.a)
+				assign(*r.a);
+		}
+
+		either(const a_type& my_a) {
+			assign(my_a);
+		}
+
+		void clear() {
+			if(a) {
+				delete a;
+				a = nullptr;
+			}
+		}
+
+		std::wstring str() const;
+
+		void assign(const a_type& my_a) {
+			clear();
+			a = new a_type(my_a);
+		}
+
+		void insert(const a_type& my_a) {
+			assign(my_a);
+		}
+
+		template <typename T> constexpr bool is() const;
+		template <typename T> constexpr bool allows() const;
+		template <typename T> bool equals(const T&) const;
+
+		~either() {
+			clear();
+		} 
+	};
 
 	template <typename A> std::wstring either<A,null>::str() const {
 		if(a) {
@@ -196,6 +257,9 @@ namespace zzz {
 		using b_type = null;
 		void clear();
 		std::wstring str() const;
+		template <typename T> constexpr bool is() const;
+		template <typename T> constexpr bool allows() const;
+		template <typename T> constexpr bool equals(const T&) const;
 	};
 
 	void either<null,null>::clear() {

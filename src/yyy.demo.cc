@@ -28,14 +28,16 @@ void do_zzz() {
 	using e_int = zzz::maybe<int>;
 	using e_str = zzz::maybe<std::wstring>;
 	using e_int_str = zzz::either<e_int,e_str>;
+	using e_int_str_bool = zzz::either<zzz::maybe<bool>,e_int_str>;
 
 	zzz::nothing nope;
 	e_int i;
 	e_str s;
 	e_int_str is;
+	e_int_str_bool isb;
 
-	i = 5;
-	s = L"fag";
+	i.assign(5);
+	s.assign(L"fag");
 
 	is.a = new e_int(i);
 	is.b = new e_str(s);
