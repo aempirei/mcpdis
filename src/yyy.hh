@@ -73,18 +73,16 @@ namespace zzz {
 	// the specialization of either<nullptr_t,b>!=nothing should generate a static assert or compiler error of some sort
 	//
 
-	using null = std::nullptr_t;
-
 	template <typename,typename> struct either;
 
-	template <typename A> struct either<A, null>;
-	template <typename A> using maybe = either<A, null>;
+	template <typename A> struct either<A, std::nullptr_t>;
+	template <typename A> using maybe = either<A, std::nullptr_t>;
 
-	template <> struct either<null, null>;
-	using nothing = maybe<null>;
+	template <> struct either<std::nullptr_t, std::nullptr_t>;
+	using nothing = maybe<std::nullptr_t>;
 
 	//
-	// either<either<...>,either<...>>
+	// recursive  either<either,either>
 	//
 
 	template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>> {
@@ -149,53 +147,14 @@ namespace zzz {
 		}
 	}
 
-	/*
-	template <typename A, typename B> either<A,B>::either() : a(nullptr), b(nullptr) {
-	}
-
-	template <typename A, typename B> either<A,B>::either(const either&r) :
-		a(r.a ? new a_type(*r.a) : nullptr),
-		b(r.b ? new b_type(*r.b) : nullptr)
-	{
-	}
-
-	template <typename A, typename B> either<A,B>::~either() {
-		clear();
-	}
-
-	template <typename A, typename B> void either<A,B>::clear() {
-		if(a) {
-			delete a;
-			a = nullptr;
-		}
-		if(b) {
-			delete b;
-			b = nullptr;
-		}
-	}
-
-	template <typename A, typename B> std::wstring either<A,B>::str() const {
-
-		if(a && b) {
-			return a->str() + L',' + b->str();
-		} else if(a) {
-			return a->str();
-		} else if(b) {
-			return b->str();
-		} else {
-			return L"";
-		}
-	}
-	*/
-
 	//
-	// A
+	//  native type or nullptr
 	//
 
-	template <typename A> struct either<A,null> {
+	template <typename A> struct either<A,std::nullptr_t> {
 
 		using a_type = A;
-		using b_type = null;
+		using b_type = std::nullptr_t;
 
 		a_type *a = nullptr;
 
@@ -238,7 +197,7 @@ namespace zzz {
 		} 
 	};
 
-	template <typename A> std::wstring either<A,null>::str() const {
+	template <typename A> std::wstring either<A,std::nullptr_t>::str() const {
 		if(a) {
 			std::wstringstream ss;
 			ss << *a;
@@ -249,25 +208,21 @@ namespace zzz {
 	}
 
 	//
-	// null
+	// nothing
 	//
 
-	template <> struct either<null,null> {
-		using a_type = null;
-		using b_type = null;
-		void clear();
-		std::wstring str() const;
+	template <> struct either<std::nullptr_t,std::nullptr_t> {
+		using a_type = std::nullptr_t;
+		using b_type = std::nullptr_t;
+		void clear() const {
+		}
+		std::wstring str() const {
+			return L"";
+		}
 		template <typename T> constexpr bool is() const;
 		template <typename T> constexpr bool allows() const;
 		template <typename T> constexpr bool equals(const T&) const;
 	};
-
-	void either<null,null>::clear() {
-	}
-
-	std::wstring either<null,null>::str() const {
-		return L"";
-	}
 
 	//
 	//
