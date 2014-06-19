@@ -25,8 +25,10 @@ void do_zzz() {
 	fu(g);
 	fu(j);
 
+	using wstr = std::wstring;
+
 	using e_int = zzz::maybe<int>;
-	using e_str = zzz::maybe<std::wstring>;
+	using e_str = zzz::maybe<wstr>;
 	using e_int_str = zzz::either<e_int,e_str>;
 	using e_int_str_bool = zzz::either<zzz::maybe<bool>,e_int_str>;
 
@@ -37,15 +39,26 @@ void do_zzz() {
 	e_int_str_bool isb;
 
 	i.assign(5);
-	s.assign(L"fag");
-
-	is.a = new e_int(i);
-	is.b = new e_str(s);
+	s.assign(wstr(L"gay"));
+	isb.insert(5);
+	isb.insert(wstr(L"fag"));
+	isb.insert(false);
 
 	std::wcout << "nothing: '" << nope.str() << "'" << std::endl;
 	std::wcout << "    int: '" << i.str() << "'" << std::endl;
 	std::wcout << "    str: '" << s.str() << "'" << std::endl;
-	std::wcout << "int/str: '" << is.str() << "'" << std::endl;
+	std::wcout << "int/str: '" << isb.str() << "'" << std::endl;
+
+	std::wcout << "isb<int> :: " << ( isb.template allows_type<int>() ) << ' ' << ( isb.template contains_type<int>() ) << std::endl;
+	std::wcout << "isb<int> == " << ( isb.template contains_value(4) ) << ' ' << ( isb.template contains_value(5) ) << std::endl;
+	std::wcout << "isb<bool> :: " << ( isb.template allows_type<bool>() ) << ' ' << ( isb.template contains_type<bool>() ) << std::endl;
+	std::wcout << "isb<bool> == " << ( isb.template contains_value(true) ) << ' ' << ( isb.template contains_value(false) ) << std::endl;
+	std::wcout << "isb<wstr> :: " << ( isb.template allows_type<wstr>() ) << ' ' << ( isb.template contains_type<wstr>() ) << std::endl;
+	std::wcout << "isb<wstr> == " << ( isb.template contains_value(wstr(L"dicks")) ) << ' ' << ( isb.template contains_value(wstr(L"fag")) ) << std::endl;
+
+	std::wcout << ( s.contains_value(wstr(L"fag")) ) << std::endl;
+	std::wcout << ( i.contains_value(4) ) << std::endl;
+	std::wcout << ( i.contains_value(5) ) << std::endl;
 }
 
 int main(int argc, char **argv) {
