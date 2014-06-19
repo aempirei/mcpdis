@@ -86,10 +86,25 @@ namespace zzz {
 	using type_set = std::set<const std::type_info*>;
 
 	//
+	// sig
+	//
+
+	template <typename...Args> struct sig {
+		using codomain = sig;
+	};
+	template <typename Arg> struct sig<Arg> {
+		using codomain = sig<Arg>;
+	};
+	template <typename...Left,typename...Right> struct sig<sig<Left...>,sig<Right...>> {
+		using codomain = typename sig<Left...,Right...>::codomain;
+	};
+
+	//
 	// nothing
 	//
 
 	template <> struct either<void,void> {
+		using codomain = sig<>;
 		constexpr bool empty() const {
 			return true;
 		}
@@ -151,6 +166,7 @@ namespace zzz {
 	template <typename A> struct either<A,void> {
 
 		using a_type = A;
+		using codomain = sig<a_type>;
 
 		a_type *a_ptr;
 
@@ -250,6 +266,8 @@ namespace zzz {
 
 		using a_type = either<A,B>;
 		using b_type = either<C,D>;
+		
+		using codomain = typename sig<typename a_type::codomain,typename b_type::codomain>::codomain;
 
 		a_type *a_ptr = nullptr;
 		b_type *b_ptr = nullptr;

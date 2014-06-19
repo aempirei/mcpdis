@@ -105,6 +105,9 @@ void do_zzz() {
 	std::wcout << "    right hand :: " << freezy(right_hand()) << std::endl;
 	std::wcout << "    both hands :: " << freezy(both_hands()) << std::endl;
 	std::wcout << "(co)both hands :: " << freezy(both_hands::codomain()) << std::endl;
+
+	std::wcout << "type id of decltype(isb)::codomain :: " << typeid(zzz::either<zzz::maybe<void*>,zzz::either<zzz::maybe<int>,zzz::maybe<char*>>>::codomain).name() << std::endl;
+	std::wcout << "type id of decltype(isb):: " << typeid(zzz::either<zzz::maybe<void*>,zzz::either<zzz::maybe<int>,zzz::maybe<char*>>>).name() << std::endl;
 }
 
 int main(int argc, char **argv) {
