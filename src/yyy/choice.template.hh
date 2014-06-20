@@ -147,13 +147,14 @@ namespace yyy {
 		// insert, assignment
 		//
 
-		void insert(const a_type& a) {
+		void assign(const a_type& a) {
 			clear();
 			a_ptr = new a_type(a);
+
 		}
 
-		void assign(const a_type& a) {
-			insert(a);
+		void insert(const a_type& a) {
+			assign(a);
 		}
 
 		template <typename T> void insert(const T&) {
@@ -186,9 +187,15 @@ namespace yyy {
 		either& operator=(const either& r) {
 			clear();
 			if(r.a_ptr)
-				a_ptr = new a_type(*r.a_ptr);
+				operator=(*r.a_ptr);
 			return *this;
 		}
+
+		either& operator=(const a_type& a) {
+			assign(a);
+			return *this;
+		}
+
 
 		//
 		// helper

@@ -7,6 +7,7 @@ LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/fn.cc src/predicate.cc src/r
 LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 YYYCC = src/yyy/grammar.cc src/yyy/binding.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy.cc
 YYYHH = $(YYYCC:.cc=.hh)
+TPLHH = src/yyy/choice.template.hh src/yyy/symbol.template.hh
 # MAYBE = src/maybe.cc src/maybe.hh src/maybe.template.hh
 # EITHER = src/either.cc src/either.hh src/either.template.hh
 
@@ -29,7 +30,7 @@ demo: bin/yyy.demo bin/either.demo
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
-src/yyy.demo.o: src/yyy.demo.cc $(YYYHH) $(YYYCC)
+src/yyy.demo.o: src/yyy.demo.cc $(YYYHH) $(YYYCC) $(TPLHH)
 
 src/either.demo.o: src/either.demo.cc $(EITHER) $(MAYBE)
 
