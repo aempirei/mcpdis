@@ -111,10 +111,11 @@ int main(int argc, char **argv) {
 
 	std::wcout << "R r := " << std::endl;
 
-	R r = R(OP_ANY);// << P(m).by_type().plus() << P().any().star() << P().end();
+	R r = R(OP_ANY) << P(m).by_type().plus() << P().any().star() << P().end();
 
 	std::wcout << "rule := " << r.str() << std::endl;
-	 std::wcout << "rule := " << (std::wstring)r << std::endl;
+	// std::wcout << "rule := " << (std::wstring)r << std::endl;
+	return 0;
 
 	do_yyy();
 

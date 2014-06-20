@@ -45,8 +45,8 @@ namespace yyy {
 	template <typename> struct binding;
 	template <typename> struct grammar;
 
-	template <typename T> using meta = typename choice<T,symbol::ref>::type;
-	template <typename T> using argument = typename choice<T,function<T>>::type;
+	template <typename T> using meta = typename choice<symbol::ref,T>::type;
+	template <typename T> using argument = typename choice<function<T>,T>::type;
 	template <typename T> using rule = function<predicate<T>>;
 
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>

@@ -99,24 +99,6 @@ namespace yyy {
 
 		namespace either_generic {
 
-			template <typename T> static constexpr bool empty(const T*const&ptr) {
-				return ( not ptr ) or ptr->empty();
-			}
-
-			template <typename T> static void clear(T *&ptr) {
-				if(ptr) {
-					delete ptr;
-					ptr = nullptr;
-				}
-			}
-
-			template <typename T> static T *update(T*&l_ptr, const T*const&r_ptr) {
-				clear(l_ptr);
-				if(r_ptr)
-					l_ptr = new T(*r_ptr);
-				return l_ptr;
-			}
-
 			template <template <class> class K, typename T> static std::wstring str(const K<T>&t) {
 				return t.str();
 			}
@@ -152,23 +134,26 @@ namespace yyy {
 		// constructors
 		//
 
-		constexpr either() : a_ptr(nullptr) {
+		constexpr either() : either(nullptr) {
 		}
-
-		either(const either& r) : a_ptr(r.a_ptr ? new a_type(*r.a_ptr) : nullptr) {
+		either(const either& r) : either(r.a_ptr) {
 		}
-
-		either(const a_type& a) : a_ptr(new a_type(a)) {
+		either(const a_type& a) : either(&a) {
+		}
+		either(const a_type *my_a_ptr) : a_ptr(my_a_ptr ? new a_type(*my_a_ptr) : nullptr) {
 		}
 
 		//
-		// insert, assignment, empty, clear
+		// insert, assignment
 		//
 
 		void insert(const a_type& a) {
-			if(a_ptr == nullptr)
-				a_ptr = new a_type();
-			*a_ptr = a;
+			clear();
+			a_ptr = new a_type(a);
+		}
+
+		void assign(const a_type& a) {
+			insert(a);
 		}
 
 		template <typename T> void insert(const T&) {
@@ -178,19 +163,31 @@ namespace yyy {
 		}
 
 		template <typename T> void assign(const T& t) {
-			clear();
 			insert(t);
 		}
+
+		//
+		// empty, clear
+		//
 
 		constexpr bool empty() const {
 			return a_ptr == nullptr;
 		}
 
 		void clear() {
-			if(a_ptr) {
-				delete a_ptr;
-				a_ptr = nullptr;
-			}
+			if(a_ptr) delete a_ptr;
+			a_ptr = nullptr;
+		}
+
+		//
+		// operators
+		//
+
+		either& operator=(const either& r) {
+			clear();
+			if(r.a_ptr)
+				a_ptr = new a_type(*r.a_ptr);
+			return *this;
 		}
 
 		//
@@ -261,34 +258,48 @@ namespace yyy {
 		using a_type = either<A,B>;
 		using b_type = either<C,D>;
 		
-		a_type *a_ptr = nullptr;
-		b_type *b_ptr = nullptr;
+		a_type *a_ptr;
+		b_type *b_ptr;
 
 		//
 		// constructors
 		//
 
-		either() {
+		constexpr either() : either(nullptr,nullptr) {
+		}
+		either(const either& r) : either(r.a_ptr,r.b_ptr) {
+		}
+		either(const a_type& a) : either(&a,nullptr) {
+		}
+		either(const b_type& b) : either(nullptr,&b) {
+		}
+		either(const a_type *my_a_ptr, const b_type *my_b_ptr)
+			: a_ptr(my_a_ptr ? new a_type(*my_a_ptr) : nullptr)
+			, b_ptr(my_b_ptr ? new b_type(*my_b_ptr) : nullptr)
+		{
 		}
 
-		either(const either& r) {
-			either_generic::update(a_ptr,r.a_ptr);
-			either_generic::update(b_ptr,r.b_ptr);
-		}
 
 		//
-		// insert, assignment, empty, clear
+		// empty, clear
 		//
 
 
 		constexpr bool empty() const {
-			return either_generic::empty(a_ptr) and either_generic::empty(b_ptr);
+			return ( a_ptr == nullptr or a_ptr->empty() )
+			   and ( b_ptr == nullptr or b_ptr->empty() );
 		}
 
 		void clear() {
-			either_generic::clear(a_ptr);
-			either_generic::clear(b_ptr);
+			if(a_ptr) delete a_ptr;
+			if(b_ptr) delete b_ptr;
+			a_ptr = nullptr;
+			b_ptr = nullptr;
 		}
+
+		//
+		// insert,assign
+		//
 
 		template <typename T> void insert(const T& t) {
 
@@ -318,6 +329,17 @@ namespace yyy {
 		template <typename T> void assign(const T& t) {
 			clear();
 			insert(t);
+		}
+
+		//
+		// operators
+		//
+
+		either& operator=(const either& r) {
+			clear();
+			if(r.a_ptr) a_ptr = new a_type(*r.a_ptr);
+			if(r.b_ptr) b_ptr = new b_type(*r.b_ptr);
+			return *this;
 		}
 
 		//
