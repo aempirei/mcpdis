@@ -63,7 +63,7 @@ namespace yyy {
 	};
 
 	//
-	// either_helper
+	// either_helper, either_generic
 	//
 
 	namespace {
@@ -95,8 +95,47 @@ namespace yyy {
 			static bool contains_value(const either_type& x, const test_type& a) {
 				return contains_type(x) and ( a == *x.a_ptr );
 			}
-
 		};
+
+		namespace either_generic {
+
+			template <typename T> static constexpr bool empty(const T*const&ptr) {
+				return ( not ptr ) or ptr->empty();
+			}
+
+			template <typename T> static void clear(T *&ptr) {
+				if(ptr) {
+					delete ptr;
+					ptr = nullptr;
+				}
+			}
+
+			template <typename T> static T *update(T*&l_ptr, const T*const&r_ptr) {
+				clear(l_ptr);
+				if(r_ptr)
+					l_ptr = new T(*r_ptr);
+				return l_ptr;
+			}
+
+			template <template <class> class K, typename T> static std::wstring str(const K<T>&t) {
+				return t.str();
+			}
+
+			template <typename T> static std::wstring str(const T&t) {
+				std::wstringstream ss;
+				ss << t;
+				return ss.str();
+			}
+
+			template <symbol_type S> static std::wstring str(const basic_symbol<wchar_t,S>& s) {
+				return std::wstring(s);
+			}
+
+			template <typename T> static std::wstring str(const std::basic_string<T>& t) {
+				return std::wstring(t.begin(),t.end());
+			}
+		}
+
 	}
 
 	//
@@ -155,17 +194,17 @@ namespace yyy {
 		}
 
 		//
+		// helper
+		//
+
+		template <typename T> using helper = either_helper<A,T>;
+
+		//
 		// string conversion
 		//
 
 		std::wstring str() const {
-			if(a_ptr) {
-				std::wstringstream ss;
-				ss << *a_ptr;
-				return ss.str();
-			} else {
-				return nothing().str();
-			}
+			return a_ptr ? either_generic::str(*a_ptr) : nothing().str();
 		}
 
 		//
@@ -180,16 +219,14 @@ namespace yyy {
 		// content and type checking
 		//
 
-		template <typename T> using typing = either_helper<A,T>;
-
 		template <typename T> constexpr bool allows_type() const {
-			return typing<T>::allows_type;
+			return helper<T>::allows_type;
 		}
 		template <typename T> constexpr bool contains_type() const {
-			return typing<T>::contains_type(*this);
+			return helper<T>::contains_type(*this);
 		}
 		template <typename T> constexpr bool contains_value(const T& x) const {
-			return typing<T>::contains_value(*this,x);
+			return helper<T>::contains_value(*this,x);
 		}
 		template <typename T,typename U> constexpr bool contains_any_value(const either<T,U>& e) const {
 			return ( a_ptr and e.contains_value(*a_ptr) );
@@ -218,29 +255,6 @@ namespace yyy {
 	//
 	// recursive either<either,either>
 	//
-
-	namespace {
-		struct either_generic {
-
-			template <typename T> static constexpr bool empty(const T*const&ptr) {
-				return ( not ptr ) or ptr->empty();
-			}
-
-			template <typename T> static void clear(T *&ptr) {
-				if(ptr) {
-					delete ptr;
-					ptr = nullptr;
-				}
-			}
-
-			template <typename T> static constexpr T *update(T*&l_ptr, const T*const&r_ptr) {
-				clear(l_ptr);
-				if(r_ptr)
-					l_ptr = new T(*r_ptr);
-				return l_ptr;
-			}
-		};
-	}
 
 	template <typename A,typename B,typename C,typename D> struct either<either<A,B>,either<C,D>> {
 

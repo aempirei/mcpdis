@@ -7,6 +7,8 @@
 #include <cwchar>
 
 #include <string>
+#include <iomanip>
+#include <sstream>
 #include <list>
 #include <map>
 #include <set>
@@ -43,9 +45,9 @@ namespace yyy {
 	template <typename> struct binding;
 	template <typename> struct grammar;
 
-	template <typename T> using argument = choice<T,function<T>>::type;
+	template <typename T> using meta = typename choice<T,symbol::ref>::type;
+	template <typename T> using argument = typename choice<T,function<T>>::type;
 	template <typename T> using rule = function<predicate<T>>;
-	template <typename T> using meta = choice<T,symbol::ref>::type;
 
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
 

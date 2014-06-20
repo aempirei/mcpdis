@@ -12,7 +12,7 @@ namespace yyy {
 	}
 
 	template <typename T> predicate<T>::predicate(const predicate& r) :
-		: type(r.type), arg(r.arg), reference(r.reference), mods(r.mods), quantifier(r.quantifier)
+		: type(r.type), arg(r.arg), mods(r.mods), quantifier(r.quantifier)
 	{
 	}
 
@@ -104,7 +104,6 @@ namespace yyy {
 			case types::end      : ss << '$'                                    ; break ;
 			case types::any      : ss << '.'                                    ; break ;
 			case types::mem      : ss << '#'                                    ; break ;
-			case types::by_ref   : ss << reference                              ; break ;
 			case types::by_type  : ss << "TYPE:" << /*(std::wstring)*/arg.str() ; break ;
 			case types::by_op    : ss << "OP:!!!"                               ; break ; // FIXME
 			case types::by_value : ss << /*(std::wstring)*/arg.str()            ; break ;

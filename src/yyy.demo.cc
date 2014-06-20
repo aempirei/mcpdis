@@ -1,6 +1,4 @@
 #include <yyy.hh>
-#include <typeinfo>
-#include <typeindex>
 
 namespace yyy {
 	template <typename T> grammar<T> define_grammar() {
@@ -15,37 +13,6 @@ template <zzz::symbol::type S> void fu(zzz::basic_symbol<wchar_t,S> x) {
 
 constexpr const wchar_t* boolstr (bool b) {
 	return b ? L"is" : L"isn't";
-}
-
-namespace zzz {
-	template <typename...Args> struct choice;
-
-	template <> struct choice<> {
-		using type = nothing;
-		choice() = delete;
-	};
-
-	template <typename A> struct choice<A> {
-		using type = maybe<A>;
-		choice() = delete;
-	};
-
-	template <typename A, typename B> struct choice<either<A,B>> {
-		using type = either<A,B>;
-		choice() = delete;
-	};
-
-	template <typename A, typename...Args> struct choice<A,Args...> {
-		using otherwise = typename choice<Args...>::type;
-		using type = either<maybe<A>,otherwise>;
-		choice() = delete;
-	};
-
-	template <typename A, typename B, typename...Args> struct choice<either<A,B>,Args...> {
-		using otherwise = typename choice<Args...>::type;
-		using type = either<either<A,B>,otherwise>;
-		choice() = delete;
-	};
 }
 
 void do_zzz() {

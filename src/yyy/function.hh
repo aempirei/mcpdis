@@ -21,10 +21,13 @@ namespace yyy {
 
 		template <typename U> function& operator<<(const U&);
 
+		std::wstring str() const;
 		explicit operator std::wstring() const;
 	};
 
-	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& arg) {
-		return operator<<(argument<value_type>(U(arg)));
+	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& value) {
+		argument<value_type> arg;
+		arg.assign(value);
+		return operator<<(arg);
 	}
 }
