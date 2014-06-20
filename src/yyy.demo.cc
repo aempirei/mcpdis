@@ -79,12 +79,10 @@ int main(int argc, char **argv) {
 	using F = function<term>;
 	using L = literal_t;
 	using Sv = symbol::var;
-	// using Sr = symbol::ref;
+	using Sr = symbol::ref;
 
 	using R = rule<term>;
 	using P = predicate<term>;
-	using M = meta<argument<term>>;
-	// using A = argument<term>;
 
 	maybe<literal_t> lit;
 
@@ -106,12 +104,9 @@ int main(int argc, char **argv) {
 	std::wcout << "g := " << P().any().star().str() << std::endl;
 	// std::wcout << (std::wstring)(P().any().star()) << std::endl;
 
-	M m;
-	m.assign((literal_t)666);
-
 	std::wcout << "R r := " << std::endl;
 
-	R r = R(OP_ANY) << P(m).by_type().plus() << P().any().star() << P().end();
+	R r = R(OP_ANY) << P(L(666)).by_type().plus() << P(F(OP_AND) << L(1337) << Sv(L"eax")) << P(Sr(L"satan")).qm() << P().any().star() << P().end();
 
 	std::wcout << "rule := " << r.str() << std::endl;
 	// std::wcout << "rule := " << (std::wstring)r << std::endl;

@@ -184,18 +184,16 @@ namespace yyy {
 		// operators
 		//
 
-		either& operator=(const either& r) {
-			clear();
-			if(r.a_ptr)
-				operator=(*r.a_ptr);
-			return *this;
-		}
-
 		either& operator=(const a_type& a) {
 			assign(a);
 			return *this;
 		}
 
+		either& operator=(const either& r) {
+			clear();
+			if(r.a_ptr) operator=(*r.a_ptr);
+			return *this;
+		}
 
 		//
 		// helper
@@ -276,21 +274,15 @@ namespace yyy {
 		}
 		either(const either& r) : either(r.a_ptr,r.b_ptr) {
 		}
-		either(const a_type& a) : either(&a,nullptr) {
-		}
-		either(const b_type& b) : either(nullptr,&b) {
-		}
 		either(const a_type *my_a_ptr, const b_type *my_b_ptr)
 			: a_ptr(my_a_ptr ? new a_type(*my_a_ptr) : nullptr)
 			, b_ptr(my_b_ptr ? new b_type(*my_b_ptr) : nullptr)
 		{
 		}
 
-
 		//
 		// empty, clear
 		//
-
 
 		constexpr bool empty() const {
 			return ( a_ptr == nullptr or a_ptr->empty() )
@@ -349,6 +341,11 @@ namespace yyy {
 			return *this;
 		}
 
+		template <typename T> either& operator=(const T& t) {
+			assign(t);
+			return this;
+		}
+
 		//
 		// string conversion
 		//
@@ -359,6 +356,14 @@ namespace yyy {
 			else if(a_ptr)           return a_ptr->str();
 			else if(b_ptr)           return b_ptr->str();
 			else                     return nothing().str();
+		}
+		
+		//
+		// wildcard constructor
+		//
+
+		template <typename T> either(const T& c) : either(nullptr,nullptr) {
+			assign(c);
 		}
 
 		//
