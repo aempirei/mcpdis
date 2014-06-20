@@ -7,15 +7,16 @@ LIBCC = src/mcpdis.cc src/term.cc src/pic12f.cc src/fn.cc src/predicate.cc src/r
 LIBHH = src/mcpdis.hh src/operators.hh src/ansicolor.hh
 YYYCC = src/yyy/grammar.cc src/yyy/binding.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy.cc
 YYYHH = $(YYYCC:.cc=.hh)
-MAYBE = src/maybe.cc src/maybe.hh src/maybe.template.hh
-EITHER = src/either.cc src/either.hh src/either.template.hh
+# MAYBE = src/maybe.cc src/maybe.hh src/maybe.template.hh
+# EITHER = src/either.cc src/either.hh src/either.template.hh
 
 .PHONY: all clean test demo
 
 all: $(TARGETS)
 
 clean:
-	rm -f src/*~ src/*.o $(TARGETS)
+	rm -f $(TARGETS)
+	rm -f src/*~ src/*.o src/yyy/*.o src/yyy/*~
 	rm -f test.dis
 	rm -rf bin lib
 
@@ -28,7 +29,7 @@ demo: bin/yyy.demo bin/either.demo
 
 src/dis.o: src/dis.cc src/mcpdis.hh
 
-src/yyy.demo.o: src/yyy.demo.cc $(EITHER) $(MAYBE) $(YYYHH) $(YYYCC)
+src/yyy.demo.o: src/yyy.demo.cc $(YYYHH) $(YYYCC)
 
 src/either.demo.o: src/either.demo.cc $(EITHER) $(MAYBE)
 
