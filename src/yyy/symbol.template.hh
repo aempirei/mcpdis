@@ -6,7 +6,7 @@ namespace yyy {
 	// basic_symbol, symbol, symbol_type
 	//
 
-	enum struct symbol_type { reference, variable, name, key, id, word };
+	enum struct symbol_type { ref, var, name, key, id, word };
 
 	template <typename,symbol_type> struct basic_symbol;
 
@@ -14,12 +14,12 @@ namespace yyy {
 
 	struct symbol {
 		using type = symbol_type;
-		DEFINE_SYMBOL_TYPE ( reference );
-		DEFINE_SYMBOL_TYPE ( variable  );
-		DEFINE_SYMBOL_TYPE ( name      );
-		DEFINE_SYMBOL_TYPE ( key       );
-		DEFINE_SYMBOL_TYPE ( id        );
-		DEFINE_SYMBOL_TYPE ( word      );
+		DEFINE_SYMBOL_TYPE ( ref  );
+		DEFINE_SYMBOL_TYPE ( var  );
+		DEFINE_SYMBOL_TYPE ( name );
+		DEFINE_SYMBOL_TYPE ( key  );
+		DEFINE_SYMBOL_TYPE ( id   );
+		DEFINE_SYMBOL_TYPE ( word );
 	};
 
 #undef DEFINE_SYMBOL_TYPE

@@ -45,11 +45,14 @@ namespace yyy {
 
 	template <typename T> using argument = choice<T,function<T>>::type;
 	template <typename T> using rule = function<predicate<T>>;
+	template <typename T> using meta = choice<T,symbol::ref>::type;
 
-	template <typename T> using arguments = std::list<argument<T>>;
-	template <typename T> using rules = std::list<rule<T>>;
+#define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
 
-	using term = choice<symbol::generic,literal_t>::type;
+	pluralize(argument);
+	pluralize(rule);
+
+	using term = choice<symbol::var,literal_t>::type;
 }
 
 #include "yyy/predicate.hh"
@@ -73,8 +76,8 @@ namespace zzz {
 
 	   using modifiers = std::set<modifier>;
 	   using adjectives = std::pair<modifiers,range>;
-	   using reference = symbol::reference;
-	   using term = either<maybe<literal_t>,maybe<symbol::variable>>;
+	   using reference = symbol::ref;
+	   using term = either<maybe<literal_t>,maybe<symbol::var>>;
 
 	   template <typename T> using arguments = std::list<argument<T>>;
 	   template <typename T> using function = std::pair<operator_t,arguments<T>>;

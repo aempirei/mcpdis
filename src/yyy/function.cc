@@ -40,7 +40,7 @@ namespace yyy {
 		std::wstringstream ss;
 		ss << op << L"(";
 		for(const auto& arg: args)
-			ss << L' ' << (std::wstring)arg;
+			ss << L' ' << arg.str();//(std::wstring)arg;
 		ss << L" )";
 		return ss.str();
 	}

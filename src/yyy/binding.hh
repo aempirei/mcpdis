@@ -6,7 +6,7 @@ namespace yyy {
 
 		using value_type = T;
 
-		using argument_type = either<argument<T>,binding<T>>;
+		using argument_type = choice<argument<T>,binding<T>>::type;
 
 		predicate<value_type> clause;
 		std::list<argument_type> args;

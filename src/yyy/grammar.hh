@@ -2,7 +2,7 @@
 
 namespace yyy {
 
-	template <typename T> using _grammar = std::map<symbol,rules<T>>;
+	template <typename T> using _grammar = std::map<symbol::ref,rules<T>>;
 
 	template <typename T> struct grammar : _grammar<T> {
 

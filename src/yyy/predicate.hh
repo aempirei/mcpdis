@@ -14,8 +14,7 @@ namespace yyy {
 		// properties
 
 		types type;
-		argument<value_type> arg;
-		symbol reference;
+		meta<argument<value_type>> arg;
 		std::set<modifiers> mods;
 		range quantifier;
 
@@ -25,8 +24,7 @@ namespace yyy {
 
 		predicate(const predicate&);
 
-		predicate(const symbol&);
-		predicate(const argument<value_type>&);
+		predicate(const meta<argument<value_type>>&);
 
 		// operators
 

@@ -2,24 +2,21 @@
 
 namespace yyy {
 
+	//
 	// constructors
+	//
 
 	template <typename T> predicate<T>::predicate()
 		: type(types::any), mods({modifiers::bind}), quantifier(range(1,1))
 	{
 	}
 
-	template <typename T> predicate<T>::predicate(const predicate& r)
+	template <typename T> predicate<T>::predicate(const predicate& r) :
 		: type(r.type), arg(r.arg), reference(r.reference), mods(r.mods), quantifier(r.quantifier)
 	{
 	}
 
-	template <typename T> predicate<T>::predicate(const symbol& my_reference)
-		: type(types::by_ref), reference(my_reference), mods({modifiers::bind}), quantifier(range(1,1))
-	{
-	}
-
-	template <typename T> predicate<T>::predicate(const argument<value_type>& my_arg)
+	template <typename T> predicate<T>::predicate(const meta<argument<value_type>>& my_arg)
 		: type(types::by_value), arg(my_arg), mods({modifiers::bind}), quantifier(range(1,1))
 	{
 	}
@@ -32,7 +29,9 @@ namespace yyy {
 	// template<typename T> predicate<T> predicate<T>::operator!() const; // reject
 	// template<typename T> predicate<T> predicate<T>::operator~() const; // lift
 
+	//
 	// type
+	//
 
 	template<typename T> predicate<T> predicate<T>::set_type(const types& my_type) const {
 		auto that(*this);
@@ -48,7 +47,9 @@ namespace yyy {
 	template<typename T> predicate<T> predicate<T>::by_type  () const { return set_type ( types::by_type  ); }
 	template<typename T> predicate<T> predicate<T>::by_value () const { return set_type ( types::by_value ); }
 
+	//
 	// modifier
+	//
 
 	template<typename T> predicate<T> predicate<T>::modify(const modifiers& modifier) const {
 		auto that(*this);
@@ -63,7 +64,9 @@ namespace yyy {
 	template<typename T> predicate<T> predicate<T>::bind   () const { return modify ( modifiers::bind   ); }
 	template<typename T> predicate<T> predicate<T>::reject () const { return modify ( modifiers::reject ); }
 
+	//
 	// quantifier
+	//
 
 	template<typename T> predicate<T> predicate<T>::q(const range& my_quantifier) const {
 		auto that(*this);
@@ -77,7 +80,9 @@ namespace yyy {
 	template<typename T> predicate<T> predicate<T>::plus       () const { return q ( range ( 1,UINT_MAX )); }
 	template<typename T> predicate<T> predicate<T>::qm         () const { return q ( range ( 0,1        )); }
 
+	//
 	// operator std::wstring
+	//
 
 	template <typename T> predicate<T>::operator std::wstring () const {
 
@@ -96,13 +101,13 @@ namespace yyy {
 		}
 
 		switch(type) {
-			case types::end      : ss << '$'                                             ; break ;
-			case types::any      : ss << '.'                                             ; break ;
-			case types::mem      : ss << '#'                                             ; break ;
-			case types::by_ref   : ss << reference                                       ; break ;
-			case types::by_type  : ss << "TYPE:" << (std::wstring)arg                    ; break ;
-			case types::by_op    : ss << "OP:" << arg.template ptr_to<function<T>>()->op ; break ;
-			case types::by_value : ss << (std::wstring)arg                               ; break ;
+			case types::end      : ss << '$'                                    ; break ;
+			case types::any      : ss << '.'                                    ; break ;
+			case types::mem      : ss << '#'                                    ; break ;
+			case types::by_ref   : ss << reference                              ; break ;
+			case types::by_type  : ss << "TYPE:" << /*(std::wstring)*/arg.str() ; break ;
+			case types::by_op    : ss << "OP:!!!"                               ; break ; // FIXME
+			case types::by_value : ss << /*(std::wstring)*/arg.str()            ; break ;
 
 		}
 
