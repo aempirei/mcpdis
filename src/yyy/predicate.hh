@@ -8,8 +8,8 @@ namespace yyy {
 
 		using value_type = T;
 
-		enum class types { end, any, mem, by_ref, by_type, by_op, by_value };
-		enum class modifiers { push, pop, lift, drop, bind, reject };
+		enum struct types { end, any, mem, by_ref, by_type, by_op, by_value };
+		enum struct modifiers { push, pop, lift, drop, bind, reject };
 
 		// properties
 
