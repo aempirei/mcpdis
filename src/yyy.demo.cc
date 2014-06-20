@@ -17,21 +17,35 @@ constexpr const wchar_t* boolstr (bool b) {
 	return b ? L"is" : L"isn't";
 }
 
-template <typename...Args> struct hand {
-	using codomain = hand<Args...>;
-};
-template <typename...Left,typename...Right> struct hand<hand<Left...>,hand<Right...>> {
-	using codomain = hand<Left...,Right...>;
-};
+namespace zzz {
+	template <typename...Args> struct choice;
 
-template <typename Head> std::wstring freezy(hand<Head>) {
-	std::wstringstream ss;
-	ss << typeid(Head).name();
-	return ss.str();
-}
+	template <> struct choice<> {
+		using type = nothing;
+		choice() = delete;
+	};
 
-template <typename Head,typename...Tail> std::wstring freezy(hand<Head,Tail...>) {
-	return freezy(hand<Head>()) + L' ' + freezy(hand<Tail...>());
+	template <typename A> struct choice<A> {
+		using type = maybe<A>;
+		choice() = delete;
+	};
+
+	template <typename A, typename B> struct choice<either<A,B>> {
+		using type = either<A,B>;
+		choice() = delete;
+	};
+
+	template <typename A, typename...Args> struct choice<A,Args...> {
+		using otherwise = typename choice<Args...>::type;
+		using type = either<maybe<A>,otherwise>;
+		choice() = delete;
+	};
+
+	template <typename A, typename B, typename...Args> struct choice<either<A,B>,Args...> {
+		using otherwise = typename choice<Args...>::type;
+		using type = either<either<A,B>,otherwise>;
+		choice() = delete;
+	};
 }
 
 void do_zzz() {
@@ -51,8 +65,8 @@ void do_zzz() {
 
 	using e_int = zzz::maybe<int>;
 	using e_str = zzz::maybe<wstr>;
-	using e_int_str = zzz::either<e_int,e_str>;
-	using e_int_str_bool = zzz::either<zzz::maybe<bool>,e_int_str>;
+	using e_int_str = zzz::choice<std::wstring,int>::type;
+	using e_int_str_bool = zzz::choice<int,std::wstring,bool>::type;
 
 	zzz::nothing nope;
 	e_int i;
@@ -67,10 +81,10 @@ void do_zzz() {
 
 	i.assign(int());
 
-	std::wcout << "nothing: '" << nope.str() << "'" << std::endl;
-	std::wcout << "    int: '" << i.str() << "'" << std::endl;
-	std::wcout << "    str: '" << s.str() << "'" << std::endl;
-	std::wcout << "int/str: '" << isb.str() << "'" << std::endl;
+	std::wcout << "     nothing: '" << nope.str() << "'" << std::endl;
+	std::wcout << "         int: '" << i.str() << "'" << std::endl;
+	std::wcout << "         str: '" << s.str() << "'" << std::endl;
+	std::wcout << "int/str/bool: '" << isb.str() << "'" << std::endl;
 
 	std::wcout << "isb<int> :: " << ( isb.template allows_type<int>() ) << ' ' << ( isb.template contains_type<int>() ) << std::endl;
 	std::wcout << "isb<int> == " << ( isb.template contains_value(4) ) << ' ' << ( isb.template contains_value(5) ) << std::endl;
@@ -79,35 +93,14 @@ void do_zzz() {
 	std::wcout << "isb<wstr> :: " << ( isb.template allows_type<wstr>() ) << ' ' << ( isb.template contains_type<wstr>() ) << std::endl;
 	std::wcout << "isb<wstr> == " << ( isb.template contains_value(wstr(L"dicks")) ) << ' ' << ( isb.template contains_value(wstr(L"fag")) ) << std::endl;
 
-	std::wcout << ( s.contains_value(wstr(L"fag")) ) << std::endl;
-	std::wcout << ( i.contains_value(4) ) << std::endl;
-	std::wcout << ( i.contains_value(5) ) << std::endl;
-
-	std::wcout << "type is : " << typeid(const char*).name() << std::endl;
-	std::wcout << "type is : " << typeid(typeid(int).name()).name() << std::endl;
-
 	std::wstringstream types_s;
 	std::wstringstream types_a;
-
-	isb.clear();
 
 	for(const std::type_info* x : isb.get_types()) types_s << L' ' << x->name();
 	for(const std::type_info* x : isb.allowed_types()) types_a << L' ' << x->name();
 
-	std::wcout << "types set :" << types_s.str() << ' ' << boolstr(isb.empty()) << " empty" << std::endl;
-	std::wcout << "types allowed : " << types_a.str() << ' ' << boolstr(isb.allowed_types().empty()) << " empty" << std::endl;
-
-	using left_hand = hand<int,bool,void*>;
-	using right_hand = hand<wchar_t,const char **,float[16]>;
-	using both_hands = hand<left_hand,right_hand>;
-
-	std::wcout << "     left hand :: " << freezy(left_hand()) << std::endl;
-	std::wcout << "    right hand :: " << freezy(right_hand()) << std::endl;
-	std::wcout << "    both hands :: " << freezy(both_hands()) << std::endl;
-	std::wcout << "(co)both hands :: " << freezy(both_hands::codomain()) << std::endl;
-
-	std::wcout << "type id of decltype(isb)::codomain :: " << typeid(zzz::either<zzz::maybe<void*>,zzz::either<zzz::maybe<int>,zzz::maybe<char*>>>::codomain).name() << std::endl;
-	std::wcout << "type id of decltype(isb):: " << typeid(zzz::either<zzz::maybe<void*>,zzz::either<zzz::maybe<int>,zzz::maybe<char*>>>).name() << std::endl;
+	std::wcout << "types set :" << types_s.str() << std::endl;
+	std::wcout << "types allowed : " << types_a.str() << std::endl;
 }
 
 int main(int argc, char **argv) {

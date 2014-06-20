@@ -86,25 +86,10 @@ namespace zzz {
 	using type_set = std::set<const std::type_info*>;
 
 	//
-	// sig
-	//
-
-	template <typename...Args> struct sig {
-		using codomain = sig;
-	};
-	template <typename Arg> struct sig<Arg> {
-		using codomain = sig<Arg>;
-	};
-	template <typename...Left,typename...Right> struct sig<sig<Left...>,sig<Right...>> {
-		using codomain = typename sig<Left...,Right...>::codomain;
-	};
-
-	//
 	// nothing
 	//
 
 	template <> struct either<void,void> {
-		using codomain = sig<>;
 		constexpr bool empty() const {
 			return true;
 		}
@@ -136,9 +121,11 @@ namespace zzz {
 
 	namespace {
 		template <typename A,typename T> struct either_typing {
+
 			using either_type = either<A,void>;
 			using value_type = A;
 			using test_type = T;
+
 			static const bool allows_type = false;
 			static bool contains_type(const either_type&) {
 				return false;
@@ -149,9 +136,11 @@ namespace zzz {
 		};
 
 		template <typename A> struct either_typing<A,A> {
+
 			using either_type = either<A,void>;
 			using value_type = A;
 			using test_type = A;
+
 			static const bool allows_type = true;
 			static bool contains_type(const either_type& x) {
 				return x.a_ptr not_eq nullptr;
@@ -166,7 +155,6 @@ namespace zzz {
 	template <typename A> struct either<A,void> {
 
 		using a_type = A;
-		using codomain = sig<a_type>;
 
 		a_type *a_ptr;
 
@@ -245,15 +233,18 @@ namespace zzz {
 	//
 
 	namespace generic {
+
 		template <typename T> static constexpr bool empty(const T*const&ptr) {
 			return ( not ptr ) or ptr->empty();
 		}
+
 		template <typename T> static void clear(T *&ptr) {
 			if(ptr) {
 				delete ptr;
 				ptr = nullptr;
 			}
 		}
+
 		template <typename T> static constexpr T *update(T*&l_ptr, const T*const&r_ptr) {
 			clear(l_ptr);
 			if(r_ptr)
@@ -267,8 +258,6 @@ namespace zzz {
 		using a_type = either<A,B>;
 		using b_type = either<C,D>;
 		
-		using codomain = typename sig<typename a_type::codomain,typename b_type::codomain>::codomain;
-
 		a_type *a_ptr = nullptr;
 		b_type *b_ptr = nullptr;
 
