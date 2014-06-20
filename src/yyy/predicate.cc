@@ -11,7 +11,7 @@ namespace yyy {
 	{
 	}
 
-	template <typename T> predicate<T>::predicate(const predicate& r) :
+	template <typename T> predicate<T>::predicate(const predicate& r)
 		: type(r.type), arg(r.arg), mods(r.mods), quantifier(r.quantifier)
 	{
 	}
@@ -85,6 +85,10 @@ namespace yyy {
 	//
 
 	template <typename T> predicate<T>::operator std::wstring () const {
+		return str();
+	}
+
+	template <typename T> std::wstring predicate<T>::str() const {
 
 		std::wstringstream ss;
 		

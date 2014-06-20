@@ -31,8 +31,8 @@ namespace yyy {
 
 }
 
-#include "yyy/choice.template.hh"
 #include "yyy/symbol.template.hh"
+#include "yyy/choice.template.hh"
 
 namespace yyy {
 

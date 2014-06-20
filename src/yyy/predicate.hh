@@ -70,6 +70,7 @@ namespace yyy {
 		predicate plus() const;
 		predicate qm() const;
 
+		std::wstring str() const;
 		explicit operator std::wstring() const;
 	};
 }
