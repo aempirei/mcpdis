@@ -39,10 +39,16 @@ namespace yyy {
 		std::wstring str() const {
 			return L"()";
 		}
+		template <typename> static constexpr bool allows_type() { 
+			return false;
+		}
+		template <typename T,typename U> static constexpr bool allows_any_type(const either<T,U>&e) {
+			return false;
+		}
 		template <typename> constexpr bool contains_type() const {
 			return false;
 		}
-		template <typename> constexpr bool allows_type() const {
+		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
 			return false;
 		}
 		template <typename T> constexpr bool contains_value(const T&) const {
@@ -51,13 +57,10 @@ namespace yyy {
 		template <typename T,typename U> constexpr bool contains_any_value(const either<T,U>& e) const {
 			return false;
 		}
-		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
-			return false;
-		}
 		type_set get_types() const {
 			return type_set();
 		}
-		type_set allowed_types() const {
+		static type_set allowed_types() {
 			return type_set();
 		}
 	};
@@ -221,27 +224,35 @@ namespace yyy {
 		// content and type checking
 		//
 
-		template <typename T> constexpr bool allows_type() const {
+		template <typename T> static constexpr bool allows_type() {
 			return helper<T>::allows_type;
 		}
+
+		template <typename T,typename U> static constexpr bool allows_any_type(const either<T,U>&e) {
+			return e.template contains_type<a_type>();
+		}
+
 		template <typename T> constexpr bool contains_type() const {
 			return helper<T>::contains_type(*this);
 		}
+
+		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
+			return ( a_ptr and e.template contains_type<a_type>() );
+		}
+
 		template <typename T> constexpr bool contains_value(const T& x) const {
 			return helper<T>::contains_value(*this,x);
 		}
+
 		template <typename T,typename U> constexpr bool contains_any_value(const either<T,U>& e) const {
 			return ( a_ptr and e.contains_value(*a_ptr) );
-		}
-		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
-			return ( a_ptr and e.template contains_type<a_type>() );
 		}
 
 		//
 		// get the currently assigned types
 		//
 
-		type_set allowed_types() const {
+		static type_set allowed_types() {
 			return type_set({&typeid(a_type)});
 		}
 
@@ -302,14 +313,14 @@ namespace yyy {
 
 		template <typename T> void insert(const T& t) {
 
-			if( a_type().template allows_type<T>() ) {
+			if( a_type::template allows_type<T>() ) {
 
 				if(a_ptr == nullptr)
 					a_ptr = new a_type();
 
 				a_ptr->insert(t);
 
-			} else if( b_type().template allows_type<T>() ) {
+			} else if( b_type::template allows_type<T>() ) {
 
 				if(b_ptr == nullptr)
 					b_ptr = new b_type();
@@ -378,37 +389,46 @@ namespace yyy {
 		// content and type checking
 		//
 
-		template <typename T> constexpr bool allows_type() const {
-			return ( a_type().template allows_type<T>() )
-			    or ( b_type().template allows_type<T>() );
+		template <typename T> static constexpr bool allows_type() {
+			return ( a_type::template allows_type<T>() )
+			    or ( b_type::template allows_type<T>() );
 		}
+
+		template <typename T,typename U> static constexpr bool allows_any_type(const either<T,U>& e) {
+			return ( a_type::allows_any_type(e) )
+			    or ( b_type::allows_any_type(e) );
+		}
+
 		template <typename T> constexpr bool contains_type() const {
 			return ( a_ptr and a_ptr->template contains_type<T>() )
 			    or ( b_ptr and b_ptr->template contains_type<T>() );
 		}
+
+		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
+			return ( a_ptr and a_ptr->contains_any_type(e) )
+			    or ( b_ptr and b_ptr->contains_any_type(e) ); 
+		}
+
 		template <typename T> constexpr bool contains_value(const T& t) const {
 			return ( a_ptr and a_ptr->contains_value(t) )
 			    or ( b_ptr and b_ptr->contains_value(t) ); 
 		}
+
 		template <typename T,typename U> constexpr bool contains_any_value(const either<T,U>& e) const {
 			return ( a_ptr and a_ptr->contains_any_value(e) )
 			    or ( b_ptr and b_ptr->contains_any_value(e) ); 
-		}
-		template <typename T,typename U> constexpr bool contains_any_type(const either<T,U>& e) const {
-			return ( a_ptr and a_ptr->contains_any_type(e) )
-			    or ( b_ptr and b_ptr->contains_any_type(e) ); 
 		}
 
 		//
 		// get all of the allowed types
 		//
 
-		type_set allowed_types() const {
+		static type_set allowed_types() {
 
 			type_set types;
 
-			auto a_types( a_type().allowed_types() );
-			auto b_types( b_type().allowed_types() );
+			auto a_types( a_type::allowed_types() );
+			auto b_types( b_type::allowed_types() );
 
 			types.insert(a_types.begin(), a_types.end());
 			types.insert(b_types.begin(), b_types.end());

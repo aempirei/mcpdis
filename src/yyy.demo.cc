@@ -44,9 +44,11 @@ void do_yyy() {
 	e_int_str_bool isb;
 
 	i.assign(5);
-	s.assign(wstr(L"gay"));
-	isb.insert(5);
-	isb.insert(false);
+	isb.insert<wstr>(L"gay");
+	isb.insert<int>(5);
+	isb.insert<bool>(false);
+
+	isb.clear();
 
 	i.assign(int());
 
@@ -55,7 +57,7 @@ void do_yyy() {
 	std::wcout << "         str: '" << s.str() << "'" << std::endl;
 	std::wcout << "int/str/bool: '" << isb.str() << "'" << std::endl;
 
-	std::wcout << "isb<int> :: " << ( isb.template allows_type<int>() ) << ' ' << ( isb.template contains_type<int>() ) << std::endl;
+	std::wcout << "isb<int> :: " << ( e_int_str_bool::template allows_type<int>() ) << ' ' << ( isb.template contains_type<int>() ) << std::endl;
 	std::wcout << "isb<int> == " << ( isb.template contains_value(4) ) << ' ' << ( isb.template contains_value(5) ) << std::endl;
 	std::wcout << "isb<bool> :: " << ( isb.template allows_type<bool>() ) << ' ' << ( isb.template contains_type<bool>() ) << std::endl;
 	std::wcout << "isb<bool> == " << ( isb.template contains_value(true) ) << ' ' << ( isb.template contains_value(false) ) << std::endl;
@@ -65,8 +67,12 @@ void do_yyy() {
 	std::wstringstream types_s;
 	std::wstringstream types_a;
 
+	using big_type = choice<bool,char,std::wstring,std::type_info>::type;
+
 	for(const std::type_info* x : isb.get_types()) types_s << L' ' << x->name();
 	for(const std::type_info* x : isb.allowed_types()) types_a << L' ' << x->name();
+
+	std::wcout << "big_type will allow isb values? " << ( big_type::allows_any_type(isb) ? "TRUE" : "FALSE" ) << std::endl;
 
 	std::wcout << "types set :" << types_s.str() << std::endl;
 	std::wcout << "types allowed : " << types_a.str() << std::endl;
