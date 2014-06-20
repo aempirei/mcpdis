@@ -105,12 +105,13 @@ namespace yyy {
 		}
 
 		switch(type) {
-			case types::end      : ss << '$'                                    ; break ;
-			case types::any      : ss << '.'                                    ; break ;
-			case types::mem      : ss << '#'                                    ; break ;
-			case types::by_type  : ss << "TYPE:" << /*(std::wstring)*/arg.str() ; break ;
-			case types::by_op    : ss << "OP:!!!"                               ; break ; // FIXME
-			case types::by_value : ss << /*(std::wstring)*/arg.str()            ; break ;
+			case types::end      : ss << '$'                                       ; break ;
+			case types::any      : ss << '.'                                       ; break ;
+			case types::mem      : ss << '#'                                       ; break ;
+			case types::by_ref   : ss << '<' << /*(std::wstring)*/arg.str() << '>' ; break ; // FIXME
+			case types::by_type  : ss << "TYPE:" << /*(std::wstring)*/arg.str()    ; break ; // FIXME
+			case types::by_op    : ss << "OP:!!!"                                  ; break ; // FIXME
+			case types::by_value : ss << /*(std::wstring)*/arg.str()               ; break ; // FIXME
 
 		}
 

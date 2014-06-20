@@ -13,6 +13,7 @@ namespace yyy {
 #define DEFINE_SYMBOL_TYPE(X) using X = basic_symbol<wchar_t,type::X>
 
 	struct symbol {
+		symbol() = delete;
 		using type = symbol_type;
 		DEFINE_SYMBOL_TYPE ( ref  );
 		DEFINE_SYMBOL_TYPE ( var  );

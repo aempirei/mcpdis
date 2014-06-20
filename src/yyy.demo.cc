@@ -21,7 +21,7 @@ void do_yyy() {
 
 	using namespace yyy;
 
-	symbol::reference g(L"ref-symbol");
+	symbol::ref g(L"ref-symbol");
 	symbol::name j(L"name-symbol");
 
 	std::wcout << typeid(g).name() << " := " << g << std::endl;
@@ -78,17 +78,19 @@ int main(int argc, char **argv) {
 
 	using F = function<term>;
 	using L = literal_t;
-	using S = symbol;
+	using Sv = symbol::var;
+	// using Sr = symbol::ref;
 
 	using R = rule<term>;
 	using P = predicate<term>;
-	using A = argument<term>;
+	using M = meta<argument<term>>;
+	// using A = argument<term>;
 
 	maybe<literal_t> lit;
 
 	setlocale(LC_CTYPE, "");
 
-	F f = F(OP_SAME) << ( F(OP_OR) << S(L"what") ) << L(666);
+	F f = F(OP_SAME) << ( F(OP_OR) << Sv(L"what") ) << L(666);
 
 	for(int i = 0; i < argc; i++)
 		f << L(atoi(argv[i]));
@@ -97,17 +99,22 @@ int main(int argc, char **argv) {
 
 	f << f;
 
-	std::wcout << (std::wstring)f << std::endl;
+	std::wcout << "f := " << (std::wstring)f << std::endl;
 
 	auto g = define_grammar<term>();
 
-	std::wcout << P().any().star().str() << std::endl;
+	std::wcout << "g := " << P().any().star().str() << std::endl;
 	// std::wcout << (std::wstring)(P().any().star()) << std::endl;
 
-	R r = R(OP_ANY) << P(A(666)).by_type().plus() << P().any().star() << P().end();
+	M m;
+	m.assign((literal_t)666);
+
+	std::wcout << "R r := " << std::endl;
+
+	R r = R(OP_ANY);// << P(m).by_type().plus() << P().any().star() << P().end();
 
 	std::wcout << "rule := " << r.str() << std::endl;
-	// std::wcout << "rule := " << (std::wstring)r << std::endl;
+	 std::wcout << "rule := " << (std::wstring)r << std::endl;
 
 	do_yyy();
 
