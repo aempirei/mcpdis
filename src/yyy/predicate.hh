@@ -8,6 +8,8 @@ namespace yyy {
 
 		using value_type = T;
 
+		using range = std::pair<size_t,size_t>;
+
 		enum struct types { end, any, mem, by_ref, by_type, by_op, by_value };
 		enum struct modifiers { push, pop, lift, drop, bind, reject };
 
@@ -28,11 +30,11 @@ namespace yyy {
 
 		// operators
 
-		// predicate operator-() const; /* drop */
-		// predicate operator+() const; /* plus */
-		// predicate operator*() const; /* star */
-		// predicate operator!() const; /* reject */
-		// predicate operator~() const; /* lift */
+		predicate operator-() const; /* drop */
+		predicate operator+() const; /* plus */
+		predicate operator*() const; /* star */
+		predicate operator!() const; /* reject */
+		predicate operator~() const; /* lift */
 
 		// type
 

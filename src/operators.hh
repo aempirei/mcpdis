@@ -33,5 +33,5 @@ enum class operators : wchar_t {
 	SWAP = OP_SWAP,
 	NOT = OP_NOT,
 	ROTL = OP_ROTL,
-	ROTR= OP_ROTR
+	ROTR = OP_ROTR
 };

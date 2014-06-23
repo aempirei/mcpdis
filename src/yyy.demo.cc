@@ -89,6 +89,8 @@ int main(int argc, char **argv) {
 
 	using R = rule<term>;
 	using P = predicate<term>;
+	using E = entry<term>;
+	using G = grammar<term>;
 
 	maybe<literal_t> lit;
 
@@ -107,13 +109,15 @@ int main(int argc, char **argv) {
 
 	auto g = define_grammar<term>();
 
-	std::wcout << "g := " << P().any().star().str() << std::endl;
+	std::wcout << "g := " << (*P()).str() << std::endl;
 
 	std::wcout << "R r := " << std::endl;
 
-	R r = R(OP_ANY) << P(L(666)).by_type().plus() << P(F(OP_AND) << L(1337) << Sv(L"eax")) << P(Sr(L"satan")).qm() << P().any().star() << P().end();
+	E e1(Sr(L"satan"), R(OP_AND) << P(L(1337)) << P(Sv(L"eax")));
+	E e2(Sr(L"hello"), R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P().by_op() << *P() << P().end();
 
-	std::wcout << "rule := " << r.str() << std::endl;
+	std::wcout << e1.first << " := " << e1.second.str() << std::endl;
+	std::wcout << e2.first << " := " << e2.second.str() << std::endl;
 
 	do_yyy();
 

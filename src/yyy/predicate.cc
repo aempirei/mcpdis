@@ -23,11 +23,11 @@ namespace yyy {
 
 	// operators
 
-	// template<typename T> predicate<T> predicate<T>::operator-() const; // drop
-	// template<typename T> predicate<T> predicate<T>::operator+() const; // plus
-	// template<typename T> predicate<T> predicate<T>::operator*() const; // star
-	// template<typename T> predicate<T> predicate<T>::operator!() const; // reject
-	// template<typename T> predicate<T> predicate<T>::operator~() const; // lift
+	template<typename T> predicate<T> predicate<T>::operator-() const { return drop   (); }
+	template<typename T> predicate<T> predicate<T>::operator+() const { return plus   (); }
+	template<typename T> predicate<T> predicate<T>::operator*() const { return star   (); }
+	template<typename T> predicate<T> predicate<T>::operator!() const { return reject (); }
+	template<typename T> predicate<T> predicate<T>::operator~() const { return lift   (); }
 
 	//
 	// type
@@ -105,17 +105,17 @@ namespace yyy {
 		}
 
 		switch(type) {
-			case types::end      : ss << '$'                                       ; break ;
-			case types::any      : ss << '.'                                       ; break ;
-			case types::mem      : ss << '#'                                       ; break ;
-			case types::by_ref   : ss << '<' << /*(std::wstring)*/arg.str() << '>' ; break ; // FIXME
-			case types::by_type  : ss << "TYPE:" << /*(std::wstring)*/arg.str()    ; break ; // FIXME
-			case types::by_op    : ss << "OP:!!!"                                  ; break ; // FIXME
-			case types::by_value : ss << /*(std::wstring)*/arg.str()               ; break ; // FIXME
+			case types::end      : ss << '$'                     ; break ;
+			case types::any      : ss << '.'                     ; break ;
+			case types::mem      : ss << '#'                     ; break ;
+			case types::by_ref   : ss << '<' << arg.str() << '>' ; break ; // FIXME
+			case types::by_type  : ss << "TYPE:" << arg.str()    ; break ; // FIXME
+			case types::by_op    : ss << "OP:!!!"                ; break ; // FIXME
+			case types::by_value : ss << arg.str()               ; break ; // FIXME
 
 		}
 
-		if(quantifier == range(1,1))                   { /* do nothing */ }
+		/**/ if(quantifier == range(1,1))              { /* do nothing */ }
 		else if(quantifier == range(0,1))              ss << '?';
 		else if(quantifier == range(1,UINT_MAX))       ss << '+';
 		else if(quantifier == range(0,UINT_MAX))       ss << '*';
