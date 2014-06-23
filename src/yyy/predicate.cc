@@ -110,7 +110,7 @@ namespace yyy {
 			case types::mem      : ss << '#'                     ; break ;
 			case types::by_ref   : ss << '<' << arg.str() << '>' ; break ; // FIXME
 			case types::by_type  : ss << "TYPE:" << arg.str()    ; break ; // FIXME
-			case types::by_op    : ss << "OP:!!!"                ; break ; // FIXME
+			case types::by_op    : ss << "OP:" << arg.str()      ; break ; // FIXME
 			case types::by_value : ss << arg.str()               ; break ; // FIXME
 
 		}

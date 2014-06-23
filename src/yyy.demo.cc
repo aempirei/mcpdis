@@ -3,8 +3,31 @@
 #include <iomanip>
 
 namespace yyy {
+
+	using L = literal_t;
+	using Sv = symbol::var;
+	using Sr = symbol::ref;
+
 	template <typename T> grammar<T> define_grammar() {
-		grammar<T> g;
+
+		using F = function<T>;
+		using R = rule<T>;
+		using P = predicate<T>;
+		using G = grammar<T>;
+		using RS = rules<T>;
+
+		G g;
+
+		g[L"combo"] = {
+			R(OP_SAME) << P(Sr(L"satan")).by_ref(),
+			R(OP_OR) << P(Sr(L"combo")).by_ref(),
+			R(OP_ANY) << *P() << !P(Sv(L"noway")) << P().end()
+		};
+
+		g[L"any"  ] = { R(OP_ANY) << *P() << P().end() };
+		g[L"satan"] = { R(OP_AND) << P(L(1337)) << P(Sv(L"eax")) };
+		g[L"hello"] = { R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P(F(OP_AND)).by_op() << *P() << P().end() };
+
 		return g;
 	}
 }
@@ -83,14 +106,6 @@ int main(int argc, char **argv) {
 	using namespace yyy;
 
 	using F = function<term>;
-	using L = literal_t;
-	using Sv = symbol::var;
-	using Sr = symbol::ref;
-
-	using R = rule<term>;
-	using P = predicate<term>;
-	using E = entry<term>;
-	using G = grammar<term>;
 
 	maybe<literal_t> lit;
 
@@ -109,15 +124,16 @@ int main(int argc, char **argv) {
 
 	auto g = define_grammar<term>();
 
-	std::wcout << "g := " << (*P()).str() << std::endl;
+	for(const auto& entry : g) {
 
-	std::wcout << "R r := " << std::endl;
+		const auto& name = entry.first;
 
-	E e1(Sr(L"satan"), R(OP_AND) << P(L(1337)) << P(Sv(L"eax")));
-	E e2(Sr(L"hello"), R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P().by_op() << *P() << P().end();
+		for(const auto& r : entry.second) {
+			std::wcout << name << " := " << r.str() << std::endl;
+		}
 
-	std::wcout << e1.first << " := " << e1.second.str() << std::endl;
-	std::wcout << e2.first << " := " << e2.second.str() << std::endl;
+		std::wcout << std::endl;
+	}
 
 	do_yyy();
 
