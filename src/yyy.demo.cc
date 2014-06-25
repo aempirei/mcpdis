@@ -1,5 +1,4 @@
-#include <yyy.hh>
-#include <iostream>
+#include <yyy.hh> #include <iostream>
 #include <iomanip>
 
 namespace yyy {
@@ -16,19 +15,16 @@ namespace yyy {
 		using G = grammar<T>;
 		using RS = rules<T>;
 
-		G g;
-
-		g[L"combo"] = {
-			R(OP_SAME) << P(Sr(L"satan")).by_ref(),
-			R(OP_OR) << P(Sr(L"combo")).by_ref(),
-			R(OP_ANY) << *P() << !P(Sv(L"noway")) << P().end()
+		return G {
+			{ L"combo", {
+					    R(OP_SAME) << P(Sr(L"satan")).by_ref(),
+						    R(OP_OR) << P(Sr(L"combo")).by_ref(),
+						    R(OP_ANY) << *P() << !P(Sv(L"noway")) << P().end()
+				    } },
+				{ L"any", { R(OP_ANY) << *P() << P().end() } },
+				{ L"satan", { R(OP_AND) << P(L(1337)) << P(Sv(L"eax")) } },
+				{ L"hello", { R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P(F(OP_AND)).by_op() << *P() << P().end() } }
 		};
-
-		g[L"any"  ] = { R(OP_ANY) << *P() << P().end() };
-		g[L"satan"] = { R(OP_AND) << P(L(1337)) << P(Sv(L"eax")) };
-		g[L"hello"] = { R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P(F(OP_AND)).by_op() << *P() << P().end() };
-
-		return g;
 	}
 }
 
