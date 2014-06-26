@@ -9,11 +9,13 @@ using namespace yyy;
 struct instruction_set;
 struct instruction;
 struct operation;
-struct operands;
 struct bitstream;
-struct dictionary;
 
-typedef std::list<operation> sourcecode;
+using dictionary = std::map<symbol::var,argument<term>>;
+using operands = std::map<operator_t,symbol::var>;
+using sourcecode = std::list<operation>;
+
+// value -> symbol::var::stoul(s, nullptr, 2)
 
 typedef void accumulation_function(operation&, dictionary&);
 
@@ -34,9 +36,6 @@ namespace pic12f {
 
 	void PC(operation&, dictionary&);
 }
-
-template <typename T> using dictionary = std::map<symbol::var,argument<T>>;
-template <typename T> using operands = std::map<operator_t,symbol::var>;
 
 template <typename S, typename X> contains(const S& s, const X& x) {
 	return (s.find(x) not_eq s.end());
@@ -69,18 +68,6 @@ struct bitstream {
 
 	bitstream();
 	bitstream(FILE *);
-};
-
-//
-// operands
-
-using _operands = std::map<operator_t,symbol::var>;
-
-struct operands : _operands {
-	using _operands::_operands;
-	literal_t value(key_type) const;
-	bool has_arg(key_type) const;
-	bool has_args(const key_type *) const;
 };
 
 //
