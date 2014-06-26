@@ -6,14 +6,14 @@ namespace yyy {
 
 		using value_type = T;
 
-		op op;
+		operator_t op;
 		arguments<value_type> args;
 
 		function();
 
-		function(const op&);
+		function(operator_t);
 		function(const function&);
-		function(const op&, const arguments<value_type>&);
+		function(operator_t, const arguments<value_type>&);
 
 		function& operator<<(const argument<value_type>&);
 		function& operator<<(const function<value_type>&);
