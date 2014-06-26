@@ -511,8 +511,21 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" := " << k.second.str() << std::endl;
+				if(k.second.contains_type<symbol::var>()) {
+
+					if(not k.second.contains_value(k.first))
+						std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" $= " << k.second.str() << std::endl;
+
+				} else if(k.second.contains_type<literal_t>()) {
+
+					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" #= " << k.second.str() << std::endl;
+
+				} else {
+
+					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" := " << k.second.str() << std::endl;
+				}
 			}
+
 			std::wcout << std::endl;
 		}
 	}
