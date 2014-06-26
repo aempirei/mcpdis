@@ -14,6 +14,8 @@
 
 #include <mcpdis.hh>
 
+using namespace dis;
+
 struct configuration;
 
 typedef std::wstring stream_processor_fn(bitstream&);
