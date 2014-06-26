@@ -354,7 +354,7 @@ namespace yyy {
 
 		template <typename T> either& operator=(const T& t) {
 			assign(t);
-			return this;
+			return *this;
 		}
 
 		//

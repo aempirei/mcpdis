@@ -15,7 +15,7 @@
 
 #include <typeinfo>
 
-#include <operators.hh>
+#include <ansicolor.hh>
 
 #include "yyy/symbol.template.hh"
 #include "yyy/choice.template.hh"
@@ -29,10 +29,20 @@ namespace yyy {
 	//
 
 	using literal_t = uint16_t;
-	using register_t = uint8_t;
 	using operator_t = wchar_t;
 
 	using range = std::pair<size_t,size_t>;
+
+}
+
+#include "yyy/operators.hh"
+
+#include "yyy/symbol.template.hh"
+#include "yyy/choice.template.hh"
+
+#define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
+
+namespace yyy {
 
 	//
 	// forward declarations
@@ -46,11 +56,9 @@ namespace yyy {
 	template <typename T> using meta = typename choice<symbol::ref,T>::type;
 	template <typename T> using argument = typename choice<function<T>,T>::type;
 	template <typename T> using rule = function<predicate<T>>;
-	template <typename T> using entry = typename grammar<T>::value_type;
 
-	pluralize(argument);
-	pluralize(rule);
-
+	pluralize(argument);	// arguments
+	pluralize(rule);	// rules
 }
 
 #undef pluralize
@@ -67,6 +75,6 @@ namespace yyy {
 	extern template struct predicate<term>;
 	extern template struct function<term>;
 	extern template struct function<predicate<term>>;
+	extern template struct binding<term>;
 	extern template struct grammar<term>;
-	// extern template struct binding<term>;
 }

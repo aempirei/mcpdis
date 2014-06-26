@@ -54,7 +54,8 @@ void usage(const char *arg0) {
 	std::wcerr << std::endl;
 }
 
-void initialize_grammar(std::list<symbol>& s, std::list<symbol>& z, std::list<symbol>& a, grammar<term>& g) {
+/*
+void initialize_grammar(std::list<symbol::var>& s, std::list<symbol::var>& z, std::list<symbol::var>& a, grammar<term>& g) {
 
 	typedef predicate<term> PT;
 	typedef const PT CPT;
@@ -203,7 +204,7 @@ void initialize_grammar(std::list<symbol>& s, std::list<symbol>& z, std::list<sy
 	g.insert(dga.begin(), dga.end());
 }
 
-void print_rules(const configuration& config, const std::wstring& name, const std::list<symbol> ks, grammar<term>& g) {
+void print_rules(const configuration& config, const std::wstring& name, const std::list<symbol::var> ks, grammar<term>& g) {
 
 	std::wcout << L"[:" << name << L":]" << std::endl << std::endl;
 
@@ -238,6 +239,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 
 	std::wcout << std::endl;
 }
+*/
 
 int main(int argc, char **argv) {
 
@@ -251,9 +253,9 @@ int main(int argc, char **argv) {
 	std::list<symbol> z;
 	std::list<symbol> a;
 
-	grammar<term> g;
+	// grammar<term> g;
 
-	initialize_grammar(s, z, a, g);
+	// initialize_grammar(s, z, a, g);
 
 	while ((opt = getopt(argc, argv, "hvx:m")) != -1) {
 		switch (opt) {
@@ -295,9 +297,11 @@ int main(int argc, char **argv) {
 
 	if(config.print_model) {
 
+		/*
 		print_rules(config, L"root", s, g);
 		print_rules(config, L"optimization", z, g);
 		print_rules(config, L"auxiliary", a, g);
+		*/
 
 	} else {
 
@@ -379,25 +383,25 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 				std::wcout << L' ' << std::setw(6) << std::setfill(L' ') << std::left << op.opcode.name << L' ';
 
-				if(op.args.has_args(L"df")) {
+				if(contains(op.args, L'd') and contains(op.args, L'f')) {
 
-					if(op.args.value(L'd') == 0)
+					if(op.argul(L'd') == 0)
 						std::wcout << ANSI_LOGREEN << L'W' << ANSI_CLR << ", ";
 
-					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.argul(L'f')) << ANSI_CLR;
 
-				} else if(op.args.has_args(L"bf")) {
+				} else if(contains(op.args, L'b') and contains(op.args, L'f')) {
 
-					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
-					std::wcout << L'<' << ANSI_LORED << op.args.value(L'b') << ANSI_CLR << L'>';
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.argul(L'f')) << ANSI_CLR;
+					std::wcout << L'<' << ANSI_LORED << op.argul(L'b') << ANSI_CLR << L'>';
 
-				} else if(op.args.has_arg(L'f')) {
+				} else if(contains(op.args, L'f')) {
 
-					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.args.value(L'f')) << ANSI_CLR;
+					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.argul(L'f')) << ANSI_CLR;
 
-				} else if(op.args.has_arg(L'k')) {
+				} else if(contains(op.args, L'k')) {
 
-					std::wcout << ANSI_LORED << pic12f::address_string(op.args.value(L'k')) << ANSI_CLR;
+					std::wcout << ANSI_LORED << pic12f::address_string(op.argul(L'k')) << ANSI_CLR;
 				}
 			}
 
@@ -439,11 +443,11 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 		} else if(op.opcode.pcl_type == instruction::pcl_types::jump) {
 
-			labels.insert(op.args.value(L'k'));
+			labels.insert(op.argul(L'k'));
 
 		} else if(op.opcode.pcl_type == instruction::pcl_types::call) {
 
-			labels.insert(op.args.value(L'k'));
+			labels.insert(op.argul(L'k'));
 			labels.insert(op.address + 1);
 		}
 	}
@@ -456,7 +460,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 	int n = 1;
 
 	for(auto iter = code.begin(); iter != code.end(); iter++) {
-		
+
 		if(labels.find(iter->address) != labels.end()) {
 
 			dictionary state;
@@ -507,13 +511,18 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				if(k.second.is_symbol(k.first)) {
-						
-					// do nothing for identity
+				if(k.second.contains_type<symbol::var>()) {
+
+					if(not k.second.contains_value(k.first))
+						std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" $= " << k.second.str() << std::endl;
+
+				} else if(k.second.contains_type<literal_t>()) {
+
+					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" #= " << k.second.str() << std::endl;
 
 				} else {
 
-					std::wcout << L'\t' << str(k) << std::endl;
+					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" := " << k.second.str() << std::endl;
 				}
 			}
 

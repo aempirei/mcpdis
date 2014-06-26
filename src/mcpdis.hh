@@ -1,41 +1,21 @@
 #pragma once
 
-#include <cstdint>
-#include <cwchar>
-
-#include <string>
 #include <vector>
-#include <list>
-#include <map>
-#include <set>
-#include <initializer_list>
 
-#include <operators.hh>
-#include <ansicolor.hh>
 #include <yyy.hh>
 
-typedef unsigned long literal_t;
-typedef uint8_t reg_t;
-typedef wchar_t op_t;
+using namespace yyy;
 
 struct instruction_set;
 struct instruction;
 struct operation;
-struct arguments;
 struct bitstream;
-struct dictionary;
-struct range;
-struct term;
 
-typedef std::list<operation> sourcecode;
-typedef std::wstring symbol;
+using dictionary = std::map<symbol::var,argument<term>>;
+using operands = std::map<operator_t,symbol::var>;
+using sourcecode = std::list<operation>;
 
-template<typename> struct fn;
-template<typename> struct predicate;
-template<typename> struct grammar;
-
-template<typename T> using rule = fn<predicate<T>>;
-template<typename T> using rules = std::list<rule<T>>;
+// value -> symbol::var::stoul(s, nullptr, 2)
 
 typedef void accumulation_function(operation&, dictionary&);
 
@@ -46,10 +26,10 @@ namespace pic12f {
 
 	extern instruction_set pic12f675;
 
-	symbol address_string(literal_t);
-	symbol register_string(reg_t);
-	symbol register_name(reg_t);
-	symbol dest_string(bool,reg_t);
+	symbol::var address_string(literal_t);
+	symbol::var register_string(literal_t);
+	symbol::var register_name(literal_t);
+	symbol::var dest_string(bool,literal_t);
 
 	void power(dictionary&);
 	void finalize(dictionary&);
@@ -57,98 +37,19 @@ namespace pic12f {
 	void PC(operation&, dictionary&);
 }
 
-//
-// dictionary
+template <typename S, typename X> bool contains(const S& s, const X& x) {
+	return (s.find(x) not_eq s.end());
+}
 
-using _dictionary = std::map<symbol,term>;
+// template <typename S, typename X, typename...Xs> bool contains(const S& s, const X& x, Xs...xs) { return contains(s,x) and contains(s,xs...); }
 
-struct dictionary : _dictionary {
-	using _dictionary::_dictionary;
-	bool has_key(const key_type&) const;
-	mapped_type& touch(const key_type&);
-};
+template <typename A, typename B> B& touch(std::map<A,B>& s, const A& x) {
+	if(not contains(s,x))
+		s[x] = B(x);
+	return s.at(x);
+}
 
-std::wstring str(const dictionary::value_type&);
-
-//
-// fn
-
-template<typename T> struct fn {
-
-	typedef T value_type;
-	typedef std::list<T> args_type;
-
-	op_t op;
-	args_type args;
-
-	fn();
-	fn(op_t);
-	fn(op_t, const args_type&);
-	fn(const fn&);
-
-	fn& operator=(const fn&);
-
-	bool operator==(const fn&) const;
-	bool operator<(const fn&) const;
-
-	fn& operator<<(const T&);
-
-	size_t arity() const;
-
-	void clear();
-
-	void concat(const args_type&);
-
-	explicit operator std::wstring () const;
-};
-
-//
-// term
-
-struct term {
-
-	enum class term_type : op_t {
-		literal = L'L',
-		symbol = L'S',
-		function = L'F'
-	};
-
-	typedef term_type types;
-
-	term_type type;
-
-	literal_t l;
-	symbol s;
-	fn<term> f;
-
-	term();
-	term(literal_t);
-	term(const symbol&);
-	term(const fn<term>&);
-	term(const term&);
-
-	bool is_function(op_t) const;
-	bool is_literal(literal_t) const;
-	bool is_symbol(const symbol&) const;
-
-	bool is_function() const;
-	bool is_symbol() const;
-	bool is_literal() const;
-
-	bool is_nullary() const;
-	bool is_unary() const;
-	bool is_binary() const;
-
-	bool is_arity(size_t) const;
-
-	bool operator==(const term&) const;
-	bool operator<(const term&) const;
-
-	term& operator=(const term&);
-
-	explicit operator std::wstring () const;
-	explicit operator std::string () const;
-};
+// template <typename T> std::wstring str(const typename dictionary<T>::value_type&);
 
 //
 // bitstream
@@ -172,25 +73,13 @@ struct bitstream {
 };
 
 //
-// arguments
-
-using _arguments = std::map<op_t,symbol>;
-
-struct arguments : _arguments {
-	using _arguments::_arguments;
-	literal_t value(key_type) const;
-	bool has_arg(key_type) const;
-	bool has_args(const key_type *) const;
-};
-
-//
 // instruction
 
 struct instruction {
 
 	// types
 
-	enum file_register : reg_t {
+	enum file_register : literal_t {
 
 		INDF   = 0x00,
 		TMR0   = 0x01,
@@ -210,7 +99,7 @@ struct instruction {
 
 	};
 
-	enum flags : reg_t {
+	enum flags : literal_t {
 
 		none = 0,
 
@@ -239,17 +128,17 @@ struct instruction {
 		ret
 	};
 
-	symbol pattern;
-	symbol name;
+	symbol::var pattern;
+	symbol::var name;
 
 	accumulation_function *fn;
 
 	pcl_types pcl_type;
 
-	reg_t status;
+	literal_t status;
 
-	bool match(const symbol&) const;
-	template<typename T> bool match(const symbol&, T) const;
+	bool match(const symbol::var&) const;
+	template<typename T> bool match(const symbol::var&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -263,7 +152,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	value_type find(const symbol&) const;
+	value_type find(const symbol::var&) const;
 
 	void sort();
 };
@@ -273,16 +162,18 @@ struct instruction_set : _instruction_set {
 
 struct operation {
 
-	symbol s;
+	symbol::var s;
 
 	literal_t address;
 
 	instruction opcode;
 
-	arguments args;
+	operands args;
 
 	operation();
-	operation(const symbol&, literal_t, const instruction_set&);
+	operation(const symbol::var&, literal_t, const instruction_set&);
 
 	void execute(dictionary&);
+
+	literal_t argul(const operands::key_type&) const;
 };

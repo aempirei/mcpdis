@@ -8,14 +8,13 @@ namespace yyy {
 	using Sv = symbol::var;
 	using Sr = symbol::ref;
 
+	using F = function<term>;
+	using R = rule<term>;
+	using P = predicate<term>;
+	using G = grammar<term>;
+	using RS = rules<term>;
+
 	template <typename T> grammar<T> define_grammar() {
-
-		using F = function<T>;
-		using R = rule<T>;
-		using P = predicate<T>;
-		using G = grammar<T>;
-		using RS = rules<T>;
-
 		return G {
 			{ L"combo", {
 					    R(OP_SAME) << P(Sr(L"satan")).by_ref(),
@@ -125,9 +124,8 @@ int main(int argc, char **argv) {
 
 		const auto& name = entry.first;
 
-		for(const auto& r : entry.second) {
+		for(const auto& r : entry.second)
 			std::wcout << name << " := " << r.str() << std::endl;
-		}
 
 		std::wcout << std::endl;
 	}

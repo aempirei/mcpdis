@@ -17,7 +17,7 @@
 //
 /////////////////////
 
-template<class T> bool instruction::match(const symbol& s, T f) const {
+template<class T> bool instruction::match(const symbol::var& s, T f) const {
 	
 	if(s.length() != pattern.length())
 		return false;
@@ -35,14 +35,14 @@ template<class T> bool instruction::match(const symbol& s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const symbol& s, arguments *p) const {
+template<> bool instruction::match(const symbol::var& s, operands *p) const {
 
 	p->clear();
 
 	return match(s, [&](int n) { (*p)[pattern[n]].push_back(s[n]); });
 }
 
-bool instruction::match(const symbol& s) const {
+bool instruction::match(const symbol::var& s) const {
 
 	return match(s, [](int){});
 }
@@ -59,7 +59,7 @@ bool instruction::operator<(const instruction& x) const {
 //
 /////////////////////////
 
-instruction_set::value_type instruction_set::find(const symbol& s) const {
+instruction_set::value_type instruction_set::find(const symbol::var& s) const {
 
 	for(const auto& op : *this)
 		if(op.match(s))
@@ -118,68 +118,6 @@ std::wstring bitstream::get(int n) {
 ///////////////////
 //
 //
-// struct arguments
-//
-//
-///////////////////
-
-literal_t arguments::value(key_type ch) const {
-
-	unsigned long x = 0;
-
-	const mapped_type& s = at(ch);
-
-	for(size_t n = 0; n < s.length(); n++) {
-
-		x <<= 1;
-
-		if(s[n] == L'1')
-			x++;
-	}
-
-	return x;
-}
-
-bool arguments::has_arg(key_type ch) const {
-	return find(ch) != end();
-}
-
-bool arguments::has_args(const key_type *s) const {
-
-	while(*s)
-		if(!has_arg(*s++))
-			return false;
-
-	return true;
-}
-
-////////////////////
-//
-//
-// struct dictionary
-//
-//
-////////////////////
-
-bool dictionary::has_key(const dictionary::key_type& s) const {
-	return find(s) != end();
-}
-
-dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
-	if(!has_key(s))
-		operator[](s) = mapped_type(s);
-	return at(s);
-}
-
-std::wstring str(const dictionary::value_type& x) {
-	std::wstringstream ws;
-	ws << std::setw(6) << std::left << std::setfill(L' ') << x.first << L" := " << (std::wstring)x.second;
-	return ws.str();
-}
-
-///////////////////
-//
-//
 // struct operation
 //
 //
@@ -188,7 +126,7 @@ std::wstring str(const dictionary::value_type& x) {
 operation::operation() {
 }
 
-operation::operation(const symbol& my_s, literal_t my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
+operation::operation(const symbol::var& my_s, literal_t my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
 	opcode = cpu.find(s);
 	opcode.match(s, &args);
 }
@@ -204,4 +142,8 @@ void operation::execute(dictionary& d) {
 		pic12f::PC(*this, d);
 
 	pic12f::finalize(d);
+}
+
+literal_t operation::argul(const operands::key_type& x) const {
+	return std::stoul(args.at(x), nullptr, 2);
 }
