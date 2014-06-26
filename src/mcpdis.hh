@@ -72,7 +72,7 @@ struct bitstream {
 //
 // arguments
 
-using _arguments = std::map<operator_t,symbol::var>;
+using _arguments = std::map<op,symbol::var>;
 
 struct arguments : _arguments {
 	using _arguments::_arguments;

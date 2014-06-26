@@ -12,10 +12,10 @@ namespace yyy {
 	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
 	}
 
-	template <typename T> function<T>::function(operator_t op0) : function(op0, {}) {
+	template <typename T> function<T>::function(const op& my_op) : function(my_op, {}) {
 	}
 
-	template <typename T> function<T>::function(operator_t op0, const arguments<value_type>& args0) : op(op0), args(args0) {
+	template <typename T> function<T>::function(const op& my_op, const arguments<value_type>& args0) : op(my_op), args(args0) {
 	}
 
 	//

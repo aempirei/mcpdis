@@ -18,20 +18,22 @@
 #define OP_ROTL		L'\u21a9'
 #define OP_ROTR		L'\u21aa'
 
-enum class operators : wchar_t {
-	AND = OP_AND,
-	OR = OP_OR,
-	XOR = OP_XOR,
-	PLUS = OP_PLUS,
-	MINUS = OP_MINUS,
-	COMPOSE = OP_COMPOSE,
-	LIST = OP_LIST,
-	LAMBDA = OP_LAMBDA,
-	QM = OP_QM,
-	ANY = OP_ANY,
-	SAME = OP_SAME,
-	SWAP = OP_SWAP,
-	NOT = OP_NOT,
-	ROTL = OP_ROTL,
-	ROTR= OP_ROTR
-};
+namespace yyy {
+	enum struct op : operator_t {
+		AND = OP_AND,
+		OR = OP_OR,
+		XOR = OP_XOR,
+		PLUS = OP_PLUS,
+		MINUS = OP_MINUS,
+		COMPOSE = OP_COMPOSE,
+		LIST = OP_LIST,
+		LAMBDA = OP_LAMBDA,
+		QM = OP_QM,
+		ANY = OP_ANY,
+		SAME = OP_SAME,
+		SWAP = OP_SWAP,
+		NOT = OP_NOT,
+		ROTL = OP_ROTL,
+		ROTR = OP_ROTR
+	};
+}

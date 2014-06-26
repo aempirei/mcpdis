@@ -16,7 +16,6 @@
 #include <typeinfo>
 
 #include <ansicolor.hh>
-#include <operators.hh>
 
 namespace yyy {
 
@@ -31,6 +30,8 @@ namespace yyy {
 	using range = std::pair<size_t,size_t>;
 
 }
+
+#include "yyy/operators.hh"
 
 #include "yyy/symbol.template.hh"
 #include "yyy/choice.template.hh"
