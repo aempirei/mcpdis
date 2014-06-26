@@ -1,4 +1,5 @@
-#include <yyy.hh> #include <iostream>
+#include <yyy.hh>
+#include <iostream>
 #include <iomanip>
 
 namespace yyy {
