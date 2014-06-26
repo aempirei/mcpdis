@@ -118,68 +118,6 @@ std::wstring bitstream::get(int n) {
 ///////////////////
 //
 //
-// struct arguments
-//
-//
-///////////////////
-
-literal_t arguments::value(key_type ch) const {
-
-	unsigned long x = 0;
-
-	const mapped_type& s = at(ch);
-
-	for(size_t n = 0; n < s.length(); n++) {
-
-		x <<= 1;
-
-		if(s[n] == L'1')
-			x++;
-	}
-
-	return x;
-}
-
-bool arguments::has_arg(key_type ch) const {
-	return find(ch) != end();
-}
-
-bool arguments::has_args(const key_type *s) const {
-
-	while(*s)
-		if(!has_arg(*s++))
-			return false;
-
-	return true;
-}
-
-////////////////////
-//
-//
-// struct dictionary
-//
-//
-////////////////////
-
-bool dictionary::has_key(const dictionary::key_type& s) const {
-	return find(s) != end();
-}
-
-dictionary::mapped_type& dictionary::touch(const dictionary::key_type& s) {
-	if(!has_key(s))
-		operator[](s) = mapped_type(s);
-	return at(s);
-}
-
-std::wstring str(const dictionary::value_type& x) {
-	std::wstringstream ws;
-	ws << std::setw(6) << std::left << std::setfill(L' ') << x.first << L" := " << (std::wstring)x.second;
-	return ws.str();
-}
-
-///////////////////
-//
-//
 // struct operation
 //
 //
