@@ -27,9 +27,9 @@ namespace pic12f {
 	extern instruction_set pic12f675;
 
 	symbol::var address_string(literal_t);
-	symbol::var register_string(register_t);
-	symbol::var register_name(register_t);
-	symbol::var dest_string(bool,register_t);
+	symbol::var register_string(literal_t);
+	symbol::var register_name(literal_t);
+	symbol::var dest_string(bool,literal_t);
 
 	void power(dictionary&);
 	void finalize(dictionary&);
@@ -37,7 +37,7 @@ namespace pic12f {
 	void PC(operation&, dictionary&);
 }
 
-template <typename S, typename X> contains(const S& s, const X& x) {
+template <typename S, typename X> bool contains(const S& s, const X& x) {
 	return (s.find(x) not_eq s.end());
 }
 
@@ -77,7 +77,7 @@ struct instruction {
 
 	// types
 
-	enum file_register : register_t {
+	enum file_register : literal_t {
 
 		INDF   = 0x00,
 		TMR0   = 0x01,
@@ -97,7 +97,7 @@ struct instruction {
 
 	};
 
-	enum flags : register_t {
+	enum flags : literal_t {
 
 		none = 0,
 
@@ -133,7 +133,7 @@ struct instruction {
 
 	pcl_types pcl_type;
 
-	register_t status;
+	literal_t status;
 
 	bool match(const symbol::var&) const;
 	template<typename T> bool match(const symbol::var&, T) const;

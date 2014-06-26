@@ -35,7 +35,7 @@ template<class T> bool instruction::match(const symbol::var& s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const symbol::var& s, arguments *p) const {
+template<> bool instruction::match(const symbol::var& s, operands *p) const {
 
 	p->clear();
 

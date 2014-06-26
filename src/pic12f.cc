@@ -13,7 +13,7 @@
 #define GN(a)		void a(operation&o, dictionary&c)
 #define HN(a)		void a(operation&, dictionary&c)
 
-#define USE_B		register_t b = (1 << OARG(L'b'))
+#define USE_B		literal_t b = (1 << OARG(L'b'))
 #define USE_W		const symbol::var W = L"W"
 #define USE_D		const symbol::var d = load_d(o)
 #define USE_F		const symbol::var f = load_f(o)
@@ -22,10 +22,10 @@
 #define USE_REG(R)	const symbol::var R = register_name(instruction::file_register::R)
 #define USE_STACK	const symbol::var STACK = L"STACK"
 
-#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_AND, { literal_t((register_t)~(register_t)(mask)), c[reg] }); }while(0)
-#define SET_BIT(reg, mask)   do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_OR , { literal_t(             (register_t)(mask)), c[reg] }); }while(0)
+#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_AND, { literal_t(255&~(mask)), c[reg] }); }while(0)
+#define SET_BIT(reg, mask)   do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_OR , { literal_t(255& (mask)), c[reg] }); }while(0)
 
-#define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = literal_t((register_t)(x)); c[PCLATH] = literal_t((register_t)((x) >> 8)); }while(0)
+#define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = literal_t(255&(x)); c[PCLATH] = literal_t(255&((x) >> 8)); }while(0)
 
 namespace pic12f {
 
@@ -72,9 +72,9 @@ namespace pic12f {
 
 		argument<term>& reg = touch(c,STATUS);
 
-		reg = function<term>(OP_AND, { literal_t((register_t)~instruction::flags::Z), reg });
+		reg = function<term>(OP_AND, { literal_t(255&~instruction::flags::Z), reg });
 
-		// F(OP_AND) << L((register_t)~instruction::flags::Z) << reg;
+		// F(OP_AND) << L(255&~instruction::flags::Z) << reg;
 	}
 
 	GN(MOVF)   {
@@ -88,8 +88,8 @@ namespace pic12f {
 
 		term& reg = touch(c,STATUS);
 
-		reg = function<term>(OP_AND, { (register_t)~instruction::flags::Z, reg });
-		reg = function<term>(OP_OR , { (register_t) instruction::flags::Z, reg });
+		reg = function<term>(OP_AND, { literal_t(255&~instruction::flags::Z), reg });
+		reg = function<term>(OP_OR , { literal_t(255& instruction::flags::Z), reg });
 		// reg = term(function<term>(OP_OR, { term(L"Z"), reg }));
 
 	}
@@ -120,15 +120,15 @@ namespace pic12f {
 
 	GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = function<term>(OP_LIST, { literal_t(pc + 1), touch(c,STACK) }); }
 
-	GN(MOVLW)  { USE_K; USE_W; c[W] = literal_t((register_t)k); }
+	GN(MOVLW)  { USE_K; USE_W; c[W] = literal_t(255&k); }
 
 	GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-	GN(IORLW)  { USE_K; USE_W; c[W] = function<term>(OP_OR   , { literal_t((register_t)k), touch(c,W) }); }
-	GN(ANDLW)  { USE_K; USE_W; c[W] = function<term>(OP_AND  , { literal_t((register_t)k), touch(c,W) }); }
-	GN(XORLW)  { USE_K; USE_W; c[W] = function<term>(OP_XOR  , { literal_t((register_t)k), touch(c,W) }); }
-	GN(SUBLW)  { USE_K; USE_W; c[W] = function<term>(OP_MINUS, { literal_t((register_t)k), touch(c,W) }); }
-	GN(ADDLW)  { USE_K; USE_W; c[W] = function<term>(OP_PLUS , { literal_t((register_t)k), touch(c,W) }); }
+	GN(IORLW)  { USE_K; USE_W; c[W] = function<term>(OP_OR   , { literal_t(255&k), touch(c,W) }); }
+	GN(ANDLW)  { USE_K; USE_W; c[W] = function<term>(OP_AND  , { literal_t(255&k), touch(c,W) }); }
+	GN(XORLW)  { USE_K; USE_W; c[W] = function<term>(OP_XOR  , { literal_t(255&k), touch(c,W) }); }
+	GN(SUBLW)  { USE_K; USE_W; c[W] = function<term>(OP_MINUS, { literal_t(255&k), touch(c,W) }); }
+	GN(ADDLW)  { USE_K; USE_W; c[W] = function<term>(OP_PLUS , { literal_t(255&k), touch(c,W) }); }
 
 	GN(PC)     {
 		USE_PC;
@@ -198,17 +198,17 @@ namespace pic12f {
 		return ts.str();
 	}
 
-	symbol::var register_string(register_t x) {
+	symbol::var register_string(literal_t x) {
 		std::wstringstream ts;
 		ts << L'r' << std::uppercase << std::right << std::hex << std::setw(2) << std::setfill(L'0') << x;
 		return ts.str();
 	}
 
-	symbol::var dest_string(bool f, register_t x) {
+	symbol::var dest_string(bool f, literal_t x) {
 		return f ? register_name(x) : L"W";
 	}
 
-	symbol::var register_name(register_t x) {
+	symbol::var register_name(literal_t x) {
 
 		switch(x) {
 			case 0x00: return L"INDF";

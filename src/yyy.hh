@@ -24,7 +24,6 @@ namespace yyy {
 	//
 
 	using literal_t = uint16_t;
-	using register_t = uint8_t;
 	using operator_t = wchar_t;
 
 	using range = std::pair<size_t,size_t>;
