@@ -383,14 +383,14 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 				std::wcout << L' ' << std::setw(6) << std::setfill(L' ') << std::left << op.opcode.name << L' ';
 
-				if(contains(op.args, L'd') and contains(op.args, L'f')) {
+				if(contains(op.args, L'd', L'f')) {
 
 					if(op.argul(L'd') == 0)
 						std::wcout << ANSI_LOGREEN << L'W' << ANSI_CLR << ", ";
 
 					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.argul(L'f')) << ANSI_CLR;
 
-				} else if(contains(op.args, L'b') and contains(op.args, L'f')) {
+				} else if(contains(op.args, L'b', L'f')) {
 
 					std::wcout << ANSI_LOGREEN << pic12f::register_name(op.argul(L'f')) << ANSI_CLR;
 					std::wcout << L'<' << ANSI_LORED << op.argul(L'b') << ANSI_CLR << L'>';
