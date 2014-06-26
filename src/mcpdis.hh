@@ -14,18 +14,12 @@
 #include <ansicolor.hh>
 #include <yyy.hh>
 
-typedef unsigned long literal_t;
-typedef uint8_t reg_t;
-typedef wchar_t op_t;
-
 struct instruction_set;
 struct instruction;
 struct operation;
 struct arguments;
 struct bitstream;
 struct dictionary;
-struct range;
-struct term;
 
 typedef std::list<operation> sourcecode;
 typedef std::wstring symbol;

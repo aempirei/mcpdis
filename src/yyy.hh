@@ -34,6 +34,8 @@ namespace yyy {
 #include "yyy/symbol.template.hh"
 #include "yyy/choice.template.hh"
 
+#define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
+
 namespace yyy {
 
 	//
@@ -49,13 +51,13 @@ namespace yyy {
 	template <typename T> using argument = typename choice<function<T>,T>::type;
 	template <typename T> using rule = function<predicate<T>>;
 
-#define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
-
 	pluralize(argument);
 	pluralize(rule);
 
 	using term = choice<symbol::var,literal_t>::type;
 }
+
+#undef pluralize
 
 #include "yyy/predicate.hh"
 #include "yyy/function.hh"
@@ -70,31 +72,4 @@ namespace yyy {
 	// extern template struct binding<term>;
 	extern template struct grammar<term>;
 
-}
-
-namespace zzz {
-	/*
-	   template <typename> struct argument;
-
-	   using modifiers = std::set<modifier>;
-	   using adjectives = std::pair<modifiers,range>;
-	   using reference = symbol::ref;
-	   using term = either<maybe<literal_t>,maybe<symbol::var>>;
-
-	   template <typename T> using arguments = std::list<argument<T>>;
-	   template <typename T> using function = std::pair<operator_t,arguments<T>>;
-	   template <typename T> using meta = either<maybe<reference>,T>;
-	   template <typename T> using predicate = std::pair<adjectives,meta<argument<T>>>;
-	   template <typename T> using rule = function<predicate<T>>;
-	   template <typename T> using rules = std::list<rule<T>>;
-	   template <typename T> using grammar = std::map<symbol::key,rules<T>>;
-	   template <typename T> using entry = typename grammar<T>::value_type;
-	   template <typename T> using binding = std::pair<predicate<T>,arguments<T>>;
-
-	   template <typename T> struct argument : either<T,maybe<function<T>>> {
-	   using unit_type = T;
-	   using base_type = either<T,maybe<function<T>>>;
-	   using base_type::base_type;
-	   };
-	 */
 }
