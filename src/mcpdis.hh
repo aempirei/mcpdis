@@ -9,7 +9,7 @@ using namespace yyy;
 struct instruction_set;
 struct instruction;
 struct operation;
-struct arguments;
+struct operands;
 struct bitstream;
 struct dictionary;
 
@@ -35,18 +35,20 @@ namespace pic12f {
 	void PC(operation&, dictionary&);
 }
 
-//
-// dictionary
+template <typename T> using dictionary = std::map<symbol::var,argument<T>>;
+template <typename T> using operands = std::map<operator_t,symbol::var>;
 
-using _dictionary = std::map<symbol::var,argument<term>>;
+template <typename S, typename X> contains(const S& s, const X& x) {
+	return (s.find(x) not_eq s.end());
+}
 
-struct dictionary : _dictionary {
-	using _dictionary::_dictionary;
-	bool has_key(const key_type&) const;
-	mapped_type& touch(const key_type&);
-};
+template <typename S, typename X> S& touch(S& s, const X& x) {
+	if(not contains(s,x))
+		s[x] = X(x);
+	return s;
+}
 
-std::wstring str(const dictionary::value_type&);
+// template <typename T> std::wstring str(const typename dictionary<T>::value_type&);
 
 //
 // bitstream
@@ -70,12 +72,12 @@ struct bitstream {
 };
 
 //
-// arguments
+// operands
 
-using _arguments = std::map<op,symbol::var>;
+using _operands = std::map<operator_t,symbol::var>;
 
-struct arguments : _arguments {
-	using _arguments::_arguments;
+struct operands : _operands {
+	using _operands::_operands;
 	literal_t value(key_type) const;
 	bool has_arg(key_type) const;
 	bool has_args(const key_type *) const;
@@ -177,7 +179,7 @@ struct operation {
 
 	instruction opcode;
 
-	arguments args;
+	operands args;
 
 	operation();
 	operation(const symbol::var&, literal_t, const instruction_set&);
