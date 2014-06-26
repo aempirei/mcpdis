@@ -1,7 +1,5 @@
 #pragma once
 
-#define DEFINE_SYMBOL_TYPE(X) using X = basic_symbol<wchar_t,type::X>
-
 namespace yyy {
 
 	//
@@ -37,5 +35,3 @@ namespace yyy {
 		}
 	};
 }
-
-#undef DEFINE_SYMBOL_TYPE
