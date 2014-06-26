@@ -11,7 +11,7 @@
 #define OP_LAMBDA	L'\u03bb'
 #define OP_QM		L'?'
 #define OP_ANY		OP_QM
-#define OP_SAME		OP_LAMBDA
+#define OP_THIS		OP_LAMBDA
 
 #define OP_SWAP		L'%'
 #define OP_NOT		L'\u00ac'

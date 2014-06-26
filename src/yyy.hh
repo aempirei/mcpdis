@@ -82,7 +82,7 @@ namespace yyy {
 		using P = predicate<quick_type>;
 		using R = rule<quick_type>;
 		using A = argument<quick_type>;
-		using M = meta<quick_type>;
+		using M = meta<argument<quick_type>>;
 		using B = binding<quick_type>;
 		using G = grammar<quick_type>;
 		using L = literal_t;

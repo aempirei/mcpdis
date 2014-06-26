@@ -16,6 +16,8 @@
 
 using namespace dis;
 
+using namespace yyy::quick;
+
 struct configuration;
 
 typedef std::wstring stream_processor_fn(bitstream&);
@@ -56,49 +58,43 @@ void usage(const char *arg0) {
 	std::wcerr << std::endl;
 }
 
-/*
-void initialize_grammar(std::list<symbol::var>& s, std::list<symbol::var>& z, std::list<symbol::var>& a, grammar<term>& g) {
+#define Pr(x) P(S::ref(x))
 
-	typedef predicate<term> PT;
-	typedef const PT CPT;
-	typedef term::term_type TT;
-	typedef PT::filter_type FT;
-	typedef rule<term> RT;
+void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S::ref>& a, G& g) {
 
-	CPT L(FT { TT::literal });
-	CPT S(FT { TT::symbol });
-	CPT F(FT { TT::function });
-	CPT LS(FT { TT::literal, TT::symbol });
-
-	CPT DOT = PT();
-	CPT TAIL = PT().star();
-	CPT END = PT::predicate_type::end;
-	CPT MEM = PT::predicate_type::mem;
+	 const auto pL = P(M() << L()).by_type();
+	 const auto pF = P(M() << F()).by_type();
+	 const auto pS = P(M() << S::var()).by_type();
+	 const auto pLF = P(M() << L() << F()).by_type();
+	 const auto pLS = P(M() << L() << S::var()).by_type();
+	 const auto pFS = P(M() << F() << S::var()).by_type();
+	 const auto pLFS = P(M() << L() << F() << S::var()).by_type();
 
 	// init
 
 	g.clear();
 	s.clear();
 	z.clear();
-	
+	a.clear();
+
 	// root rules
 	//
 	//
 
-	grammar<term> dgs = {
+	G dgs = {
 
-		{ L"AND"    , { RT(OP_AND    ) << L"n-ary" } },
-		{ L"OR"     , { RT(OP_OR     ) << L"n-ary" } },
-		{ L"XOR"    , { RT(OP_XOR    ) << L"n-ary" } },
-		{ L"PLUS"   , { RT(OP_PLUS   ) << L"n-ary" } },
-		{ L"MINUS"  , { RT(OP_MINUS  ) << L"n-ary" } },
-		{ L"COMPOSE", { RT(OP_COMPOSE) << L"n-ary" } },
-		{ L"LIST"   , { RT(OP_LIST   ) << L"n-ary" } },
+		{ L"AND"    , { R(OP_AND    ) << Pr(L"n-ary") } },
+		{ L"OR"     , { R(OP_OR     ) << Pr(L"n-ary") } },
+		{ L"XOR"    , { R(OP_XOR    ) << Pr(L"n-ary") } },
+		{ L"PLUS"   , { R(OP_PLUS   ) << Pr(L"n-ary") } },
+		{ L"MINUS"  , { R(OP_MINUS  ) << Pr(L"n-ary") } },
+		{ L"COMPOSE", { R(OP_COMPOSE) << Pr(L"n-ary") } },
+		{ L"LIST"   , { R(OP_LIST   ) << Pr(L"n-ary") } },
 
-		{ L"SWAP"   , { RT(OP_SWAP) << L"unary" } },
-		{ L"NOT"    , { RT(OP_NOT ) << L"unary" } },
-		{ L"ROTL"   , { RT(OP_ROTL) << L"unary" } },
-		{ L"ROTR"   , { RT(OP_ROTR) << L"unary" } },
+		{ L"SWAP"   , { R(OP_SWAP) << Pr(L"unary") } },
+		{ L"NOT"    , { R(OP_NOT ) << Pr(L"unary") } },
+		{ L"ROTL"   , { R(OP_ROTL) << Pr(L"unary") } },
+		{ L"ROTR"   , { R(OP_ROTR) << Pr(L"unary") } },
 
 	};
 
@@ -111,72 +107,72 @@ void initialize_grammar(std::list<symbol::var>& s, std::list<symbol::var>& z, st
 	//
 	//
 
-	grammar<term> dgz = {
+	G dgz = {
 
 		{ L"lift",
 			{
-				RT(OP_AND    ) << L"AND",
-				RT(OP_OR     ) << L"OR",
-				RT(OP_XOR    ) << L"XOR",
-				RT(OP_PLUS   ) << L"PLUS",
-				RT(OP_COMPOSE) << L"COMPOSE",
-				RT(OP_LIST   ) << L"LIST"
+				R(OP_AND    ) << Pr(L"AND"),
+				R(OP_OR     ) << Pr(L"OR"),
+				R(OP_XOR    ) << Pr(L"XOR"),
+				R(OP_PLUS   ) << Pr(L"PLUS"),
+				R(OP_COMPOSE) << Pr(L"COMPOSE"),
+				R(OP_LIST   ) << Pr(L"LIST")
 			} },
 
 		{ L"aggregate",
 			{
-				RT(OP_AND ) << L"literals",
-				RT(OP_OR  ) << L"literals",
-				RT(OP_XOR ) << L"literals",
-				RT(OP_PLUS) << L"literals"
+				R(OP_AND ) << Pr(L"literals"),
+				R(OP_OR  ) << Pr(L"literals"),
+				R(OP_XOR ) << Pr(L"literals"),
+				R(OP_PLUS) << Pr(L"literals")
 			} },
 
 		{ L"compute",
 			{
-				RT(OP_SWAP) << L,
-				RT(OP_NOT ) << L,
-				RT(OP_ROTL) << L,
-				RT(OP_ROTR) << L
+				R(OP_SWAP) << pL,
+				R(OP_NOT ) << pL,
+				R(OP_ROTL) << pL,
+				R(OP_ROTR) << pL,
 			} },
 
 		{ L"distribute",
 			{
-				RT(OP_AND) << DOT << L"OR",
-				RT(OP_OR) << DOT << L"AND"
+				R(OP_AND) << P() << Pr(L"OR"),
+				R(OP_OR) << P() << Pr(L"AND")
 			} },
 
 		{ L"idempotent",
 			{
-				RT(OP_AND) << L"matchpair",
-				RT(OP_OR ) << L"matchpair"
+				R(OP_AND) << Pr(L"matchpair"),
+				R(OP_OR ) << Pr(L"matchpair")
 			} },
 
 		{ L"nilpotent",
 			{
-				RT(OP_XOR) << L"matchpair"
+				R(OP_XOR) << Pr(L"matchpair")
 			} },
 
 		{ L"involution",
 			{
-				RT(OP_NOT ) << L"NOT",
-				RT(OP_SWAP) << L"SWAP"
+				R(OP_NOT ) << Pr(L"NOT"),
+				R(OP_SWAP) << Pr(L"SWAP")
 			} },
 
 		{ L"inverse",
 			{
-				RT(OP_ROTL) << L"ROTR",
-				RT(OP_ROTR) << L"ROTL"
+				R(OP_ROTL) << Pr(L"ROTR"),
+				R(OP_ROTR) << Pr(L"ROTL")
 			} },
 
 		{ L"nop",
 			{
-				RT(OP_AND    ) << L"unary",
-				RT(OP_OR     ) << L"unary",
-				RT(OP_XOR    ) << L"unary",
-				RT(OP_PLUS   ) << L"unary",
-				RT(OP_MINUS  ) << L"unary",
-				RT(OP_COMPOSE) << L"unary",
-				RT(OP_LIST   ) << L"unary"
+				R(OP_AND    ) << Pr(L"unary"),
+				R(OP_OR     ) << Pr(L"unary"),
+				R(OP_XOR    ) << Pr(L"unary"),
+				R(OP_PLUS   ) << Pr(L"unary"),
+				R(OP_MINUS  ) << Pr(L"unary"),
+				R(OP_COMPOSE) << Pr(L"unary"),
+				R(OP_LIST   ) << Pr(L"unary")
 			} }
 	};
 
@@ -191,13 +187,13 @@ void initialize_grammar(std::list<symbol::var>& s, std::list<symbol::var>& z, st
 
 	grammar<term> dga = {
 
-		{ L"unary"    , { RT() << DOT << END        } },
+		{ L"unary"    , { R(OP_THIS) << P() << P().end()     } },
 
-		{ L"n-ary"    , { RT() << DOT.plus() << END } },
+		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()    } },
 
-		{ L"matchpair", { RT() << DOT << MEM        } },
+		{ L"matchpair", { R(OP_THIS) << P() << P().mem()     } },
 
-		{ L"literals" , { RT() << L.ge(2)           } }
+		{ L"literals" , { R(OP_THIS) << pL.min(2) } }
 	};
 
 	for(const auto& r : dga)
@@ -206,42 +202,40 @@ void initialize_grammar(std::list<symbol::var>& s, std::list<symbol::var>& z, st
 	g.insert(dga.begin(), dga.end());
 }
 
-void print_rules(const configuration& config, const std::wstring& name, const std::list<symbol::var> ks, grammar<term>& g) {
+void print_rules(const configuration& config, const std::wstring& name, const std::list<S::ref>& refs, G& g) {
 
 	std::wcout << L"[:" << name << L":]" << std::endl << std::endl;
 
-	for(const auto& k : ks) {
+	for(const auto& ref : refs) {
 
-		const auto& rs = g[k];
+		const auto& rs = g[ref];
 		auto iter = rs.begin();
 
 		if(config.verbose) {
 
 			if(iter != rs.end())
-				std::wcout << k << L" := " << (std::wstring)*iter << std::endl;
+				std::wcout << ref << L" := " << iter->str() << std::endl;
 
 			while(++iter != rs.end())
-				std::wcout << std::setw(k.length()) << L"" << L" := " << (std::wstring)*iter << std::endl;
+				std::wcout << std::setw(ref.length()) << L"" << L" := " << iter->str() << std::endl;
 
 			std::wcout << std::endl;
 
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(10) << std::left << k << ANSI_HIRED << L" := " << ANSI_CLR << (std::wstring)*iter;
+				std::wcout << std::setw(10) << std::left << ref << ANSI_HIRED << L" := " << ANSI_CLR << iter->str();
 
 			while(++iter != rs.end())
-				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << (std::wstring)*iter;
+				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
 
 			std::wcout << std::endl;
 
 		}
-
 	}
 
 	std::wcout << std::endl;
 }
-*/
 
 int main(int argc, char **argv) {
 
@@ -251,13 +245,13 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_CTYPE, "");
 
-	std::list<symbol> s;
-	std::list<symbol> z;
-	std::list<symbol> a;
+	std::list<symbol::ref> s;
+	std::list<symbol::ref> z;
+	std::list<symbol::ref> a;
 
-	// grammar<term> g;
+	G g;
 
-	// initialize_grammar(s, z, a, g);
+	initialize_grammar(s, z, a, g);
 
 	while ((opt = getopt(argc, argv, "hvx:m")) != -1) {
 		switch (opt) {
@@ -299,11 +293,9 @@ int main(int argc, char **argv) {
 
 	if(config.print_model) {
 
-		/*
 		print_rules(config, L"root", s, g);
 		print_rules(config, L"optimization", z, g);
 		print_rules(config, L"auxiliary", a, g);
-		*/
 
 	} else {
 

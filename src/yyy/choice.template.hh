@@ -198,6 +198,11 @@ namespace yyy {
 			return *this;
 		}
 
+		either& operator<<(const a_type& a) {
+			insert(a);
+			return *this;
+		}
+
 		//
 		// helper
 		//
@@ -354,6 +359,11 @@ namespace yyy {
 
 		template <typename T> either& operator=(const T& t) {
 			assign(t);
+			return *this;
+		}
+
+		template <typename T> either& operator<<(const T& t) {
+			insert(t);
 			return *this;
 		}
 

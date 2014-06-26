@@ -17,7 +17,7 @@ namespace yyy {
 	template <typename T> grammar<T> define_grammar() {
 		return G {
 			{ L"combo", {
-					    R(OP_SAME) << P(Sr(L"satan")).by_ref(),
+					    R(OP_THIS) << P(Sr(L"satan")).by_ref(),
 						    R(OP_OR) << P(Sr(L"combo")).by_ref(),
 						    R(OP_ANY) << *P() << !P(Sv(L"noway")) << P().end()
 				    } },
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_CTYPE, "");
 
-	F f = F(OP_SAME) << ( F(OP_OR) << Sv(L"what") ) << L(666);
+	F f = F(OP_THIS) << ( F(OP_OR) << Sv(L"what") ) << L(666);
 
 	for(int i = 0; i < argc; i++)
 		f << L(atoi(argv[i]));
