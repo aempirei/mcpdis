@@ -28,7 +28,9 @@ namespace yyy {
 		using unit_type = T;
 		using base_type = std::basic_string<unit_type>;
 		using base_type::base_type;
-		basic_symbol(const base_type&s) : basic_symbol(s.begin(), s.end()) {
+		basic_symbol(const base_type&s) : base_type(s.begin(), s.end()) {
+		}
+		basic_symbol() : base_type() {
 		}
 	};
 }

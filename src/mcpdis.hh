@@ -41,10 +41,10 @@ template <typename S, typename X> bool contains(const S& s, const X& x) {
 	return (s.find(x) not_eq s.end());
 }
 
-template <typename S, typename X> S& touch(S& s, const X& x) {
+template <typename A, typename B> B& touch(std::map<A,B>& s, const A& x) {
 	if(not contains(s,x))
-		s[x] = X(x);
-	return s;
+		s[x] = B(x);
+	return s.at(x);
 }
 
 // template <typename T> std::wstring str(const typename dictionary<T>::value_type&);

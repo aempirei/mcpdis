@@ -7,7 +7,7 @@
 
 #include <mcpdis.hh>
 
-#define OARG(X)		symbol::var::stoul(o.args.at(X), nullptr, 2)
+#define OARG(X)		std::stoul(o.args.at(X), nullptr, 2)
 
 #define FN(a)		void a(operation&, dictionary&)
 #define GN(a)		void a(operation&o, dictionary&c)
@@ -86,7 +86,7 @@ namespace pic12f {
 
 		USE_REG(STATUS);
 
-		term& reg = touch(c,STATUS);
+		argument<term>& reg = touch(c,STATUS);
 
 		reg = function<term>(OP_AND, { literal_t(255&~instruction::flags::Z), reg });
 		reg = function<term>(OP_OR , { literal_t(255& instruction::flags::Z), reg });
