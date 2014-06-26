@@ -20,12 +20,14 @@
 #define USE_REG(R)	const symbol::var R = register_name(instruction::file_register::R)
 #define USE_STACK	const symbol::var STACK = L"STACK"
 
-#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_AND, { literal_t(255&~(mask)), c[reg] }); }while(0)
-#define SET_BIT(reg, mask)   do{ USE_REG(reg); touch(c,reg); c[reg] = function<term>(OP_OR , { literal_t(255& (mask)), c[reg] }); }while(0)
+#define CLEAR_BIT(reg, mask) do{ USE_REG(reg); touch(c,reg); c[reg] = F(OP_AND) << L8(~(mask)) << c[reg]; }while(0)
+#define SET_BIT(reg, mask)   do{ USE_REG(reg); touch(c,reg); c[reg] = F(OP_OR) << L8(mask) << c[reg]; }while(0)
 
-#define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = literal_t(255&(x)); c[PCLATH] = literal_t(255&((x) >> 8)); }while(0)
+#define SET_PC(x) do{ USE_REG(PCL); USE_REG(PCLATH); c[PCL] = L8(x); c[PCLATH] = L8H(x); }while(0)
 
 namespace dis {
+
+	using namespace yyy::quick;
 
 	namespace pic12f {
 
@@ -43,8 +45,8 @@ namespace dis {
 			USE_REG(PCL);
 			USE_REG(PCLATH);
 
-			c[PCL] = symbol::var(L"TOS.lo");
-			c[PCLATH] = symbol::var(L"TOS.hi");
+			c[PCL] = S::var(L"TOS.lo");
+			c[PCLATH] = S::var(L"TOS.hi");
 		}
 
 		GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
@@ -66,15 +68,13 @@ namespace dis {
 
 			USE_D;
 
-			c[d] = literal_t(0);
+			c[d] = L(0);
 
 			USE_REG(STATUS);
 
-			argument<term>& reg = touch(c,STATUS);
+			auto& reg = touch(c,STATUS);
 
-			reg = function<term>(OP_AND, { literal_t(255&~instruction::flags::Z), reg });
-
-			// F(OP_AND) << L(255&~instruction::flags::Z) << reg;
+			reg = F(OP_AND) << L8(~instruction::flags::Z) << reg;
 		}
 
 		GN(MOVF)   {
@@ -86,30 +86,29 @@ namespace dis {
 
 			USE_REG(STATUS);
 
-			argument<term>& reg = touch(c,STATUS);
+			auto& reg = touch(c,STATUS);
 
-			reg = function<term>(OP_AND, { literal_t(255&~instruction::flags::Z), reg });
-			reg = function<term>(OP_OR , { literal_t(255& instruction::flags::Z), reg });
-			// reg = term(function<term>(OP_OR, { term(L"Z"), reg }));
-
+			reg = F(OP_AND) << L8(~instruction::flags::Z) << reg;
+			reg = F(OP_OR) << L8(instruction::flags::Z) << reg;
+			// reg = F(OP_OR) << S::var(L"Z") << reg;
 		}
 
-		GN(IORWF)  { USE_W; USE_D; USE_F; c[d] = function<term>(OP_OR   , { touch(c,f) , touch(c,W)   }); }
-		GN(ANDWF)  { USE_W; USE_D; USE_F; c[d] = function<term>(OP_AND  , { touch(c,f) , touch(c,W)   }); }
-		GN(XORWF)  { USE_W; USE_D; USE_F; c[d] = function<term>(OP_XOR  , { touch(c,f) , touch(c,W)   }); }
-		GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = function<term>(OP_MINUS, { touch(c,f) , touch(c,W)   }); }
-		GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = function<term>(OP_PLUS , { touch(c,f) , touch(c,W)   }); }
+		GN(IORWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_OR   ) << touch(c,f) << touch(c,W); }
+		GN(ANDWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_AND  ) << touch(c,f) << touch(c,W); }
+		GN(XORWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_XOR  ) << touch(c,f) << touch(c,W); }
+		GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_MINUS) << touch(c,f) << touch(c,W); }
+		GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_PLUS ) << touch(c,f) << touch(c,W); }
 
-		GN(DECF)   { USE_D; USE_F;         c[d] = function<term>(OP_MINUS, { touch(c,f), literal_t(1) }); }
-		GN(INCF)   { USE_D; USE_F;         c[d] = function<term>(OP_PLUS , { touch(c,f), literal_t(1) }); }
+		GN(DECF)   { USE_D; USE_F;         c[d] = F(OP_MINUS) << touch(c,f) << L(1); }
+		GN(INCF)   { USE_D; USE_F;         c[d] = F(OP_PLUS ) << touch(c,f) << L(1); }
 
-		GN(COMF)   { USE_D; USE_F;         c[d] = function<term>(OP_NOT  , { touch(c,f)               }); }
-		GN(RRF)    { USE_D; USE_F;         c[d] = function<term>(OP_ROTR , { touch(c,f)               }); }
-		GN(RLF)    { USE_D; USE_F;         c[d] = function<term>(OP_ROTL , { touch(c,f)               }); }
-		GN(SWAPF)  { USE_D; USE_F;         c[d] = function<term>(OP_SWAP , { touch(c,f)               }); }
+		GN(COMF)   { USE_D; USE_F;         c[d] = F(OP_NOT ) << touch(c,f); }
+		GN(RRF)    { USE_D; USE_F;         c[d] = F(OP_ROTR) << touch(c,f); }
+		GN(RLF)    { USE_D; USE_F;         c[d] = F(OP_ROTL) << touch(c,f); }
+		GN(SWAPF)  { USE_D; USE_F;         c[d] = F(OP_SWAP) << touch(c,f); }
 
-		GN(BCF)    { USE_F; USE_B; c[f] = function<term>(OP_AND  , { literal_t(255&~b), touch(c,f) }); }
-		GN(BSF)    { USE_F; USE_B; c[f] = function<term>(OP_OR   , { literal_t(255& b), touch(c,f) }); } 
+		GN(BCF)    { USE_F; USE_B; c[f] = F(OP_AND) << L8(~b) << touch(c,f); }
+		GN(BSF)    { USE_F; USE_B; c[f] = F(OP_OR ) << L8( b) << touch(c,f); } 
 
 		FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 		FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }
@@ -118,17 +117,17 @@ namespace dis {
 
 		GN(GOTO)   { USE_K; SET_PC(k); }
 
-		GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = function<term>(OP_LIST, { literal_t(pc + 1), touch(c,STACK) }); }
+		GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = F(OP_LIST, { L(pc + 1), touch(c,STACK) }); }
 
-		GN(MOVLW)  { USE_K; USE_W; c[W] = literal_t(255&k); }
+		GN(MOVLW)  { USE_K; USE_W; c[W] = L8(k); }
 
 		GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-		GN(IORLW)  { USE_K; USE_W; c[W] = function<term>(OP_OR   , { literal_t(255&k), touch(c,W) }); }
-		GN(ANDLW)  { USE_K; USE_W; c[W] = function<term>(OP_AND  , { literal_t(255&k), touch(c,W) }); }
-		GN(XORLW)  { USE_K; USE_W; c[W] = function<term>(OP_XOR  , { literal_t(255&k), touch(c,W) }); }
-		GN(SUBLW)  { USE_K; USE_W; c[W] = function<term>(OP_MINUS, { literal_t(255&k), touch(c,W) }); }
-		GN(ADDLW)  { USE_K; USE_W; c[W] = function<term>(OP_PLUS , { literal_t(255&k), touch(c,W) }); }
+		GN(IORLW)  { USE_K; USE_W; c[W] = F(OP_OR   , { L8(k), touch(c,W) }); }
+		GN(ANDLW)  { USE_K; USE_W; c[W] = F(OP_AND  , { L8(k), touch(c,W) }); }
+		GN(XORLW)  { USE_K; USE_W; c[W] = F(OP_XOR  , { L8(k), touch(c,W) }); }
+		GN(SUBLW)  { USE_K; USE_W; c[W] = F(OP_MINUS, { L8(k), touch(c,W) }); }
+		GN(ADDLW)  { USE_K; USE_W; c[W] = F(OP_PLUS , { L8(k), touch(c,W) }); }
 
 		GN(PC)     {
 			USE_PC;
@@ -143,14 +142,14 @@ namespace dis {
 
 			/* fix these for actual power on values */
 
-			USE_REG(PCL)   ; c[PCL]    = literal_t(0);
-			USE_REG(STATUS); c[STATUS] = literal_t(0);
-			USE_REG(PCLATH); c[PCLATH] = literal_t(0);
-			USE_REG(INTCON); c[INTCON] = literal_t(0);
-			USE_REG(PIR1)  ; c[PIR1]   = literal_t(0);
-			USE_REG(T1CON) ; c[T1CON]  = literal_t(0);
-			USE_REG(CMCON) ; c[CMCON]  = literal_t(0);
-			USE_REG(ADCON0); c[ADCON0] = literal_t(0);
+			USE_REG(PCL)   ; c[PCL]    = L(0);
+			USE_REG(STATUS); c[STATUS] = L(0);
+			USE_REG(PCLATH); c[PCLATH] = L(0);
+			USE_REG(INTCON); c[INTCON] = L(0);
+			USE_REG(PIR1)  ; c[PIR1]   = L(0);
+			USE_REG(T1CON) ; c[T1CON]  = L(0);
+			USE_REG(CMCON) ; c[CMCON]  = L(0);
+			USE_REG(ADCON0); c[ADCON0] = L(0);
 		}
 
 		instruction_set pic12f675 = {

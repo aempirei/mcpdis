@@ -85,12 +85,19 @@ namespace yyy {
 		using M = meta<quick_type>;
 		using B = binding<quick_type>;
 		using G = grammar<quick_type>;
+		using L = literal_t;
+		using S = symbol;
 
-	}
+		constexpr L L8  (L x) { return (uint8_t )x; }
+		constexpr L L16 (L x) { return (uint16_t)x; }
 
-	extern template struct predicate<quick::quick_type>;
-	extern template struct function<quick::quick_type>;
-	extern template struct function<predicate<quick::quick_type>>;
-	extern template struct binding<quick::quick_type>;
-	extern template struct grammar<quick::quick_type>;
+		constexpr L L8H (L x) { return (uint8_t )(x >> 8); }
+		constexpr L L8L (L x) { return (uint8_t )(x >> 0); }
+	 }
+
+	extern template struct predicate <quick::quick_type>;
+	extern template struct function <quick::quick_type>;
+	extern template struct function <predicate <quick::quick_type> >;
+	extern template struct binding <quick::quick_type>;
+	extern template struct grammar <quick::quick_type>;
 }
