@@ -99,13 +99,13 @@ namespace dis {
 		GN(SUBWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_MINUS) << touch(c,f) << touch(c,W); }
 		GN(ADDWF)  { USE_W; USE_D; USE_F; c[d] = F(OP_PLUS ) << touch(c,f) << touch(c,W); }
 
-		GN(DECF)   { USE_D; USE_F;         c[d] = F(OP_MINUS) << touch(c,f) << L(1); }
-		GN(INCF)   { USE_D; USE_F;         c[d] = F(OP_PLUS ) << touch(c,f) << L(1); }
+		GN(DECF)   { USE_D; USE_F; c[d] = F(OP_MINUS) << touch(c,f) << L(1); }
+		GN(INCF)   { USE_D; USE_F; c[d] = F(OP_PLUS ) << touch(c,f) << L(1); }
 
-		GN(COMF)   { USE_D; USE_F;         c[d] = F(OP_NOT ) << touch(c,f); }
-		GN(RRF)    { USE_D; USE_F;         c[d] = F(OP_ROTR) << touch(c,f); }
-		GN(RLF)    { USE_D; USE_F;         c[d] = F(OP_ROTL) << touch(c,f); }
-		GN(SWAPF)  { USE_D; USE_F;         c[d] = F(OP_SWAP) << touch(c,f); }
+		GN(COMF)   { USE_D; USE_F; c[d] = F(OP_NOT ) << touch(c,f); }
+		GN(RRF)    { USE_D; USE_F; c[d] = F(OP_ROTR) << touch(c,f); }
+		GN(RLF)    { USE_D; USE_F; c[d] = F(OP_ROTL) << touch(c,f); }
+		GN(SWAPF)  { USE_D; USE_F; c[d] = F(OP_SWAP) << touch(c,f); }
 
 		GN(BCF)    { USE_F; USE_B; c[f] = F(OP_AND) << L8(~b) << touch(c,f); }
 		GN(BSF)    { USE_F; USE_B; c[f] = F(OP_OR ) << L8( b) << touch(c,f); } 
@@ -117,17 +117,17 @@ namespace dis {
 
 		GN(GOTO)   { USE_K; SET_PC(k); }
 
-		GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = F(OP_LIST, { L(pc + 1), touch(c,STACK) }); }
+		GN(CALL)   { GOTO(o, c); USE_PC; USE_STACK; c[STACK] = F(OP_LIST) << L(pc+1) << touch(c,STACK); }
 
 		GN(MOVLW)  { USE_K; USE_W; c[W] = L8(k); }
 
 		GN(RETLW)  { MOVLW(o, c); RETURN(o, c); }
 
-		GN(IORLW)  { USE_K; USE_W; c[W] = F(OP_OR   , { L8(k), touch(c,W) }); }
-		GN(ANDLW)  { USE_K; USE_W; c[W] = F(OP_AND  , { L8(k), touch(c,W) }); }
-		GN(XORLW)  { USE_K; USE_W; c[W] = F(OP_XOR  , { L8(k), touch(c,W) }); }
-		GN(SUBLW)  { USE_K; USE_W; c[W] = F(OP_MINUS, { L8(k), touch(c,W) }); }
-		GN(ADDLW)  { USE_K; USE_W; c[W] = F(OP_PLUS , { L8(k), touch(c,W) }); }
+		GN(IORLW)  { USE_K; USE_W; c[W] = F(OP_OR   ) << L8(k) << touch(c,W); }
+		GN(ANDLW)  { USE_K; USE_W; c[W] = F(OP_AND  ) << L8(k) << touch(c,W); }
+		GN(XORLW)  { USE_K; USE_W; c[W] = F(OP_XOR  ) << L8(k) << touch(c,W); }
+		GN(SUBLW)  { USE_K; USE_W; c[W] = F(OP_MINUS) << L8(k) << touch(c,W); }
+		GN(ADDLW)  { USE_K; USE_W; c[W] = F(OP_PLUS ) << L8(k) << touch(c,W); }
 
 		GN(PC)     {
 			USE_PC;
