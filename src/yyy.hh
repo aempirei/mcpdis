@@ -72,9 +72,25 @@ namespace yyy {
 
 	using term = choice<symbol::var,literal_t>::type;
 
-	extern template struct predicate<term>;
-	extern template struct function<term>;
-	extern template struct function<predicate<term>>;
-	extern template struct binding<term>;
-	extern template struct grammar<term>;
+	namespace quick {
+
+		using namespace yyy;
+
+		using quick_type = term;
+
+		using F = function<quick_type>;
+		using P = predicate<quick_type>;
+		using R = rule<quick_type>;
+		using A = argument<quick_type>;
+		using M = meta<quick_type>;
+		using B = binding<quick_type>;
+		using G = grammar<quick_type>;
+
+	}
+
+	extern template struct predicate<quick::quick_type>;
+	extern template struct function<quick::quick_type>;
+	extern template struct function<predicate<quick::quick_type>>;
+	extern template struct binding<quick::quick_type>;
+	extern template struct grammar<quick::quick_type>;
 }
