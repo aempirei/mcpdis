@@ -106,8 +106,8 @@ namespace pic12f {
 	GN(RLF)    { USE_D; USE_F;         c[d] = function<term>(OP_ROTL , { touch(c,f)               }); }
 	GN(SWAPF)  { USE_D; USE_F;         c[d] = function<term>(OP_SWAP , { touch(c,f)               }); }
 
-	GN(BCF)    { USE_F; USE_B; b = ~b; c[f] = function<term>(OP_AND  , { literal_t(b), touch(c,f) }); }
-	GN(BSF)    { USE_F; USE_B;         c[f] = function<term>(OP_OR   , { literal_t(b), touch(c,f) }); } 
+	GN(BCF)    { USE_F; USE_B; c[f] = function<term>(OP_AND  , { literal_t(255&~b), touch(c,f) }); }
+	GN(BSF)    { USE_F; USE_B; c[f] = function<term>(OP_OR   , { literal_t(255& b), touch(c,f) }); } 
 
 	FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 	FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }

@@ -511,10 +511,9 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				std::wcout << L'\t' << k.second.str() << std::endl;
+				std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" := " << k.second.str() << std::endl;
 			}
+			std::wcout << std::endl;
 		}
-
-		std::wcout << std::endl;
 	}
 }
