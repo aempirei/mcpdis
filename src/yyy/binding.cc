@@ -15,4 +15,12 @@ namespace yyy {
 		binding& operator<<(const argument_type&);
 	};
 #endif
+		template <typename T> binding<T>::binding(const predicate<value_type>&my_clause) : clause(my_clause) {
+		}
+
+		template <typename T> binding<T>& binding<T>::operator<<(const argument_type&arg) {
+			args.push_back(arg);
+			return *this;
+		}
+
 }

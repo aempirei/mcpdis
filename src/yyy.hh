@@ -52,8 +52,8 @@ namespace yyy {
 	template <typename T> using argument = typename choice<function<T>,T>::type;
 	template <typename T> using rule = function<predicate<T>>;
 
-	pluralize(argument);
-	pluralize(rule);
+	pluralize(argument);	// arguments
+	pluralize(rule);	// rules
 
 	using term = choice<symbol::var,literal_t>::type;
 }
@@ -70,7 +70,7 @@ namespace yyy {
 	extern template struct predicate<term>;
 	extern template struct function<term>;
 	extern template struct function<predicate<term>>;
-	// extern template struct binding<term>;
+	extern template struct binding<term>;
 	extern template struct grammar<term>;
 
 }

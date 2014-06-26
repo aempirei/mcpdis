@@ -24,10 +24,10 @@ namespace pic12f {
 
 	extern instruction_set pic12f675;
 
-	symbol address_string(literal_t);
-	symbol register_string(reg_t);
-	symbol register_name(reg_t);
-	symbol dest_string(bool,reg_t);
+	symbol::var address_string(literal_t);
+	symbol::var register_string(register_t);
+	symbol::var register_name(register_t);
+	symbol::var dest_string(bool,register_t);
 
 	void power(dictionary&);
 	void finalize(dictionary&);
@@ -38,7 +38,7 @@ namespace pic12f {
 //
 // dictionary
 
-using _dictionary = std::map<symbol,term>;
+using _dictionary = std::map<symbol::var,argument<term>>;
 
 struct dictionary : _dictionary {
 	using _dictionary::_dictionary;
@@ -72,7 +72,7 @@ struct bitstream {
 //
 // arguments
 
-using _arguments = std::map<op_t,symbol>;
+using _arguments = std::map<operator_t,symbol::var>;
 
 struct arguments : _arguments {
 	using _arguments::_arguments;
@@ -88,7 +88,7 @@ struct instruction {
 
 	// types
 
-	enum file_register : reg_t {
+	enum file_register : register_t {
 
 		INDF   = 0x00,
 		TMR0   = 0x01,
@@ -108,7 +108,7 @@ struct instruction {
 
 	};
 
-	enum flags : reg_t {
+	enum flags : register_t {
 
 		none = 0,
 
@@ -137,17 +137,17 @@ struct instruction {
 		ret
 	};
 
-	symbol pattern;
-	symbol name;
+	symbol::var pattern;
+	symbol::var name;
 
 	accumulation_function *fn;
 
 	pcl_types pcl_type;
 
-	reg_t status;
+	register_t status;
 
-	bool match(const symbol&) const;
-	template<typename T> bool match(const symbol&, T) const;
+	bool match(const symbol::var&) const;
+	template<typename T> bool match(const symbol::var&, T) const;
 
 	bool operator<(const instruction&) const;
 };
@@ -161,7 +161,7 @@ struct instruction_set : _instruction_set {
 
 	using _instruction_set::_instruction_set;
 
-	value_type find(const symbol&) const;
+	value_type find(const symbol::var&) const;
 
 	void sort();
 };
@@ -171,7 +171,7 @@ struct instruction_set : _instruction_set {
 
 struct operation {
 
-	symbol s;
+	symbol::var s;
 
 	literal_t address;
 
@@ -180,7 +180,7 @@ struct operation {
 	arguments args;
 
 	operation();
-	operation(const symbol&, literal_t, const instruction_set&);
+	operation(const symbol::var&, literal_t, const instruction_set&);
 
 	void execute(dictionary&);
 };

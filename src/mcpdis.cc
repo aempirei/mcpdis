@@ -17,7 +17,7 @@
 //
 /////////////////////
 
-template<class T> bool instruction::match(const symbol& s, T f) const {
+template<class T> bool instruction::match(const symbol::var& s, T f) const {
 	
 	if(s.length() != pattern.length())
 		return false;
@@ -35,14 +35,14 @@ template<class T> bool instruction::match(const symbol& s, T f) const {
 	return true;
 }
 
-template<> bool instruction::match(const symbol& s, arguments *p) const {
+template<> bool instruction::match(const symbol::var& s, arguments *p) const {
 
 	p->clear();
 
 	return match(s, [&](int n) { (*p)[pattern[n]].push_back(s[n]); });
 }
 
-bool instruction::match(const symbol& s) const {
+bool instruction::match(const symbol::var& s) const {
 
 	return match(s, [](int){});
 }
@@ -59,7 +59,7 @@ bool instruction::operator<(const instruction& x) const {
 //
 /////////////////////////
 
-instruction_set::value_type instruction_set::find(const symbol& s) const {
+instruction_set::value_type instruction_set::find(const symbol::var& s) const {
 
 	for(const auto& op : *this)
 		if(op.match(s))
@@ -188,7 +188,7 @@ std::wstring str(const dictionary::value_type& x) {
 operation::operation() {
 }
 
-operation::operation(const symbol& my_s, literal_t my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
+operation::operation(const symbol::var& my_s, literal_t my_address, const instruction_set& cpu) : s(my_s), address(my_address) {
 	opcode = cpu.find(s);
 	opcode.match(s, &args);
 }
