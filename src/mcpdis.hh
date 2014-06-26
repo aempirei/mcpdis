@@ -41,6 +41,8 @@ template <typename S, typename X> bool contains(const S& s, const X& x) {
 	return (s.find(x) not_eq s.end());
 }
 
+// template <typename S, typename X, typename...Xs> bool contains(const S& s, const X& x, Xs...xs) { return contains(s,x) and contains(s,xs...); }
+
 template <typename A, typename B> B& touch(std::map<A,B>& s, const A& x) {
 	if(not contains(s,x))
 		s[x] = B(x);
@@ -172,4 +174,6 @@ struct operation {
 	operation(const symbol::var&, literal_t, const instruction_set&);
 
 	void execute(dictionary&);
+
+	literal_t argul(const operands::key_type&) const;
 };

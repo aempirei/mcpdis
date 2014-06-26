@@ -143,3 +143,7 @@ void operation::execute(dictionary& d) {
 
 	pic12f::finalize(d);
 }
+
+literal_t operation::argul(const operands::key_type& x) const {
+	return std::stoul(args.at(x), nullptr, 2);
+}

@@ -7,17 +7,15 @@
 
 #include <mcpdis.hh>
 
-#define OARG(X)		std::stoul(o.args.at(X), nullptr, 2)
-
 #define FN(a)		void a(operation&, dictionary&)
 #define GN(a)		void a(operation&o, dictionary&c)
 #define HN(a)		void a(operation&, dictionary&c)
 
-#define USE_B		literal_t b = (1 << OARG(L'b'))
+#define USE_B		literal_t b = (1 << o.argul(L'b'))
 #define USE_W		const symbol::var W = L"W"
 #define USE_D		const symbol::var d = load_d(o)
 #define USE_F		const symbol::var f = load_f(o)
-#define USE_K		const literal_t k = OARG(L'k')
+#define USE_K		const literal_t k = o.argul(L'k')
 #define USE_PC		const literal_t pc = o.address
 #define USE_REG(R)	const symbol::var R = register_name(instruction::file_register::R)
 #define USE_STACK	const symbol::var STACK = L"STACK"
@@ -31,11 +29,11 @@ namespace pic12f {
 
 
 	symbol::var load_d(operation& o) {
-		return dest_string(OARG(L'd'), OARG(L'f'));
+		return dest_string(o.argul(L'd'), o.argul(L'f'));
 	}
 
 	symbol::var load_f(operation& o) {
-		return register_name(OARG(L'f'));
+		return register_name(o.argul(L'f'));
 	}
 
 	HN(RETURN) {
