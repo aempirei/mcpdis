@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEFINE_SYMBOL_TYPE(X) using X = basic_symbol<wchar_t,type::X>
+
 namespace yyy {
 
 	//
@@ -9,8 +11,6 @@ namespace yyy {
 	enum struct symbol_type { ref, var, name, key, id, word };
 
 	template <typename,symbol_type> struct basic_symbol;
-
-#define DEFINE_SYMBOL_TYPE(X) using X = basic_symbol<wchar_t,type::X>
 
 	struct symbol {
 		symbol() = delete;
@@ -23,8 +23,6 @@ namespace yyy {
 		DEFINE_SYMBOL_TYPE ( word );
 	};
 
-#undef DEFINE_SYMBOL_TYPE
-
 	template <typename T, symbol_type S> struct basic_symbol : std::basic_string<T> {
 		static constexpr decltype(S) type_enum = S;
 		using unit_type = T;
@@ -32,3 +30,5 @@ namespace yyy {
 		using base_type::base_type;
 	};
 }
+
+#undef DEFINE_SYMBOL_TYPE
