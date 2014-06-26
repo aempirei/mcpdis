@@ -1,18 +1,10 @@
 #pragma once
 
-#include <cstdint>
-#include <cwchar>
-
-#include <string>
 #include <vector>
-#include <list>
-#include <map>
-#include <set>
-#include <initializer_list>
 
-#include <operators.hh>
-#include <ansicolor.hh>
 #include <yyy.hh>
+
+using namespace yyy;
 
 struct instruction_set;
 struct instruction;
@@ -22,14 +14,6 @@ struct bitstream;
 struct dictionary;
 
 typedef std::list<operation> sourcecode;
-typedef std::wstring symbol;
-
-template<typename> struct fn;
-template<typename> struct predicate;
-template<typename> struct grammar;
-
-template<typename T> using rule = fn<predicate<T>>;
-template<typename T> using rules = std::list<rule<T>>;
 
 typedef void accumulation_function(operation&, dictionary&);
 
@@ -63,86 +47,6 @@ struct dictionary : _dictionary {
 };
 
 std::wstring str(const dictionary::value_type&);
-
-//
-// fn
-
-template<typename T> struct fn {
-
-	typedef T value_type;
-	typedef std::list<T> args_type;
-
-	op_t op;
-	args_type args;
-
-	fn();
-	fn(op_t);
-	fn(op_t, const args_type&);
-	fn(const fn&);
-
-	fn& operator=(const fn&);
-
-	bool operator==(const fn&) const;
-	bool operator<(const fn&) const;
-
-	fn& operator<<(const T&);
-
-	size_t arity() const;
-
-	void clear();
-
-	void concat(const args_type&);
-
-	explicit operator std::wstring () const;
-};
-
-//
-// term
-
-struct term {
-
-	enum class term_type : op_t {
-		literal = L'L',
-		symbol = L'S',
-		function = L'F'
-	};
-
-	typedef term_type types;
-
-	term_type type;
-
-	literal_t l;
-	symbol s;
-	fn<term> f;
-
-	term();
-	term(literal_t);
-	term(const symbol&);
-	term(const fn<term>&);
-	term(const term&);
-
-	bool is_function(op_t) const;
-	bool is_literal(literal_t) const;
-	bool is_symbol(const symbol&) const;
-
-	bool is_function() const;
-	bool is_symbol() const;
-	bool is_literal() const;
-
-	bool is_nullary() const;
-	bool is_unary() const;
-	bool is_binary() const;
-
-	bool is_arity(size_t) const;
-
-	bool operator==(const term&) const;
-	bool operator<(const term&) const;
-
-	term& operator=(const term&);
-
-	explicit operator std::wstring () const;
-	explicit operator std::string () const;
-};
 
 //
 // bitstream
@@ -280,96 +184,3 @@ struct operation {
 
 	void execute(dictionary&);
 };
-
-//
-// parser
-
-typedef std::pair<unsigned int, unsigned int> _range;
-
-struct range : _range {
-	using _range::_range;
-	static const range star;
-	static const range plus;
-	static const range qm;
-	static const range one;
-	static const range zero;
-};
-
-template <typename T> struct predicate {
-
-	// types
-	//
-	
-	typedef T value_type;
-	typedef decltype(value_type::type) value_type_type;
-
-	enum class predicate_type { type, value, ref, mem, any, end };
-
-	typedef predicate_type types;
-	typedef std::set<value_type_type> filter_type;
-
-	// abstract predicate
-	//
-	//
-
-	predicate_type type;
-
-	symbol ref;
-	value_type value;
-	filter_type filter;
-
-	range q;
-
-	// concrete predicate
-	//
-	//
-
-	std::list<value_type> args;
-	rule<value_type> child;
-
-	// methods
-	//
-	//
-
-	predicate();
-
-	predicate(const predicate&);
-
-	predicate(predicate_type);
-	predicate(predicate_type, const range&);
-
-	predicate(const wchar_t *);
-	predicate(const symbol&);
-	predicate(const filter_type&);
-	predicate(const value_type&);
-
-	predicate& operator=(const predicate&);
-
-	bool operator==(const predicate&) const;
-	bool operator<(const predicate&) const;
-
-	operator std::wstring () const;
-
-	predicate star() const;
-	predicate plus() const;
-	predicate qm() const;
-
-	predicate ge(unsigned int) const;
-	predicate le(unsigned int) const;
-	predicate eq(unsigned int) const;
-};
-
-template<typename T> using _grammar = std::map<symbol,rules<T>>;
-
-template<typename T> struct grammar : _grammar<T> {
-
-	using _grammar<T>::_grammar;
-
-	template<typename U> bool match(const symbol&, const U&, rule<T> *);
-	template<typename U> bool match(const rule<T>&, U&, rule<T> *);
-};
-
-extern template struct predicate<term>;
-extern template struct grammar<term>;
-extern template struct fn<term>;
-extern template struct fn<predicate<term>>;

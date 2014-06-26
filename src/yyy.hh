@@ -15,6 +15,7 @@
 
 #include <typeinfo>
 
+#include <ansicolor.hh>
 #include <operators.hh>
 
 namespace yyy {
