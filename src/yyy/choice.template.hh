@@ -107,17 +107,36 @@ namespace yyy {
 			}
 
 			template <typename T> static std::wstring str(const T&t) {
+				const auto id = std::type_index(typeid(T));
 				std::wstringstream ss;
-				ss << t;
+				if(typecolor.find(id) == typecolor.end())
+					ss << t;
+				else
+					ss << typecolor[id] << t << ANSI_CLR;
 				return ss.str();
 			}
 
 			template <symbol_type S> static std::wstring str(const basic_symbol<wchar_t,S>& s) {
-				return std::wstring(s);
+
+				const auto id = std::type_index(typeid(decltype(s)));
+				auto t = std::wstring(s);
+
+				if(typecolor.find(id) != typecolor.end())
+						t = typecolor[id] + t + ANSI_CLR;
+
+				return t;
 			}
 
-			template <typename T> static std::wstring str(const std::basic_string<T>& t) {
-				return std::wstring(t.begin(),t.end());
+			template <typename T> static std::wstring str(const std::basic_string<T>& s) {
+
+				const auto id = std::type_index(typeid(decltype(s)));
+				auto t = std::wstring(s.begin(),s.end());
+
+				if(typecolor.find(id) != typecolor.end())
+					t = typecolor[id] + t + ANSI_CLR;
+
+				return t;
+
 			}
 		}
 

@@ -19,9 +19,6 @@
 
 #include <ansicolor.hh>
 
-#include "yyy/symbol.template.hh"
-#include "yyy/choice.template.hh"
-
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
 
 namespace yyy {
@@ -35,6 +32,8 @@ namespace yyy {
 
 	using range = std::pair<size_t,size_t>;
 
+	extern std::map<std::type_index, const operator_t> typeoperator;
+	extern std::map<std::type_index, const std::wstring> typecolor;
 }
 
 #include "yyy/operators.hh"
@@ -73,8 +72,6 @@ namespace yyy {
 namespace yyy {
 
 	using term = choice<symbol::var,literal_t>::type;
-
-	extern std::map<std::type_index, operator_t> term_typename;
 
 	namespace quick {
 

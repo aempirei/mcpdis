@@ -118,7 +118,7 @@ namespace yyy {
 					       ss << ANSI_LOMAGENTA << L'[' << ANSI_HIMAGENTA;
 
 					       for(const auto id : arg.get_types())
-						       ss << term_typename[id];
+						       ss << typeoperator[id];
 
 					       ss << ANSI_LOMAGENTA << L']' << ANSI_CLR;
 
