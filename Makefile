@@ -1,7 +1,7 @@
 CXX = g++
 
 CPPFLAGS = -Isrc -DUSE_COLOR
-CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O2
+CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O0
 LIBFLAGS = -Llib -lmcpdis -lyyy
 
 TARGETS = lib/libmcpdis.a lib/libyyy.a bin/dis bin/yyy.demo

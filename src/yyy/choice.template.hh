@@ -179,6 +179,29 @@ namespace yyy {
 			assign(a);
 		}
 
+		a_type& get(a_type*) const {
+			if(a_ptr == nullptr) {
+				std::stringstream ss;
+				ss << "nullptr for get of " << typeid(a_type).name() << ".";
+				throw std::runtime_error(ss.str());
+			}
+			return *a_ptr;
+		}
+
+		a_type& get() const {
+			return get((a_type*)nullptr);
+		}
+
+		template <typename T> T& get(T*) const {
+			std::stringstream ss;
+			ss << "get of " << typeid(T).name() << " from " << typeid(*this).name() << " not possible.";
+			throw std::runtime_error(ss.str());
+		}
+
+		template <typename T> T& get() const {
+			return get((T*)nullptr);
+		}
+
 		template <typename T> void insert(const T&) {
 			std::stringstream ss;
 			ss << "insert of " << typeid(T).name() << " to " << typeid(*this).name() << " not possible.";
@@ -329,6 +352,31 @@ namespace yyy {
 			if(b_ptr) delete b_ptr;
 			a_ptr = nullptr;
 			b_ptr = nullptr;
+		}
+
+		//
+		// get
+		//
+
+		template <typename T> T& get(T*) const {
+
+			if( a_ptr and a_ptr->template contains_type<T>() ) {
+
+				return a_ptr->get((T*)nullptr);
+
+			} else if( b_ptr and b_ptr->template contains_type<T>() ) {
+
+				return b_ptr->get((T*)nullptr);
+
+			} else {
+				std::stringstream ss;
+				ss << "missing data for get of " << typeid(T).name() << ".";
+				throw std::runtime_error(ss.str());
+			}
+		}
+
+		template <typename T> T& get() const {
+			return get((T*)nullptr);
 		}
 
 		//
