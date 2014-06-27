@@ -12,11 +12,13 @@
 #define HN(a)		void a(operation&, dictionary&c)
 
 #define USE_B		literal_t b = (1 << o.argul(L'b'))
+#define USE_K		literal_t k = o.argul(L'k')
+#define USE_PC		literal_t pc = o.address
+
 #define USE_W		const symbol::var W = L"W"
 #define USE_D		const symbol::var d = load_d(o)
 #define USE_F		const symbol::var f = load_f(o)
-#define USE_K		const literal_t k = o.argul(L'k')
-#define USE_PC		const literal_t pc = o.address
+
 #define USE_REG(R)	const symbol::var R = register_name(instruction::file_register::R)
 #define USE_STACK	const symbol::var STACK = L"STACK"
 
@@ -60,7 +62,7 @@ namespace dis {
 			USE_W;
 			USE_F; 
 
-			c[f] = touch(c,W);  
+			c[f] = A( touch(c,W) );
 		}
 
 
@@ -82,7 +84,7 @@ namespace dis {
 			USE_D;
 			USE_F;
 
-			c[d] = touch(c,f);
+			c[d] = A( touch(c,f) );
 
 			USE_REG(STATUS);
 

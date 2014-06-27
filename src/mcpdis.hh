@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include <yyy.hh>
 
@@ -44,7 +45,7 @@ namespace dis {
 
 	template <typename A, typename B> B& touch(std::map<A,B>& s, const A& x) {
 		if(not contains(s,x))
-			s[x] = B(x);
+			s[x] = x;
 		return s.at(x);
 	}
 
