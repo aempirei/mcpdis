@@ -11,9 +11,11 @@
 #include <sstream>
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <set>
 
 #include <typeinfo>
+#include <typeindex>
 
 #include <ansicolor.hh>
 
@@ -72,6 +74,8 @@ namespace yyy {
 
 	using term = choice<symbol::var,literal_t>::type;
 
+	extern std::map<std::type_index, operator_t> term_typename;
+
 	namespace quick {
 
 		using namespace yyy;
@@ -93,7 +97,7 @@ namespace yyy {
 
 		constexpr L L8H (L x) { return (uint8_t )(x >> 8); }
 		constexpr L L8L (L x) { return (uint8_t )(x >> 0); }
-	 }
+	}
 
 	extern template struct predicate <quick::quick_type>;
 	extern template struct function <quick::quick_type>;

@@ -17,7 +17,7 @@ namespace yyy {
 	}
 
 	template <typename T> predicate<T>::predicate(const meta<argument<value_type>>& my_arg)
-		: type(types::by_value), arg(my_arg), mods({modifiers::bind}), quantifier(range(1,1))
+		: type(my_arg.template contains_type<symbol::ref>() ? types::by_ref : types::by_value), arg(my_arg), mods({modifiers::bind}), quantifier(range(1,1))
 	{
 	}
 
@@ -105,24 +105,38 @@ namespace yyy {
 		}
 
 		switch(type) {
-			case types::end      : ss << '$'                     ; break ;
-			case types::any      : ss << '.'                     ; break ;
-			case types::mem      : ss << '#'                     ; break ;
-			case types::by_ref   : ss << '<' << arg.str() << '>' ; break ; // FIXME
-			case types::by_type  : ss << "TYPE:" << arg.str()    ; break ; // FIXME
-			case types::by_op    : ss << "OP:" << arg.str()      ; break ; // FIXME
-			case types::by_value : ss << arg.str()               ; break ; // FIXME
+			case types::end      : ss << '$'                       ; break ;
+			case types::any      : ss << '.'                       ; break ;
+			case types::mem      : ss << '#'                       ; break ;
+
+			case types::by_ref:
+					       ss << ANSI_LOGREEN << '<' << ANSI_HIGREEN << arg.str() << ANSI_LOGREEN << '>' << ANSI_CLR;
+					       break;
+
+			case types::by_type:
+
+					       ss << ANSI_LOMAGENTA << L'[' << ANSI_HIMAGENTA;
+
+					       for(const auto id : arg.get_types())
+						       ss << term_typename[id];
+
+					       ss << ANSI_LOMAGENTA << L']' << ANSI_CLR;
+
+					       break;
+
+			case types::by_op    : ss << "OP:" << arg.str()        ; break ; // FIXME
+			case types::by_value : ss << arg.str()                 ; break ; // FIXME
 
 		}
 
 		/**/ if(quantifier == range(1,1))              { /* do nothing */ }
-		else if(quantifier == range(0,1))              ss << '?';
-		else if(quantifier == range(1,UINT_MAX))       ss << '+';
-		else if(quantifier == range(0,UINT_MAX))       ss << '*';
-		else if(quantifier.first == quantifier.second) ss << '{' << quantifier.first << '}';
-		else if(quantifier.first == 0)                 ss << "{," << quantifier.second << '}';
-		else if(quantifier.second == UINT_MAX)         ss << '{' << quantifier.first << ",}";
-		else                                           ss << '{' << quantifier.first << ',' << quantifier.second << '}';
+		else if(quantifier == range(0,1))              ss << ANSI_HIYELLOW << '?' << ANSI_CLR;
+		else if(quantifier == range(1,UINT_MAX))       ss << ANSI_HIYELLOW << '+' << ANSI_CLR;
+		else if(quantifier == range(0,UINT_MAX))       ss << ANSI_HIYELLOW << '*' << ANSI_CLR;
+		else if(quantifier.first == quantifier.second) ss << ANSI_LOYELLOW << '{' << ANSI_HIYELLOW << quantifier.first << ANSI_LOYELLOW << '}' << ANSI_CLR;
+		else if(quantifier.first == 0)                 ss << ANSI_LOYELLOW << "{," << ANSI_HIYELLOW << quantifier.second << ANSI_LOYELLOW << '}' << ANSI_CLR;
+		else if(quantifier.second == UINT_MAX)         ss << ANSI_LOYELLOW << '{' << ANSI_HIYELLOW << quantifier.first << ANSI_LOYELLOW << ",}" << ANSI_CLR;
+		else                                           ss << ANSI_LOYELLOW << '{' << ANSI_HIYELLOW << quantifier.first << ANSI_LOYELLOW << ',' << ANSI_HIYELLOW << quantifier.second << ANSI_LOYELLOW << '}' << ANSI_CLR;
 
 		return ss.str();
 	}

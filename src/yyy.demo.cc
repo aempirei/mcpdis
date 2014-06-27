@@ -88,8 +88,8 @@ void do_yyy() {
 
 	using big_type = choice<bool,char,std::wstring,std::type_info>::type;
 
-	for(const std::type_info* x : isb.get_types()) types_s << L' ' << x->name();
-	for(const std::type_info* x : isb.allowed_types()) types_a << L' ' << x->name();
+	for(auto x : isb.get_types()) types_s << L' ' << term_typename[x];
+	for(auto x : isb.allowed_types()) types_a << L' ' << term_typename[x];
 
 	std::wcout << "big_type will allow isb values? " << ( big_type::allows_any_type(isb) ? "TRUE" : "FALSE" ) << std::endl;
 

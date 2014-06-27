@@ -24,7 +24,7 @@ namespace yyy {
 	// type_set
 	//
 
-	using type_set = std::set<const std::type_info*>;
+	using type_set = std::set<std::type_index>;
 
 	//
 	// either<void,void> / nothing
@@ -258,7 +258,7 @@ namespace yyy {
 		//
 
 		static type_set allowed_types() {
-			return type_set({&typeid(a_type)});
+			return type_set({std::type_index(typeid(a_type))});
 		}
 
 		//
