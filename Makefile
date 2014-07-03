@@ -1,6 +1,6 @@
 CXX = g++
 
-CPPFLAGS = -Isrc -DUSE_COLOR
+CPPFLAGS = -Isrc
 CXXFLAGS = -Wall -W -pedantic -std=gnu++11 -O0
 LIBFLAGS = -Llib -lmcpdis -lyyy
 

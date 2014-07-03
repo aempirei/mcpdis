@@ -126,10 +126,11 @@ namespace yyy {
 					       ss << typecolor[std::type_index(typeid(function<term>))];
 					       ss << "F(" << arg.template get<function<term>>().op << ")";
 					       ss << ANSI_CLR;
-
 					       break;
 
-			case types::by_value : ss << L'"' << arg.str() << L'"' ; break ; // FIXME
+			case types::by_value:
+					       ss << L'"' << arg.str() << L'"';
+					       break;
 
 		}
 

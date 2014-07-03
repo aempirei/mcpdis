@@ -53,6 +53,7 @@ namespace yyy {
 	template <typename> struct function;
 	template <typename> struct binding;
 	template <typename> struct grammar;
+	template <typename> struct parser;
 
 	template <typename T> using meta = typename choice<symbol::ref,T>::type;
 	template <typename T> using argument = typename choice<function<T>,T>::type;
