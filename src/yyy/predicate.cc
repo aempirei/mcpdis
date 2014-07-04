@@ -170,6 +170,8 @@ namespace yyy {
 				return true;
 			case types::mem:
 				throw std::runtime_error("mem predicate not implemented");
+			case types::by_ref:
+				throw std::runtime_error("test by_ref called on plain argument");
 			case types::by_op:
 				return arg.template contains_type<function<T>>()
 					and x.template contains_type<function<T>>()
@@ -178,10 +180,8 @@ namespace yyy {
 				return arg.contains_any_value(x);
 			case types::by_type:
 				return arg.contains_any_type(x);
-			default:
-				throw std::runtime_error("predicate<T>::test(const argument<T>&) called with unexpected argument type");
-				break;
 		}
+		return false;
 	}
 
 	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
