@@ -171,11 +171,9 @@ namespace yyy {
 			case types::mem:
 				throw std::runtime_error("mem predicate not implemented");
 			case types::by_op:
-				/*
-				   if(arg.template contains_type<function<T>>())
-				   if(x.template contains_type<function<T>>())
-				   return (x.template get<function<T>>().op == x.template get<function<T>>().op);
-				 */
+				if(arg.template contains_type<function<T>>())
+					if(x.template contains_type<function<T>>())
+						return (x.template get<function<T>>().op == x.template get<function<T>>().op);
 				return false;
 			case types::by_value:
 				return arg.contains_any_value(x);
