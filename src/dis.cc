@@ -338,7 +338,7 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 		if(config.verbose) {
 
-			if(labels.find(op.address) == labels.end())
+			if(!yyy::contains(labels,op.address))
 				std::wcout << L' ';
 			else
 				std::wcout << L'*';
@@ -372,7 +372,7 @@ void print_code(const configuration& config, const sourcecode& code, const std::
 
 		} else {
 
-			if(labels.find(op.address) != labels.end()) 
+			if(yyy::contains(labels, op.address))
 				std::wcout << pic12f::address_string(op.address) << L':';
 			else
 				std::wcout << L"     ";
@@ -459,7 +459,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 	for(auto iter = code.begin(); iter != code.end(); iter++) {
 
-		if(labels.find(iter->address) != labels.end()) {
+		if(yyy::contains(labels,iter->address)) {
 
 			dictionary state;
 

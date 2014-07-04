@@ -61,6 +61,7 @@ namespace yyy {
 
 	pluralize(argument);	// arguments
 	pluralize(rule);	// rules
+	pluralize(binding);	// bindings
 }
 
 #undef pluralize
@@ -103,10 +104,17 @@ namespace yyy {
 	extern template struct binding <quick::quick_type>;
 	extern template struct grammar <quick::quick_type>;
 
-// templates inline
+	// inline function templates
+	template <typename S, typename X> bool contains(const S& s, const X& x) {
+		return (s.find(x) not_eq s.end());
+	}
+
+	template <typename S, typename X, typename...Xs> bool contains(const S& s, const X& x, Xs...xs) {
+		return contains(s,x) and contains(s,xs...);
+	}
 
 	template <typename T> std::type_index typekey(const T&) {
-		return std::type_index( typecolor.find( std::type_index(typeid(T)) ) != typecolor.end() ? typeid(T) : typeid(void) );
+		return std::type_index( contains(typecolor,  std::type_index(typeid(T))) ? typeid(T) : typeid(void) );
 	}
 
 	template <typename T> std::wstring colorize(const T& t) {
@@ -114,4 +122,6 @@ namespace yyy {
 		ss << typecolor[typekey(t)] << t << ANSI_CLR;
 		return ss.str();
 	}
+
+
 }

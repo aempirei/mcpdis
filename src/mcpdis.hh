@@ -35,14 +35,6 @@ namespace dis {
 		void PC(operation&, dictionary&);
 	}
 
-	template <typename S, typename X> bool contains(const S& s, const X& x) {
-		return (s.find(x) not_eq s.end());
-	}
-
-	template <typename S, typename X, typename...Xs> bool contains(const S& s, const X& x, Xs...xs) {
-		return contains(s,x) and contains(s,xs...);
-	}
-
 	template <typename A, typename B> B& touch(std::map<A,B>& s, const A& x) {
 		if(not contains(s,x))
 			s[x] = x;
