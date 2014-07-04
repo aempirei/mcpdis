@@ -31,6 +31,7 @@ struct configuration {
 	bool verbose = false;
 	bool print_model = false;
 	stream_processor_fn *stream_processor = be14;
+	G g;
 };
 
 std::wstring arg_string(wchar_t, std::wstring);
@@ -253,9 +254,7 @@ int main(int argc, char **argv) {
 	std::list<symbol::ref> z;
 	std::list<symbol::ref> a;
 
-	G g;
-
-	initialize_grammar(s, z, a, g);
+	initialize_grammar(s, z, a, config.g);
 
 	while ((opt = getopt(argc, argv, "hvx:m")) != -1) {
 		switch (opt) {
@@ -297,9 +296,9 @@ int main(int argc, char **argv) {
 
 	if(config.print_model) {
 
-		print_rules(config, L"root", s, g);
-		print_rules(config, L"optimization", z, g);
-		print_rules(config, L"auxiliary", a, g);
+		print_rules(config, L"root", s, config.g);
+		print_rules(config, L"optimization", z, config.g);
+		print_rules(config, L"auxiliary", a, config.g);
 
 	} else {
 
@@ -518,9 +517,11 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" #= " << k.second.str() << std::endl;
 
-				} else {
+				} else if(k.second.contains_type<F>()) {
 
 					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" := " << k.second.str() << std::endl;
+
+					auto result = config.g.parse(L"OR", k.second.get<F>());
 				}
 			}
 

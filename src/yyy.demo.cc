@@ -76,12 +76,12 @@ void do_yyy() {
 	std::wcout << "         str: '" << s.str() << "'" << std::endl;
 	std::wcout << "int/str/bool: '" << isb.str() << "'" << std::endl;
 
-	std::wcout << "isb<int> :: " << ( e_int_str_bool::template allows_type<int>() ) << ' ' << ( isb.template contains_type<int>() ) << std::endl;
-	std::wcout << "isb<int> == " << ( isb.template contains_value(4) ) << ' ' << ( isb.template contains_value(5) ) << std::endl;
-	std::wcout << "isb<bool> :: " << ( isb.template allows_type<bool>() ) << ' ' << ( isb.template contains_type<bool>() ) << std::endl;
-	std::wcout << "isb<bool> == " << ( isb.template contains_value(true) ) << ' ' << ( isb.template contains_value(false) ) << std::endl;
-	std::wcout << "isb<wstr> :: " << ( isb.template allows_type<wstr>() ) << ' ' << ( isb.template contains_type<wstr>() ) << std::endl;
-	std::wcout << "isb<wstr> == " << ( isb.template contains_value(wstr(L"dicks")) ) << ' ' << ( isb.template contains_value(wstr(L"fag")) ) << std::endl;
+	std::wcout << "isb<int> :: " << ( e_int_str_bool::allows_type<int>() ) << ' ' << ( isb.contains_type<int>() ) << std::endl;
+	std::wcout << "isb<int> == " << ( isb.contains_value(4) ) << ' ' << ( isb.contains_value(5) ) << std::endl;
+	std::wcout << "isb<bool> :: " << ( isb.allows_type<bool>() ) << ' ' << ( isb.contains_type<bool>() ) << std::endl;
+	std::wcout << "isb<bool> == " << ( isb.contains_value(true) ) << ' ' << ( isb.contains_value(false) ) << std::endl;
+	std::wcout << "isb<wstr> :: " << ( isb.allows_type<wstr>() ) << ' ' << ( isb.contains_type<wstr>() ) << std::endl;
+	std::wcout << "isb<wstr> == " << ( isb.contains_value(wstr(L"dicks")) ) << ' ' << ( isb.contains_value(wstr(L"fag")) ) << std::endl;
 
 	std::wstringstream types_s;
 	std::wstringstream types_a;
