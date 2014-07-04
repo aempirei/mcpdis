@@ -431,6 +431,18 @@ namespace yyy {
 			return *this;
 		}
 
+		either& operator=(const a_type& r) {
+			clear();
+			a_ptr = new a_type(r);
+			return *this;
+		}
+
+		either& operator=(const b_type& r) {
+			clear();
+			b_ptr = new b_type(r);
+			return *this;
+		}
+
 		template <typename T> either& operator=(const T& t) {
 			assign(t);
 			return *this;
