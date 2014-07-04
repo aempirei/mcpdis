@@ -21,6 +21,8 @@ namespace yyy {
 
 		template <typename U> function& operator<<(const U&);
 
+		bool operator==(const function&) const;
+
 		std::wstring str() const;
 		explicit operator std::wstring() const;
 	};

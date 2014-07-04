@@ -78,5 +78,8 @@ namespace yyy {
 		using test_return_type = std::pair<bool,binding<T>>;
 
 		test_return_type test(const grammar<T>&, const function<T>&);
+		bool test(const argument<T>&);
+
+		bool operator==(const predicate&) const;
 	};
 }

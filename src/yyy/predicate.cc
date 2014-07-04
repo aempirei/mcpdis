@@ -161,6 +161,31 @@ namespace yyy {
 
 		return ss.str();
 	}
+	
+	template <typename T> bool predicate<T>::test(const argument<T>& x) {
+		switch(type) {
+			case types::end:
+				return false;
+			case types::any:
+				return true;
+			case types::mem:
+				throw std::runtime_error("mem predicate not implemented");
+			case types::by_op:
+				/*
+				   if(arg.template contains_type<function<T>>())
+				   if(x.template contains_type<function<T>>())
+				   return (x.template get<function<T>>().op == x.template get<function<T>>().op);
+				 */
+				return false;
+			case types::by_value:
+				return arg.contains_any_value(x);
+			case types::by_type:
+				return arg.contains_any_type(x);
+			default:
+				throw std::runtime_error("predicate<T>::test(const argument<T>&) called with unexpected argument type");
+				break;
+		}
+	}
 
 	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
@@ -180,8 +205,10 @@ namespace yyy {
 					throw std::runtime_error("any predicate contained unexpected non-empty argument");
 				} else {
 					binding<T> b(*this);
-					//for(const auto& x : f.args) {
-					//}
+					for(const auto& x : f.args) {
+						b << x;
+						//FIXME
+					}
 				}
 				break;
 
@@ -198,6 +225,12 @@ namespace yyy {
 					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
 				} else {
 					auto dast = g.parse(arg.template get<symbol::ref>(), f);
+					if(dast.first) {
+						binding<T> b(*this);
+						for(const auto& x : dast.second)
+							b << x;
+						return test_return_type(true, b);
+					}
 				}
 				break;
 
@@ -224,6 +257,10 @@ namespace yyy {
 		}
 
 		return test_return_type(false,binding<value_type>());
+	}
+
+	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
+		return type == r.type and arg == r.arg and mods == r.mods and quantifier == r.quantifier;
 	}
 
 	template struct predicate<term>;

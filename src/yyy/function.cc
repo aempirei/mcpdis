@@ -56,6 +56,10 @@ namespace yyy {
 		return str();
 	}
 
+	template <typename T> bool function<T>::operator==(const function<T>& r) const {
+		return op == r.op and args == r.args;
+	}
+
 	template struct function<term>;
 	template struct function<predicate<term>>;
 }

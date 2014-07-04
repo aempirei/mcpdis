@@ -63,6 +63,9 @@ namespace yyy {
 		static type_set allowed_types() {
 			return type_set();
 		}
+		bool operator==(const either&) const {
+			return true;
+		}
 	};
 
 	//
@@ -295,6 +298,10 @@ namespace yyy {
 			return ( a_ptr and e.contains_value(*a_ptr) );
 		}
 
+		bool operator==(const either& r) const {
+			return ( empty() and r.empty() ) or ( a_ptr and r.a_ptr and *a_ptr == *r.a_ptr );
+		}
+
 		//
 		// get the currently assigned types
 		//
@@ -494,6 +501,18 @@ namespace yyy {
 		template <typename T,typename U> constexpr bool contains_any_value(const either<T,U>& e) const {
 			return ( a_ptr and a_ptr->contains_any_value(e) )
 			    or ( b_ptr and b_ptr->contains_any_value(e) ); 
+		}
+
+		bool operator==(const either& r) const {
+			if((a_ptr and r.a_ptr) and not (*a_ptr == *r.a_ptr)) return false;
+			if((b_ptr and r.b_ptr) and not (*b_ptr == *r.b_ptr)) return false;
+
+			if(a_ptr == nullptr and r.a_ptr != nullptr) return false;
+			if(a_ptr != nullptr and r.a_ptr == nullptr) return false;
+			if(b_ptr != nullptr and r.b_ptr == nullptr) return false;
+			if(b_ptr != nullptr and r.b_ptr == nullptr) return false;
+
+			return true;
 		}
 
 		//
