@@ -34,8 +34,20 @@ namespace yyy {
 	//
 
 	template<typename T> predicate<T> predicate<T>::set_type(const types& my_type) const {
+
 		auto that(*this);
+
 		that.type = my_type;
+
+		switch(that.type) {
+			case types::end:
+			case types::any:
+			case types::mem:
+				that.arg.clear();
+			default:
+				break;
+		}
+
 		return that;
 	}
 
@@ -158,18 +170,26 @@ namespace yyy {
 
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
+				if(f.args.empty())
+					return test_return_type(true,binding<T>(*this));
 				break;
 
 			case types::any:
 
-				if(not arg.empty())
+				if(not arg.empty()) {
 					throw std::runtime_error("any predicate contained unexpected non-empty argument");
+				} else {
+					binding<T> b(*this);
+					//for(const auto& x : f.args) {
+					//}
+				}
 				break;
 
 			case types::mem:
 
 				if(not arg.empty())
 					throw std::runtime_error("mem predicate contained unexpected non-empty argument");
+				throw std::runtime_error("mem predicate not implemented");
 				break;
 
 			case types::by_ref:

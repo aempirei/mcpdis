@@ -11,6 +11,13 @@ namespace yyy {
 		predicate<value_type> clause;
 		std::list<argument_type> args;
 
+		binding();
+		binding(const binding&);
+		binding(const predicate<value_type>&);
+		binding(const predicate<value_type>&, const std::list<argument_type>&);
+
+		binding& operator=(const binding&);
+
 		binding& operator<<(const argument_type&);
 	};
 }
