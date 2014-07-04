@@ -208,7 +208,7 @@ namespace yyy {
 					auto dast = g.parse(arg.template get<symbol::ref>(), f);
 					if(dast.first) {
 						for(const auto& x : dast.second)
-							b << x;
+							b.args.push_back(x);
 						return test_return_type(true, b);
 					}
 				}
@@ -233,11 +233,15 @@ namespace yyy {
 					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
 
 				for(const auto& x : f.args) {
-					if(test(x))
-						b << x;
-					else
-						return test_return_type(false,binding<T>());
+					if(test(x)) {
+						b.args.push_back(x);
+						if(quantifier.second != UINT_MAX and b.args.size() == quantifier.second)
+							break;
+					}
 				}
+
+				if(b.args.size() < quantifier.first)
+					return test_return_type(false, binding<T>());
 
 				return test_return_type(true,b);
 		}

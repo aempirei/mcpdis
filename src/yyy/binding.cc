@@ -22,10 +22,5 @@ namespace yyy {
 		return *this;
 	}
 
-	template <typename T> binding<T>& binding<T>::operator<<(const argument_type&arg) {
-		args.push_back(arg);
-		return *this;
-	}
-
 	template struct binding<term>;
 }

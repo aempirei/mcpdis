@@ -17,7 +17,5 @@ namespace yyy {
 		binding(const predicate<value_type>&, const std::list<argument_type>&);
 
 		binding& operator=(const binding&);
-
-		binding& operator<<(const argument_type&);
 	};
 }
