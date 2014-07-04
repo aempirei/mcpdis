@@ -16,7 +16,7 @@ namespace yyy {
 
 		using parse_return_type = std::pair<bool, bindings<T>>;
 
-		parse_return_type parse(const key_type&, const function<T>&);
-		parse_return_type parse(const rule<T>&, const function<T>&);
+		parse_return_type parse(const key_type&, const function<T>&) const;
+		parse_return_type parse(const rule<T>&, const function<T>&) const;
 	};
 }

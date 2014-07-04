@@ -2,7 +2,7 @@
 
 namespace yyy {
 
-	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const key_type& k, const function<T>& f) {
+	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
 		for(const rule<T> r : at(k)) {
 			auto result = parse(r,f);
@@ -13,7 +13,7 @@ namespace yyy {
 		return parse_return_type(false,{});
 	}
 
-	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const rule<T>& r, const function<T>& f) {
+	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
 
 		bindings<T> ast;
 
