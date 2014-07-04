@@ -171,10 +171,9 @@ namespace yyy {
 			case types::mem:
 				throw std::runtime_error("mem predicate not implemented");
 			case types::by_op:
-				if(arg.template contains_type<function<T>>())
-					if(x.template contains_type<function<T>>())
-						return (x.template get<function<T>>().op == x.template get<function<T>>().op);
-				return false;
+				return arg.template contains_type<function<T>>()
+					and x.template contains_type<function<T>>()
+					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
 			case types::by_value:
 				return arg.contains_any_value(x);
 			case types::by_type:
@@ -187,34 +186,18 @@ namespace yyy {
 
 	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
+		binding<T> b(*this);
+
 		switch(type) {
 
 			case types::end:
 
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
+
 				if(f.args.empty())
-					return test_return_type(true,binding<T>(*this));
-				break;
+					return test_return_type(true, b);
 
-			case types::any:
-
-				if(not arg.empty()) {
-					throw std::runtime_error("any predicate contained unexpected non-empty argument");
-				} else {
-					binding<T> b(*this);
-					for(const auto& x : f.args) {
-						b << x;
-						//FIXME
-					}
-				}
-				break;
-
-			case types::mem:
-
-				if(not arg.empty())
-					throw std::runtime_error("mem predicate contained unexpected non-empty argument");
-				throw std::runtime_error("mem predicate not implemented");
 				break;
 
 			case types::by_ref:
@@ -224,37 +207,46 @@ namespace yyy {
 				} else {
 					auto dast = g.parse(arg.template get<symbol::ref>(), f);
 					if(dast.first) {
-						binding<T> b(*this);
 						for(const auto& x : dast.second)
 							b << x;
 						return test_return_type(true, b);
 					}
 				}
+
 				break;
 
-			case types::by_type:
+			case types::any:
 
-				if(arg.template contains_type<symbol::ref>()) {
-					throw std::runtime_error("by_type predicate contains unexpected symbol::ref argument");
-				} else {
-					auto arg_types = arg.get_types();
-				}
-				break;
+				if(type == types::any and not arg.empty())
+					throw std::runtime_error("any predicate contained unexpected non-empty argument");
+
+			case types::mem:
+
+				if(type == types::mem and not arg.empty())
+					throw std::runtime_error("mem predicate contained unexpected non-empty argument");
 
 			case types::by_op:
 
-				if(not arg.template contains_type<function<value_type>>())
-					throw std::runtime_error("by_ref predicate expected symbol::ref argument but did not contain one");
-				break;
+				if(type == types::by_op and not arg.template contains_type<function<value_type>>())
+					throw std::runtime_error("by_op predicate expected function argument but did not contain one");
 
+			case types::by_type:
 			case types::by_value:
 
 				if(arg.template contains_type<symbol::ref>())
-					throw std::runtime_error("by_value predicate contains unexpected symbol::ref argument");
-				break;
+					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
+
+				for(const auto& x : f.args) {
+					if(test(x))
+						b << x;
+					else
+						return test_return_type(false,binding<T>());
+				}
+
+				return test_return_type(true,b);
 		}
 
-		return test_return_type(false,binding<value_type>());
+		return test_return_type(false,binding<T>());
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
