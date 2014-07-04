@@ -17,5 +17,7 @@ namespace yyy {
 		binding(const predicate<value_type>&, const std::list<argument_type>&);
 
 		binding& operator=(const binding&);
+
+		std::wstring str() const;
 	};
 }

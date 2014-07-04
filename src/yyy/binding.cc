@@ -22,5 +22,16 @@ namespace yyy {
 		return *this;
 	}
 
+	template <typename T> std::wstring binding<T>::str() const {
+
+		std::wstringstream ss;
+
+		ss << clause.str() << L" =>";
+		for(const auto& arg : args)
+			ss << L' ' << arg.str();
+
+		return ss.str();
+	}
+
 	template struct binding<term>;
 }
