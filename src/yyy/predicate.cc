@@ -216,14 +216,10 @@ namespace yyy {
 				break;
 
 			case types::any:
-
-				if(type == types::any and not arg.empty())
-					throw std::runtime_error("any predicate contained unexpected non-empty argument");
-
 			case types::mem:
 
-				if(type == types::mem and not arg.empty())
-					throw std::runtime_error("mem predicate contained unexpected non-empty argument");
+				if(not arg.empty())
+					throw std::runtime_error("predicate contained unexpected non-empty argument");
 
 			case types::by_op:
 
