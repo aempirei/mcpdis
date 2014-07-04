@@ -153,37 +153,51 @@ namespace yyy {
 	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
 		switch(type) {
+
 			case types::end:
+
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
 				break;
+
 			case types::any:
+
 				if(not arg.empty())
 					throw std::runtime_error("any predicate contained unexpected non-empty argument");
 				break;
+
 			case types::mem:
+
 				if(not arg.empty())
 					throw std::runtime_error("mem predicate contained unexpected non-empty argument");
 				break;
+
 			case types::by_ref:
+
 				if(not arg.template contains_type<symbol::ref>()) {
 					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
 				} else {
 					auto dast = g.parse(arg.template get<symbol::ref>(), f);
 				}
 				break;
+
 			case types::by_type:
+
 				if(arg.template contains_type<symbol::ref>()) {
 					throw std::runtime_error("by_type predicate contains unexpected symbol::ref argument");
 				} else {
 					auto arg_types = arg.get_types();
 				}
 				break;
+
 			case types::by_op:
+
 				if(not arg.template contains_type<function<value_type>>())
 					throw std::runtime_error("by_ref predicate expected symbol::ref argument but did not contain one");
 				break;
+
 			case types::by_value:
+
 				if(arg.template contains_type<symbol::ref>())
 					throw std::runtime_error("by_value predicate contains unexpected symbol::ref argument");
 				break;
