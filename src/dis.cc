@@ -218,7 +218,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		if(config.verbose) {
 
 			if(iter != rs.end())
-				std::wcout << ref << L" := " << iter->str() << std::endl;
+				std::wcout << yyy::colorize(ref) << L" := " << iter->str() << std::endl;
 
 			while(++iter != rs.end())
 				std::wcout << std::setw(ref.length()) << L"" << L" := " << iter->str() << std::endl;
@@ -228,7 +228,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(10) << std::left << ref << ANSI_HIRED << L" := " << ANSI_CLR << iter->str();
+				std::wcout << std::setw(22) << std::left << colorize(ref) << L" := " << iter->str();
 
 			while(++iter != rs.end())
 				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
@@ -512,15 +512,15 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 				if(k.second.contains_type<symbol::var>()) {
 
 					if(not k.second.contains_value(k.first))
-					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" $= " << k.second.str() << std::endl;
+					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" $= " << k.second.str() << std::endl;
 
 				} else if(k.second.contains_type<literal_t>()) {
 
-					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" #= " << k.second.str() << std::endl;
+					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" #= " << k.second.str() << std::endl;
 
 				} else {
 
-					std::wcout << std::setw(14) << std::setfill(L' ') << k.first << L" := " << k.second.str() << std::endl;
+					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" := " << k.second.str() << std::endl;
 				}
 			}
 

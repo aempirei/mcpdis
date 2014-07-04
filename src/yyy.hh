@@ -102,4 +102,16 @@ namespace yyy {
 	extern template struct function <predicate <quick::quick_type> >;
 	extern template struct binding <quick::quick_type>;
 	extern template struct grammar <quick::quick_type>;
+
+// templates inline
+
+	template <typename T> std::type_index typekey(const T&) {
+		return std::type_index( typecolor.find( std::type_index(typeid(T)) ) != typecolor.end() ? typeid(T) : typeid(void) );
+	}
+
+	template <typename T> std::wstring colorize(const T& t) {
+		std::wstringstream ss;
+		ss << typecolor[typekey(t)] << t << ANSI_CLR;
+		return ss.str();
+	}
 }

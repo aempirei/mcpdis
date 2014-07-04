@@ -2,6 +2,7 @@
 
 namespace yyy {
 	std::map<std::type_index, const operator_t> typeoperator = {
+		{ std::type_index(typeid(void)), L'\u2205' },
 		{ std::type_index(typeid(literal_t)), L'L' },
 		{ std::type_index(typeid(function<term>)), L'F' },
 		{ std::type_index(typeid(symbol::var)), L'S' },
@@ -12,6 +13,7 @@ namespace yyy {
 	};
 
 	std::map<std::type_index, const std::wstring> typecolor = {
+		{ std::type_index(typeid(void)), ANSI_CLR },
 		{ std::type_index(typeid(literal_t)), ANSI_LOCYAN },
 		{ std::type_index(typeid(function<term>)), ANSI_LOWHITE },
 		{ std::type_index(typeid(rule<term>)), ANSI_HIBLACK },
