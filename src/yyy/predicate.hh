@@ -74,5 +74,9 @@ namespace yyy {
 
 		std::wstring str() const;
 		explicit operator std::wstring() const;
+
+		using test_return_type = std::pair<bool,binding<T>>;
+
+		test_return_type test(const grammar<T>&, const function<T>&);
 	};
 }

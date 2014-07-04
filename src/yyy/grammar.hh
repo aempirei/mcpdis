@@ -14,7 +14,9 @@ namespace yyy {
 		using mapped_type = typename _grammar<T>::mapped_type;
 		using key_type = typename _grammar<T>::key_type;
 
-		bool parse(bindings<T>&, const key_type&, const T&);
-		bool parse(bindings<T>&, const rule<T>&, const T&);
+		using parse_return_type = std::pair<bool, bindings<T>>;
+
+		parse_return_type parse(const key_type&, const function<T>&);
+		parse_return_type parse(const rule<T>&, const function<T>&);
 	};
 }

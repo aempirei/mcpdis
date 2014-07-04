@@ -150,5 +150,10 @@ namespace yyy {
 		return ss.str();
 	}
 
+	template <typename T> typename predicate<T>::test_return_type test(const grammar<T>&, const function<T>&) {
+
+		return test_return_type(false,binding<T>());
+	}
+
 	template struct predicate<term>;
 }

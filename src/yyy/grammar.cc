@@ -2,24 +2,39 @@
 
 namespace yyy {
 
-	template <typename T> bool grammar<T>::parse(bindings<T>&ast, const key_type& k, const T& x) {
+	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const key_type& k, const function<T>& x) {
 
-		if(!contains(*this, k))
-			throw std::runtime_error("grammar does not contain expected rule");
+		for(const rule<T> r : at(k)) {
+			auto result = parse(r,x);
+			if(result.first)
+				return result;
+		}
 
-		for(const rule<T> r : at(k))
-			if(parse(ast, r, x))
-				return true;
-
-		return false;
+		return parse_return_type(false,{});
 	}
 
-	template <typename T> bool grammar<T>::parse(bindings<T>& , const rule<T>&, const T&) {
+	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const rule<T>& r, const function<T>& x) {
 
-		//for(const auto& p : r.args) {
-		//}
+		bindings<T> ast;
 
-		return false;
+		for(const auto& argp : r.args) {
+
+			if(argp.template contains_type<predicate<T>>()) {
+
+				auto p = argp.template get<predicate<T>>();
+				auto result = p.test(*this, x);
+
+				if(!result.first)
+					return parse_return_type(false,{});
+
+				ast.push_back(result.second);
+
+			} else {
+				throw std::runtime_error("rule contains nested predicates");
+			}
+		}
+
+		return parse_return_type(true,ast);
 	}
 
 	template struct grammar<term>;
