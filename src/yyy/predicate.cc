@@ -150,7 +150,17 @@ namespace yyy {
 		return ss.str();
 	}
 
-	template <typename T> typename predicate<T>::test_return_type test(const grammar<T>&, const function<T>&) {
+	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>&, const function<T>&) {
+
+		switch(type) {
+			case types::end: break;
+			case types::any: break;
+			case types::mem: break;
+			case types::by_ref: break;
+			case types::by_type: break;
+			case types::by_op: break;
+			case types::by_value: break;
+		}
 
 		return test_return_type(false,binding<T>());
 	}
