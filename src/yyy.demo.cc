@@ -118,10 +118,10 @@ int main(int argc, char **argv) {
 
 	f << f;
 
-	std::wcout << permits<int,int,bool,std::wstring>() << std::endl;
-	std::wcout << permits<bool,int,bool,std::wstring>() << std::endl;
-	std::wcout << permits<std::wstring,int,bool,std::wstring>() << std::endl;
-	std::wcout << permits<std::nullptr_t,int,bool,std::wstring>() << std::endl;
+	std::wcout << type_check<int,int,bool,std::wstring>() << std::endl;
+	std::wcout << type_check<bool,int,bool,std::wstring>() << std::endl;
+	std::wcout << type_check<std::wstring,int,bool,std::wstring>() << std::endl;
+	std::wcout << type_check<std::nullptr_t,int,bool,std::wstring>() << std::endl;
 
 	std::wcout << "f := " << (std::wstring)f << std::endl;
 

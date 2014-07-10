@@ -594,7 +594,7 @@ namespace yyy {
 	};
 
 	//
-	// choose
+	// type_compare
 	//
 
 	template <typename...Args> struct type_compare;
@@ -607,6 +607,10 @@ namespace yyy {
 		static constexpr bool equals = true;
 	};
 
+	//
+	// type_check
+	//
+
 	template <typename T> constexpr bool type_check() {
 		return false;
 	}
@@ -615,19 +619,13 @@ namespace yyy {
 		return (type_compare<T,U>::equals) ? true : type_check<T,Args...>();
 	}
 
+	//
+	// static_type_check
+	//
+
 	template <typename...Args> constexpr bool static_type_check() {
 		static_assert(type_check<Args...>(), "type check failed");
 		return type_check<Args...>();
-	}
-
-	template <typename T, typename...Args> std::wstring permits() {
-		std::wstringstream ss;
-		if(type_check<T,Args...>()) {
-			ss << L"( TYPE " << typeid(T).name() << " IS ALLOWED )";
-		} else {
-			ss << L"( TYPE " << typeid(T).name() << " IS REJECTED )";
-		}
-		return ss.str();
 	}
 
 	//
