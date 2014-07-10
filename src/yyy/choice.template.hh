@@ -592,4 +592,80 @@ namespace yyy {
 		using type = either<either<A,B>,otherwise>;
 		choice() = delete;
 	};
+
+	//
+	// choose
+	//
+
+	template <typename...Args> struct type_compare;
+	
+	template <typename T, typename U> struct type_compare<T,U> {
+		static constexpr bool equals = false;
+	};
+
+	template <typename T> struct type_compare<T,T> {
+		static constexpr bool equals = true;
+	};
+
+	template <typename T> constexpr bool type_check() {
+		return false;
+	}
+
+	template <typename T, typename U, typename...Args> constexpr bool type_check() {
+		return (type_compare<T,U>::equals) ? true : type_check<T,Args...>();
+	}
+
+	template <typename...Args> constexpr bool static_type_check() {
+		static_assert(type_check<Args...>(), "type check failed");
+		return type_check<Args...>();
+	}
+
+	template <typename T, typename...Args> std::wstring permits() {
+		std::wstringstream ss;
+		if(type_check<T,Args...>()) {
+			ss << L"( TYPE " << typeid(T).name() << " IS ALLOWED )";
+		} else {
+			ss << L"( TYPE " << typeid(T).name() << " IS REJECTED )";
+		}
+		return ss.str();
+	}
+
+	//
+	// choose
+	//
+
+	template <typename...Args> struct choose;
+
+	template <typename...Args> struct choose {
+
+		std::type_index data_type;
+
+		void *data_ptr;
+
+		void clear() {
+			if(data_ptr) {
+				delete data_ptr;
+				data_ptr = nullptr;
+			}
+		}
+
+		bool empty() {
+			return data_ptr == nullptr;
+		}
+
+		template <typename T> void assign(const T& t) {
+			data_type = std::type_index(typeid(T));
+			data_ptr = new T(t);
+		}
+
+		choose() : data_type(std::type_index(typeid(void))), data_ptr(nullptr) {
+		}
+
+		choose(const choose& r) : data_type(r.data_type), data_ptr(r.data_type) {
+			// fixme needs dynamic cast
+		}
+	};
 }
+
+
+

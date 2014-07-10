@@ -103,6 +103,8 @@ int main(int argc, char **argv) {
 
 	using F = function<term>;
 
+	choose<int,bool,std::wstring> x;
+
 	maybe<literal_t> lit;
 
 	setlocale(LC_CTYPE, "");
@@ -115,6 +117,11 @@ int main(int argc, char **argv) {
 	f << f;
 
 	f << f;
+
+	std::wcout << permits<int,int,bool,std::wstring>() << std::endl;
+	std::wcout << permits<bool,int,bool,std::wstring>() << std::endl;
+	std::wcout << permits<std::wstring,int,bool,std::wstring>() << std::endl;
+	std::wcout << permits<std::nullptr_t,int,bool,std::wstring>() << std::endl;
 
 	std::wcout << "f := " << (std::wstring)f << std::endl;
 

@@ -32,8 +32,8 @@ namespace yyy {
 
 	using range = std::pair<size_t,size_t>;
 
-	extern std::map<std::type_index, const operator_t> typeoperator;
-	extern std::map<std::type_index, const std::wstring> typecolor;
+	extern std::unordered_map<std::type_index, const operator_t> typeoperator;
+	extern std::unordered_map<std::type_index, const std::wstring> typecolor;
 }
 
 #include "yyy/operators.hh"
@@ -58,6 +58,19 @@ namespace yyy {
 	template <typename T> using meta = typename choice<symbol::ref,T>::type;
 	template <typename T> using argument = typename choice<function<T>,T>::type;
 	template <typename T> using rule = function<predicate<T>>;
+
+	using _hetero_datatype = std::unordered_map<std::type_index,void*>;
+	struct hetero_datatype : _hetero_datatype {
+		using _hetero_datatype::_hetero_datatype;
+		void unassign(const std::type_index&);
+		template <typename T> void unassign();
+		template <typename T> void assign(const T&);
+	};
+	template <typename...Args> struct multi_datatype : hetero_datatype {
+		using hetero_datatype::hetero_datatype;
+		using hetero_datatype::unassign;
+		using hetero_datatype::assign;
+	};
 
 	pluralize(argument);	// arguments
 	pluralize(rule);	// rules
