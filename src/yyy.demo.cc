@@ -103,8 +103,6 @@ int main(int argc, char **argv) {
 
 	using F = function<term>;
 
-	choose<int,bool,std::wstring> x;
-
 	maybe<literal_t> lit;
 
 	setlocale(LC_CTYPE, "");
@@ -136,6 +134,17 @@ int main(int argc, char **argv) {
 
 		std::wcout << std::endl;
 	}
+
+	hetero_datatype x;
+
+	x.assign(std::wstring(L"what is going on"));
+	x.assign(true);
+
+	std::wcout << x.get<std::wstring>() << std::endl;
+	std::wcout << x.get<bool>() << std::endl;
+
+	x.unassign<std::wstring>();
+	x.unassign<bool>();
 
 	do_yyy();
 

@@ -1,6 +1,7 @@
 #include <yyy.hh>
 
 namespace yyy {
+
 	std::unordered_map<std::type_index, const operator_t> typeoperator = {
 		{ std::type_index(typeid(void)), L'\u2205' },
 		{ std::type_index(typeid(literal_t)), L'L' },

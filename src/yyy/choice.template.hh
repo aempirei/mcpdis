@@ -629,39 +629,40 @@ namespace yyy {
 	}
 
 	//
-	// choose
+	// *_datatype
 	//
 
-	template <typename...Args> struct choose;
 
-	template <typename...Args> struct choose {
+	using _hetero_datatype = std::unordered_map<std::type_index,void*>;
 
-		std::type_index data_type;
+	struct hetero_datatype : _hetero_datatype {
+		using _hetero_datatype::_hetero_datatype;
+		void unassign(const std::type_index&);
 
-		void *data_ptr;
-
-		void clear() {
-			if(data_ptr) {
-				delete data_ptr;
-				data_ptr = nullptr;
+		template <typename T> void unassign() {
+			const auto key = std::type_index(typeid(T));
+			if(find(key) != end()) {
+				delete (T*)at(key);
+				erase(key);
 			}
 		}
 
-		bool empty() {
-			return data_ptr == nullptr;
-		}
-
 		template <typename T> void assign(const T& t) {
-			data_type = std::type_index(typeid(T));
-			data_ptr = new T(t);
+			const auto key = std::type_index(typeid(T));
+			unassign<T>();
+			operator[](key) = (void *)new T(t);
 		}
 
-		choose() : data_type(std::type_index(typeid(void))), data_ptr(nullptr) {
+		template <typename T> T& get() {
+			const auto key = std::type_index(typeid(T));
+			return *(T*)at(key);
 		}
+	};
 
-		choose(const choose& r) : data_type(r.data_type), data_ptr(r.data_type) {
-			// fixme needs dynamic cast
-		}
+	template <typename...Args> struct multi_datatype : hetero_datatype {
+		using hetero_datatype::hetero_datatype;
+		using hetero_datatype::unassign;
+		using hetero_datatype::assign;
 	};
 }
 
