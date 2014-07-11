@@ -593,6 +593,21 @@ namespace yyy {
 		choice() = delete;
 	};
 
+	namespace type {
+		template <typename...Args> struct list {
+		};
+
+		template <typename...> struct compare;
+
+		template <typename T,typename U> struct compare<T,U> {
+			static constexpr bool equals = false;
+		};
+
+		template <typename T> struct compare<T,T> {
+			static constexpr bool equals = true;
+		};
+	}
+
 	//
 	// type_compare
 	//

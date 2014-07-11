@@ -42,35 +42,11 @@ namespace yyy {
 #include "yyy/symbol.template.hh"
 #include "yyy/choice.template.hh"
 
+#include "yyy.template.hh"
+
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
 
 namespace yyy {
-
-	//
-	// dynamic typing
-	//
-
-	struct unrestricted_type {
-
-		std::unordered_map<std::type_index,void *> data;
-
-		unrestricted_type(const unrestricted_type&);
-		unrestricted_type();
-
-		~unrestricted_type();
-
-		unrestricted_type& operator=(const unrestricted_type&);
-		bool operator==(const unrestricted_type&) const;
-
-		template <typename T> void unassign();
-		template <typename T> void assign(const T& t);
-		template <typename T> bool contains() const;
-		template <typename T> bool contains(const T&) const;
-		template <typename T> T& get() const;
-		template <typename T> std::type_index key() const;
-	};
-
-	template <typename...> struct restricted_type;
 
 	//
 	// forward declarations
@@ -132,6 +108,7 @@ namespace yyy {
 	extern template struct grammar <quick::quick_type>;
 
 	// inline function templates
+
 	template <typename S, typename X> bool contains(const S& s, const X& x) {
 		return (s.find(x) not_eq s.end());
 	}
