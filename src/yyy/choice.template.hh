@@ -627,44 +627,4 @@ namespace yyy {
 		static_assert(type_check<Args...>(), "type check failed");
 		return type_check<Args...>();
 	}
-
-	//
-	// *_datatype
-	//
-
-
-	using _hetero_datatype = std::unordered_map<std::type_index,void*>;
-
-	struct hetero_datatype : _hetero_datatype {
-		using _hetero_datatype::_hetero_datatype;
-		void unassign(const std::type_index&);
-
-		template <typename T> void unassign() {
-			const auto key = std::type_index(typeid(T));
-			if(find(key) != end()) {
-				delete (T*)at(key);
-				erase(key);
-			}
-		}
-
-		template <typename T> void assign(const T& t) {
-			const auto key = std::type_index(typeid(T));
-			unassign<T>();
-			operator[](key) = (void *)new T(t);
-		}
-
-		template <typename T> T& get() {
-			const auto key = std::type_index(typeid(T));
-			return *(T*)at(key);
-		}
-	};
-
-	template <typename...Args> struct multi_datatype : hetero_datatype {
-		using hetero_datatype::hetero_datatype;
-		using hetero_datatype::unassign;
-		using hetero_datatype::assign;
-	};
 }
-
-
-

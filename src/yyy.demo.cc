@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 		std::wcout << std::endl;
 	}
 
-	hetero_datatype x;
+	unrestricted_type x;
 
 	x.assign(std::wstring(L"what is going on"));
 	x.assign(true);
