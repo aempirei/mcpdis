@@ -220,6 +220,10 @@ namespace yyy {
 				return r;
 			}
 
+			template <typename...Xs> container<Xs...>& overlay(container<Xs...>& r) const {
+				return r;
+			}
+
 			constexpr const wchar_t *str() const {
 				return L"";
 			}
@@ -328,6 +332,17 @@ namespace yyy {
 				}
 				return tail.project(r);
 			}
+
+			template <typename...Xs> container<Xs...>& overlay(container<Xs...>& r) const {
+				auto ref = r.find_ref<T>();
+				if(ref and head) {
+					if(*ref)
+						delete *ref;
+					*ref = new T(*head);
+				}
+				return tail.overlay(r);
+			}
+
 
 			std::wstring str() const {
 

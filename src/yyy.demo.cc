@@ -212,6 +212,9 @@ int main(int argc, char **argv) {
 	unique_type y(66,M_PI,true,OP_COMPOSE,nullptr);
 	unique_type z;
 	mini_type m;
+	mini_type n;
+
+	n.set(666LL);
 
 	z.set(false);
 	z.set(OP_PLUS);
@@ -220,6 +223,7 @@ int main(int argc, char **argv) {
 
 	std::wcout << "project :: " << y.project(m).str() << std::endl;
 	std::wcout << "project :: " << z.project(m).str() << std::endl;
+	std::wcout << "project :: " << n.overlay(m).str() << std::endl;
 
 	typeprint('y', y, M_PI);
 	typeprint('y', y, OP_COMPOSE);
