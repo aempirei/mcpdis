@@ -8,9 +8,22 @@ namespace yyy {
 		{ std::type_index(typeid(function<term>)), L'F' },
 		{ std::type_index(typeid(symbol::var)), L'S' },
 		{ std::type_index(typeid(symbol::ref)), L'R' },
+
+		{ std::type_index(typeid(double)), L'e' },
+		{ std::type_index(typeid(float)), L'f' },
+
 		{ std::type_index(typeid(int)), L'i' },
+		{ std::type_index(typeid(long)), L'l' },
 		{ std::type_index(typeid(bool)), L'b' },
-		{ std::type_index(typeid(std::wstring)), L's' },
+
+		{ std::type_index(typeid(unsigned long)), L'v' },
+		{ std::type_index(typeid(unsigned int)), L'u' },
+
+		{ std::type_index(typeid(char)), L'c' },
+		{ std::type_index(typeid(unsigned char)), L'd' },
+
+		{ std::type_index(typeid(std::wstring)), L'w' },
+		{ std::type_index(typeid(std::string)), L's' },
 	};
 
 	std::unordered_map<std::type_index, const std::wstring> typecolor = {

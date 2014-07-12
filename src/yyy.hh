@@ -117,15 +117,9 @@ namespace yyy {
 		return contains(s,x) and contains(s,xs...);
 	}
 
-	template <typename T> std::type_index typekey(const T&) {
-		return std::type_index( contains(typecolor,  std::type_index(typeid(T))) ? typeid(T) : typeid(void) );
-	}
-
 	template <typename T> std::wstring colorize(const T& t) {
 		std::wstringstream ss;
-		ss << typecolor[typekey(t)] << t << ANSI_CLR;
+		ss << type::index<T>(typecolor) << t << ANSI_CLR;
 		return ss.str();
 	}
-
-
 }

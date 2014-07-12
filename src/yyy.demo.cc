@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 		std::wcout << "contains fourth set of values" << std::endl;
 	}
 
-	using list3_type = type::list<int,bool,char>;
+	using list3_type = type::list<int,bool,char,void *>;
 	using say3_type = list3_type::tail::bind<std::tuple>;
 	using list6_type = type::concat<list3_type,list3_type>;
 	using say6_type = type::concat<say3_type,say3_type>;
@@ -177,9 +177,13 @@ int main(int argc, char **argv) {
 
 	print_types<list3_type, say3_type, list6_type, say6_type, tolist1_type, tolist2_type>();
 
-	say6_type bob;
+	say6_type dan;
+	type::reverse<say6_type> nad;
+	type::filter<bool,say6_type> alice;
 
-	std::wcout << "bob is a " << typeid(bob).name() << std::endl;
+	std::wcout << "dan is a " << typeid(dan).name() << std::endl;
+	std::wcout << "nad is a " << typeid(nad).name() << std::endl;
+	std::wcout << "alice is a " << typeid(alice).name() << std::endl;
 
 	auto t = type::map::get<int,bool,bool>(x);
 

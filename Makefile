@@ -14,7 +14,7 @@ YYYHH = $(YYYCC:.cc=.hh)
 
 TPLHH = src/yyy/choice.template.hh src/yyy/symbol.template.hh
 
-.PHONY: all clean test demo lib
+.PHONY: all clean test demo lib rebuild
 
 all: $(TARGETS)
 
@@ -23,6 +23,8 @@ clean:
 	rm -f src/*~ src/*.o src/yyy/*.o src/yyy/*~
 	rm -f test.dis
 	rm -rf bin lib
+
+rebuild: clean all
 
 test: all
 	./bin/dis -x le16 < test.bin > test.dis
@@ -34,6 +36,7 @@ test: all
 ########
 
 demo: bin/yyy.demo
+	./bin/yyy.demo 111
 
 src/yyy.demo.o: src/yyy.demo.cc
 
