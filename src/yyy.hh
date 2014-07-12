@@ -40,8 +40,6 @@ namespace yyy {
 #include "yyy/operators.hh"
 
 #include "yyy/symbol.template.hh"
-#include "yyy/choice.template.hh"
-
 #include "yyy/type.template.hh"
 
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>

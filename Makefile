@@ -12,7 +12,7 @@ LIBHH = $(LIBCC:.cc=.hh)
 YYYCC = src/yyy/grammar.cc src/yyy/binding.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy.cc
 YYYHH = $(YYYCC:.cc=.hh)
 
-TPLHH = src/yyy/choice.template.hh src/yyy/symbol.template.hh src/yyy/type.template.hh
+TPLHH = src/yyy/symbol.template.hh src/yyy/type.template.hh
 
 .PHONY: all clean test demo lib rebuild
 
