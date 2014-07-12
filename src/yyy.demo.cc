@@ -97,6 +97,20 @@ void do_yyy() {
 	std::wcout << "types allowed : " << types_a.str() << std::endl;
 }
 
+template <typename T> void print_type() {
+	std::wcout << "type(" << yyy::type::list<>::from<T>::size << ") < " << typeid(T).name() << " >" << std::endl;
+}
+
+template <typename T> void print_types() {
+	print_type<T>();
+}
+
+template <typename T, typename U, typename...Args> void print_types() {
+	print_types<T>();
+	print_types<U,Args...>();
+}
+
+
 int main(int argc, char **argv) {
 
 	using namespace yyy;
@@ -154,6 +168,18 @@ int main(int argc, char **argv) {
 		std::wcout << "contains fourth set of values" << std::endl;
 	}
 
+	using list3_type = type::list<int,bool,char>;
+	using say3_type = list3_type::tail::bind<type::say>;
+	using list6_type = type::concat<list3_type,list3_type>;
+	using say6_type = type::concat<say3_type,say3_type>;
+	using from1_type = type::from<say3_type>::to_list;
+	using from2_type = type::list<>::from<say3_type>;
+
+	print_types<list3_type, say3_type, list6_type, say6_type, from1_type, from2_type>();
+
+	say6_type bob;
+
+	std::wcout << "SAY< " << bob() << "> -- " << typeid(bob).name() << std::endl;
 
 	auto t = type::map::get<int,bool,bool>(x);
 
