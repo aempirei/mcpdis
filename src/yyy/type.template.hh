@@ -197,6 +197,10 @@ namespace yyy {
 				return false;
 			}
 
+			template <typename U> bool contains(const U&) const {
+				return false;
+			}
+
 			template <typename U> constexpr U *find() const {
 				return nullptr;
 			}
@@ -278,6 +282,11 @@ namespace yyy {
 			template <typename U> bool contains() const {
 				return find<U>();
 			}
+
+			template <typename U> bool contains(const U& u) const {
+				return contains<U>() and get<U>() == u;
+			}
+
 
 			std::wstring str() const {
 

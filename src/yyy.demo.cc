@@ -131,36 +131,37 @@ template <typename T,typename U> std::wstring typecheck() {
 template <bool B,typename T,typename U> struct getstr;
 
 template <typename T,typename U> struct getstr<true,T,U> {
-	static std::wstring s(const U&u) {
+	static std::wstring s(const T&t, const U&u) {
 		std::wstringstream ss;
-		if(u.template contains<T>()) {
-			ss << "T " << u.template get<T>();
-		} else {
-			ss << 'F';
-		}
+
+		ss << (u.template contains<T>() ? 'T' : 'F') << '/' << (u.contains(t) ? 'T' : 'F');
+
+		if(u.template contains<T>())
+			ss << ' ' << u.template get<T>();
+
 		return ss.str();
 	}
 
 };
 
 template <typename T,typename U> struct getstr<false,T,U> {
-	static constexpr const wchar_t *s(const U&) {
+	static constexpr const wchar_t *s(const T&, const U&) {
 		return L"~";
 	}
 };
 
-template <typename T,typename U> void typeprint(wchar_t wx, const U& x) {
+template <typename T,typename U> void typeprint(wchar_t wx, const U& u, const T& t) {
 
 	using namespace yyy;
 
 	typecheck<T,U>();
 
-	std::wcout << typecheck<T,U>() << ' ' << wx << " (" << x.size() << ':' << x.dim << ") := ";
-	std::wcout << x.str() << " contains " << typeoperator[type::index<T>()] << "? ";
+	std::wcout << typecheck<T,U>() << ' ' << wx << " (" << u.size() << ':' << u.dim << ") := ";
+	std::wcout << u.str() << " contains " << typeoperator[type::index<T>()] << ':' << t << " ? ";
 
 	using getstr_type = getstr<type::contains<T,U>::eval,T,U>;
 
-	std::wcout << getstr_type::s(x) << std::endl;
+	std::wcout << getstr_type::s(t,u) << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -213,12 +214,12 @@ int main(int argc, char **argv) {
 	z.set(false);
 	z.set(OP_PLUS);
 
-	typeprint<double,unique_type>('y', y);
-	typeprint<wchar_t,unique_type>('y', y);
-	typeprint<float,unique_type>('y', y);
+	typeprint('y', y, M_PI);
+	typeprint('y', y, OP_COMPOSE);
+	typeprint('y', y, (float)M_PI);
 
-	typeprint<double,unique_type>('z', z);
-	typeprint<wchar_t,unique_type>('z', z);
+	typeprint('z', z, M_PI);
+	typeprint('z', z, OP_COMPOSE);
 
 	/*
 	type::map::type x;
