@@ -16,6 +16,8 @@ namespace yyy {
 		{ std::type_index(typeid(long)), L'l' },
 		{ std::type_index(typeid(bool)), L'b' },
 
+		{ std::type_index(typeid(void *)), L'@' },
+
 		{ std::type_index(typeid(unsigned long)), L'v' },
 		{ std::type_index(typeid(unsigned int)), L'u' },
 
@@ -33,6 +35,8 @@ namespace yyy {
 		{ std::type_index(typeid(rule<term>)), ANSI_HIBLACK },
 		{ std::type_index(typeid(symbol::var)), ANSI_LOWHITE },
 		{ std::type_index(typeid(symbol::ref)), ANSI_LOGREEN },
+
+		{ std::type_index(typeid(void *)), ANSI_CLR },
 
 		{ std::type_index(typeid(double)), ANSI_CLR },
 		{ std::type_index(typeid(float)), ANSI_CLR },

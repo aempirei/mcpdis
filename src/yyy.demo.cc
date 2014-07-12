@@ -152,6 +152,22 @@ int main(int argc, char **argv) {
 		std::wcout << std::endl;
 	}
 
+	using x_type = type::container<int,bool,char,void *>;
+	using x2_type = type::concat<x_type,type::reverse<x_type>>;
+	using x4_type = type::concat<x2_type,x2_type>;
+	using reversed_type = type::reverse<x2_type>;
+	using filtered_type = type::filter<int,type::filter<bool,x2_type>>;
+	using unique_type = type::unique<x4_type>;
+
+	print_types<x_type,x2_type,x4_type,reversed_type,filtered_type,unique_type>();
+
+	unique_type y(66,true,'a',nullptr);
+	unique_type z;
+
+	std::wcout << L"unique-type y := " << y.str() << std::endl;
+	std::wcout << L"unique-type z := " << z.str() << std::endl;
+
+	/*
 	type::map::type x;
 
 	type::map::assign(x, std::wstring(L"what is going on"), bool(true), int(66));
@@ -171,15 +187,6 @@ int main(int argc, char **argv) {
 		std::wcout << "contains fourth set of values" << std::endl;
 	}
 
-	using list_type = type::list<int,bool,char,void>;
-	using listx2_type = type::concat<list_type,type::reverse<list_type>>;
-	using listx4_type = type::concat<listx2_type,listx2_type>;
-	using reversed_type = type::reverse<listx2_type>;
-	using filtered_type = type::filter<int,type::filter<bool,listx2_type>>;
-	using unique_type = type::unique<listx4_type>;
-
-	print_types<list_type,listx2_type,listx4_type,reversed_type,filtered_type,unique_type>();
-
 	auto t = type::map::get<int,bool,bool>(x);
 
 	std::wcout << typeid(std::wstring).name() << ": " << type::map::get<std::wstring>(x) << std::endl;
@@ -193,6 +200,8 @@ int main(int argc, char **argv) {
 	std::wcout << (x.empty() ? L"x is empty" : L"x is not empty") << std::endl;
 
 	do_yyy();
+
+	*/
 
 	return 0;
 }
