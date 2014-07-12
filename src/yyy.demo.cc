@@ -188,13 +188,8 @@ int main(int argc, char **argv) {
 
 	typeprint<double,unique_type>(y);
 	typeprint<double,unique_type>(z);
-
 	typeprint<wchar_t,unique_type>(y);
 	typeprint<wchar_t,unique_type>(z);
-
-	typecheck<wchar_t,unique_type>();
-	typecheck<int,unique_type>();
-	typecheck<float,unique_type>();
 
 	/*
 	type::map::type x;
