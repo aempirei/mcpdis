@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
 	}
 
 	using list3_type = type::list<int,bool,char>;
-	using say3_type = list3_type::tail::bind<type::say>;
+	using say3_type = list3_type::tail::bind<std::tuple>;
 	using list6_type = type::concat<list3_type,list3_type>;
 	using say6_type = type::concat<say3_type,say3_type>;
 	using from1_type = type::from<say3_type>::to_list;
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
 
 	say6_type bob;
 
-	std::wcout << "SAY< " << bob() << "> -- " << typeid(bob).name() << std::endl;
+	std::wcout << "bob is a " << typeid(bob).name() << std::endl;
 
 	auto t = type::map::get<int,bool,bool>(x);
 
