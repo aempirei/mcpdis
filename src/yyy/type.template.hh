@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 // comment
 
 #define template_recursive template <typename T,typename U,typename...Args>
@@ -203,6 +201,14 @@ namespace yyy {
 				return nullptr;
 			}
 
+			template <typename U> constexpr U **find_ref() const {
+				return nullptr;
+			}
+
+			template <typename U> void set(const U&) const {
+				throw std::runtime_error("container<>::set should never be called");
+			}
+
 			const wchar_t *str() const {
 				return L"";
 			};
@@ -259,9 +265,18 @@ namespace yyy {
 				return equals<T,U>::eval ? (U *)head : tail.find<U>();
 			}
 
+			template <typename U> U **find_ref() const {
+				return equals<T,U>::eval ? (U **)&head : tail.find_ref<U>();
+			}
+
 			template <typename U> U& get() const {
 				static_assert(type::contains<U,container>::eval, "container::get<> called with unexpected type");
 				return *find<U>();
+			}
+
+			template <typename U> void set(const U& u) {
+				static_assert(type::contains<U,container>::eval, "container::set<> called with unexpected type");
+				*find_ref<U>() = new U(u);
 			}
 
 			template <typename U> bool contains() const {

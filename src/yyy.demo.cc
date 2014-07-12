@@ -1,6 +1,8 @@
-#include <yyy.hh>
 #include <iostream>
 #include <iomanip>
+#include <cmath>
+
+#include <yyy.hh>
 
 namespace yyy {
 
@@ -155,7 +157,7 @@ int main(int argc, char **argv) {
 		std::wcout << std::endl;
 	}
 
-	using x_type = type::container<int,bool,char,void *>;
+	using x_type = type::container<int,double,bool,char,void *>;
 	using x2_type = type::concat<x_type,type::reverse<x_type>>;
 	using x4_type = type::concat<x2_type,x2_type>;
 	using reversed_type = type::reverse<x2_type>;
@@ -164,11 +166,13 @@ int main(int argc, char **argv) {
 
 	print_types<x_type,x2_type,x4_type,reversed_type,filtered_type,unique_type>();
 
-	unique_type y(66,true,'a',nullptr);
+	unique_type y(66,M_PI,true,'a',nullptr);
 	unique_type z;
 
-	std::wcout << L"unique-type y := " << y.str() << " contains? " << (y.contains<char>() ? 'T' : 'F') << " " << y.get<char>() << std::endl;
-	std::wcout << L"unique-type z := " << z.str() << " contains? " << (z.contains<char>() ? 'T' : 'F') << " " << (void *)z.find<char>() << std::endl;
+	z.set(M_PI);
+
+	std::wcout << L"unique-type y := " << y.str() << " contains? " << (y.contains<double>() ? 'T' : 'F') << " " << y.get<double>() << std::endl;
+	std::wcout << L"unique-type z := " << z.str() << " contains? " << (z.contains<double>() ? 'T' : 'F') << " " << z.get<double>() << std::endl;
 
 	typecheck<char,unique_type>();
 	typecheck<int,unique_type>();
