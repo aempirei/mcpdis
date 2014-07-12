@@ -98,7 +98,7 @@ void do_yyy() {
 }
 
 template <typename T> void print_type() {
-	std::wcout << "type(" << yyy::type::list<>::from<T>::size << ") < " << typeid(T).name() << " >" << std::endl;
+	std::wcout << "type(" << yyy::type::to_list<T>::size << ") < " << typeid(T).name() << " >" << std::endl;
 }
 
 template <typename T> void print_types() {
@@ -172,10 +172,10 @@ int main(int argc, char **argv) {
 	using say3_type = list3_type::tail::bind<std::tuple>;
 	using list6_type = type::concat<list3_type,list3_type>;
 	using say6_type = type::concat<say3_type,say3_type>;
-	using from1_type = type::from<say3_type>::to_list;
-	using from2_type = type::list<>::from<say3_type>;
+	using tolist1_type = type::to_list<say3_type>;
+	using tolist2_type = type::to_list<say3_type>;
 
-	print_types<list3_type, say3_type, list6_type, say6_type, from1_type, from2_type>();
+	print_types<list3_type, say3_type, list6_type, say6_type, tolist1_type, tolist2_type>();
 
 	say6_type bob;
 
