@@ -58,8 +58,8 @@ namespace yyy {
 	template <typename> struct grammar;
 	template <typename> struct parser;
 
-	template <typename T> using meta = typename choice<symbol::ref,T>::type;
-	template <typename T> using argument = typename choice<function<T>,T>::type;
+	template <typename T> using meta = type::append<symbol::ref,T>;
+	template <typename T> using argument = type::append<function<T>,T>;
 	template <typename T> using rule = function<predicate<T>>;
 
 	pluralize(argument);	// arguments
@@ -76,8 +76,7 @@ namespace yyy {
 
 namespace yyy {
 
-	using term = choice<symbol::var,literal_t>::type;
-	// using term = type::container<symbol::var,literal_t>;
+	using term = type::container<symbol::var,literal_t>;
 
 	namespace quick {
 
