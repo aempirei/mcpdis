@@ -110,6 +110,8 @@ int main(int argc, char **argv) {
 
 	F f = F(OP_THIS) << ( F(OP_OR) << Sv(L"what") ) << L(666);
 
+	std::wcout << "f := " << f.str() << std::endl;
+
 	for(int i = 0; i < argc; i++)
 		f << L(atoi(argv[i]));
 

@@ -17,7 +17,7 @@ namespace yyy {
 	}
 
 	template <typename T> predicate<T>::predicate(const meta<argument<value_type>>& my_arg)
-		: type(my_arg.template contains_type<symbol::ref>() ? types::by_ref : types::by_value), arg(my_arg), mods({modifiers::bind}), quantifier(range(1,1))
+		: type(my_arg.contains<symbol::ref>() ? types::by_ref : types::by_value), arg(my_arg), mods({modifiers::bind}), quantifier(range(1,1))
 	{
 	}
 
@@ -132,8 +132,9 @@ namespace yyy {
 
 			case types::by_op:
 
-					       ss << typecolor[type::key<function<value_type>>()];
-					       ss << "F(" << arg.template get<function<value_type>>().op << ")";
+					       ss << typecolor[yyy::type::index<function<value_type>>()];
+					       // << "F(" << arg.template get<function<value_type>>().op << ")"; // FIXME
+					       ss << "F(" << arg.type_str() << ")";
 					       ss << ANSI_CLR;
 					       break;
 

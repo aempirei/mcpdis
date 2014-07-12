@@ -56,8 +56,8 @@ namespace yyy {
 	template <typename> struct grammar;
 	template <typename> struct parser;
 
-	template <typename T> using meta = type::append<symbol::ref,T>;
-	template <typename T> using argument = type::append<function<T>,T>;
+	template <typename T> using meta = type::container<T,symbol::ref>;
+	template <typename T> using argument = type::container<T,function<T>>;
 	template <typename T> using rule = function<predicate<T>>;
 
 	pluralize(argument);	// arguments

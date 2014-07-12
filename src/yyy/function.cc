@@ -6,16 +6,13 @@ namespace yyy {
 	// function
 	//
 
-	template <typename T> function<T>::function() : function(OP_ANY) {
+	template <typename T> function<T>::function() : op(OP_ANY) {
 	}
-
-	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
+	template <typename T> function<T>::function(operator_t my_op) : op(my_op) {
 	}
-
-	template <typename T> function<T>::function(operator_t my_op) : function(my_op, {}) {
-	}
-
 	template <typename T> function<T>::function(operator_t my_op, const arguments<value_type>& args0) : op(my_op), args(args0) {
+	}
+	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
 	}
 
 	//
@@ -46,7 +43,7 @@ namespace yyy {
 	template <typename T> std::wstring function<T>::str() const {
 		std::wstringstream ss;
 		ss << (operator_t)op << L"(";
-		for(const auto& arg: args)
+		for(auto arg : args)
 			ss << L' ' << arg.str();
 		ss << L" )";
 		return ss.str();
