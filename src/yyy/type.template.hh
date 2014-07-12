@@ -205,10 +205,6 @@ namespace yyy {
 				return nullptr;
 			}
 
-			template <typename U> void set(const U&) const {
-				throw std::runtime_error("container<>::set should never be called");
-			}
-
 			const wchar_t *str() const {
 				return L"";
 			};

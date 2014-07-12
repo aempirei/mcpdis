@@ -122,6 +122,20 @@ template <typename T,typename U> void typecheck() {
 	std::wcout << (type::contains<T,U>::eval ? 'T' : 'F') << std::endl; 
 }
 
+template <typename T,typename U> void typeprint(const U& x) {
+	using namespace yyy;
+
+	typecheck<T,U>();
+
+	std::wcout << L"x := " << x.str() << " contains " << typeoperator[type::index<T>()] << "? ";
+
+	if(x.contains<T>()) {
+		std::wcout << "T " << x.template get<T>() << std::endl;
+	} else {
+		std::wcout << 'F' << std::endl;
+	}
+}
+
 int main(int argc, char **argv) {
 
 	using namespace yyy;
@@ -171,8 +185,11 @@ int main(int argc, char **argv) {
 
 	z.set(M_PI);
 
-	std::wcout << L"unique-type y := " << y.str() << " contains? " << (y.contains<double>() ? 'T' : 'F') << " " << y.get<double>() << std::endl;
-	std::wcout << L"unique-type z := " << z.str() << " contains? " << (z.contains<double>() ? 'T' : 'F') << " " << z.get<double>() << std::endl;
+	typeprint<double,unique_type>(y);
+	typeprint<double,unique_type>(z);
+
+	typeprint<char,unique_type>(y);
+	typeprint<char,unique_type>(z);
 
 	typecheck<char,unique_type>();
 	typecheck<int,unique_type>();
