@@ -115,25 +115,52 @@ template <typename T, typename U, typename...Args> void print_types() {
 	print_types<U,Args...>();
 }
 
-template <typename T,typename U> void typecheck() {
+template <typename T,typename U> std::wstring typecheck() {
+
 	using namespace yyy;
-	std::wcout << typeoperator[type::index<T>()] << ' ' << OP_IN << ' ';
-	std::wcout << U::to_list::str() << " := ";
-	std::wcout << (type::contains<T,U>::eval ? 'T' : 'F') << std::endl; 
+
+	std::wstringstream ss;
+
+	ss << typeoperator[type::index<T>()] << ' ' << OP_IN << ' ';
+	ss << U::to_list::str() << " := ";
+	ss << (type::contains<T,U>::eval ? 'T' : 'F');
+
+	return ss.str();
 }
 
-template <typename T,typename U> void typeprint(const U& x) {
+template <bool B,typename T,typename U> struct getstr;
+
+template <typename T,typename U> struct getstr<true,T,U> {
+	static std::wstring s(const U&u) {
+		std::wstringstream ss;
+		if(u.template contains<T>()) {
+			ss << "T " << u.template get<T>();
+		} else {
+			ss << 'F';
+		}
+		return ss.str();
+	}
+
+};
+
+template <typename T,typename U> struct getstr<false,T,U> {
+	static constexpr const wchar_t *s(const U&) {
+		return L"~";
+	}
+};
+
+template <typename T,typename U> void typeprint(wchar_t wx, const U& x) {
+
 	using namespace yyy;
 
 	typecheck<T,U>();
 
-	std::wcout << L"x := " << x.str() << " contains " << typeoperator[type::index<T>()] << "? ";
+	std::wcout << typecheck<T,U>() << ' ' << wx << " (" << x.size() << ':' << x.dim << ") := ";
+	std::wcout << x.str() << " contains " << typeoperator[type::index<T>()] << "? ";
 
-	if(x.contains<T>()) {
-		std::wcout << "T " << x.template get<T>() << std::endl;
-	} else {
-		std::wcout << 'F' << std::endl;
-	}
+	using getstr_type = getstr<type::contains<T,U>::eval,T,U>;
+
+	std::wcout << getstr_type::s(x) << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -186,10 +213,12 @@ int main(int argc, char **argv) {
 	z.set(false);
 	z.set(OP_PLUS);
 
-	typeprint<double,unique_type>(y);
-	typeprint<double,unique_type>(z);
-	typeprint<wchar_t,unique_type>(y);
-	typeprint<wchar_t,unique_type>(z);
+	typeprint<double,unique_type>('y', y);
+	typeprint<wchar_t,unique_type>('y', y);
+	typeprint<float,unique_type>('y', y);
+
+	typeprint<double,unique_type>('z', z);
+	typeprint<wchar_t,unique_type>('z', z);
 
 	/*
 	type::map::type x;
