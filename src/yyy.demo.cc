@@ -98,7 +98,10 @@ void do_yyy() {
 }
 
 template <typename T> void print_type() {
-	std::wcout << "type(" << yyy::type::to_list<T>::size << ") < " << typeid(T).name() << " >" << std::endl;
+
+	using namespace yyy::type;
+
+	std::wcout << "type(" << to_list<T>::size << ") <" << to_list<T>::str() << "> : " << typeid(T).name() << std::endl;
 }
 
 template <typename T> void print_types() {
@@ -168,22 +171,12 @@ int main(int argc, char **argv) {
 		std::wcout << "contains fourth set of values" << std::endl;
 	}
 
-	using list3_type = type::list<int,bool,char,void *>;
-	using say3_type = list3_type::tail::bind<std::tuple>;
-	using list6_type = type::concat<list3_type,list3_type>;
-	using say6_type = type::concat<say3_type,say3_type>;
-	using tolist1_type = type::to_list<say3_type>;
-	using tolist2_type = type::to_list<say3_type>;
+	using list3_type = type::list<int,bool,char,void>;
+	using list6_type = type::concat<list3_type,type::reverse<list3_type>>;
+	using reversed_type = type::reverse<list6_type>;
+	using filtered_type = type::filter<int,type::filter<bool,list6_type>>;
 
-	print_types<list3_type, say3_type, list6_type, say6_type, tolist1_type, tolist2_type>();
-
-	say6_type dan;
-	type::reverse<say6_type> nad;
-	type::filter<bool,say6_type> alice;
-
-	std::wcout << "dan is a " << typeid(dan).name() << std::endl;
-	std::wcout << "nad is a " << typeid(nad).name() << std::endl;
-	std::wcout << "alice is a " << typeid(alice).name() << std::endl;
+	print_types<list3_type, list6_type,reversed_type,filtered_type>();
 
 	auto t = type::map::get<int,bool,bool>(x);
 

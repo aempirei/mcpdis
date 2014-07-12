@@ -33,5 +33,22 @@ namespace yyy {
 		{ std::type_index(typeid(rule<term>)), ANSI_HIBLACK },
 		{ std::type_index(typeid(symbol::var)), ANSI_LOWHITE },
 		{ std::type_index(typeid(symbol::ref)), ANSI_LOGREEN },
+
+		{ std::type_index(typeid(double)), ANSI_CLR },
+		{ std::type_index(typeid(float)), ANSI_CLR },
+
+		{ std::type_index(typeid(int)), ANSI_CLR },
+		{ std::type_index(typeid(long)), ANSI_CLR },
+		{ std::type_index(typeid(bool)), ANSI_CLR },
+
+		{ std::type_index(typeid(unsigned long)), ANSI_CLR },
+		{ std::type_index(typeid(unsigned int)), ANSI_CLR },
+
+		{ std::type_index(typeid(char)), ANSI_CLR },
+		{ std::type_index(typeid(unsigned char)), ANSI_CLR },
+
+		{ std::type_index(typeid(std::wstring)), ANSI_CLR },
+		{ std::type_index(typeid(std::string)), ANSI_CLR }
+
 	};
 }
