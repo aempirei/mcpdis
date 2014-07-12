@@ -167,9 +167,10 @@ int main(int argc, char **argv) {
 	unique_type y(66,true,'a',nullptr);
 	unique_type z;
 
-	std::wcout << L"unique-type y := " << y.str() << std::endl;
-	std::wcout << L"unique-type z := " << z.str() << std::endl;
+	std::wcout << L"unique-type y := " << y.str() << " contains? " << (y.contains<char>() ? 'T' : 'F') << " " << y.get<char>() << std::endl;
+	std::wcout << L"unique-type z := " << z.str() << " contains? " << (z.contains<char>() ? 'T' : 'F') << " " << (void *)z.find<char>() << std::endl;
 
+	typecheck<char,unique_type>();
 	typecheck<int,unique_type>();
 	typecheck<float,unique_type>();
 

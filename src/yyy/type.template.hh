@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 // comment
 
 #define template_recursive template <typename T,typename U,typename...Args>
@@ -193,9 +195,20 @@ namespace yyy {
 				return 0;
 			}
 
+			template <typename U> bool contains() const {
+				return false;
+			}
+
+			template <typename U> constexpr U *find() const {
+				return nullptr;
+			}
+
 			const wchar_t *str() const {
 				return L"";
 			};
+
+			void clear() {
+			}
 		};
 
 		template <typename T, typename...Args> struct container<T,Args...> {
@@ -240,10 +253,19 @@ namespace yyy {
 					tail = r.tail;
 				}
 				return *this;
-			};
+			}
+
+			template <typename U> U *find() const {
+				return equals<T,U>::eval ? (U *)head : tail.find<U>();
+			}
+
+			template <typename U> U& get() const {
+				static_assert(type::contains<U,container>::eval, "container::get<> called with unexpected type");
+				return *find<U>();
+			}
 
 			template <typename U> bool contains() const {
-				return ( equals<T,U>::eval and head ) or tail.contains<U>();
+				return find<U>();
 			}
 
 			std::wstring str() const {
