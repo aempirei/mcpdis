@@ -124,6 +124,8 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_CTYPE, "");
 
+	std::wcout << std::endl << "running " << argv[0] << "..." << std::endl << std::endl;
+
 	F f = F(OP_THIS) << ( F(OP_OR) << Sv(L"what") ) << L(666);
 
 	for(int i = 0; i < argc; i++)
@@ -132,11 +134,6 @@ int main(int argc, char **argv) {
 	f << f;
 
 	f << f;
-
-	std::wcout << type_check<int,int,bool,std::wstring>() << std::endl;
-	std::wcout << type_check<bool,int,bool,std::wstring>() << std::endl;
-	std::wcout << type_check<std::wstring,int,bool,std::wstring>() << std::endl;
-	std::wcout << type_check<std::nullptr_t,int,bool,std::wstring>() << std::endl;
 
 	std::wcout << "f := " << (std::wstring)f << std::endl;
 
@@ -166,6 +163,9 @@ int main(int argc, char **argv) {
 
 	std::wcout << L"unique-type y := " << y.str() << std::endl;
 	std::wcout << L"unique-type z := " << z.str() << std::endl;
+
+	std::wcout << typeoperator[type::index<int>()] << ' ' << OP_IN << ' ' << unique_type::to_list::str() << " := ";
+	std::wcout << (unique_type::allows<int>::eval ? 'T' : 'F') << std::endl; 
 
 	/*
 	type::map::type x;

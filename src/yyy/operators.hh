@@ -20,3 +20,5 @@
 #define OP_ROTR		L'\u21aa'
 
 #define OP_NULL		L'\u2205'
+#define OP_IN		L'\u2208'
+#define OP_CONTAINS	L'\u220b'
