@@ -216,7 +216,7 @@ namespace yyy {
 				return nullptr;
 			}
 
-			template <typename...Xs> container<Xs...>& transfer(container<Xs...>& r) const {
+			template <typename...Xs> container<Xs...>& project(container<Xs...>& r) const {
 				return r;
 			}
 
@@ -319,14 +319,14 @@ namespace yyy {
 				}
 			}
 
-			template <typename...Xs> container<Xs...>& transfer(container<Xs...>& r) const {
+			template <typename...Xs> container<Xs...>& project(container<Xs...>& r) const {
 				auto ref = r.find_ref<T>();
 				if(ref) {
 					if(*ref)
 						delete *ref;
 					*ref = smart_copy(head);
 				}
-				return tail.transfer(r);
+				return tail.project(r);
 			}
 
 			std::wstring str() const {

@@ -218,7 +218,8 @@ int main(int argc, char **argv) {
 
 	y.template unset<bool>();
 
-	std::wcout << "transfer :: " << y.transfer(m).str() << std::endl;
+	std::wcout << "project :: " << y.project(m).str() << std::endl;
+	std::wcout << "project :: " << z.project(m).str() << std::endl;
 
 	typeprint('y', y, M_PI);
 	typeprint('y', y, OP_COMPOSE);
