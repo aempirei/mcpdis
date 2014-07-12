@@ -224,6 +224,9 @@ int main(int argc, char **argv) {
 	typeprint('z', z, M_PI);
 	typeprint('z', z, OP_COMPOSE);
 
+	std::wcout << "y == z :: " << (y == z ? 'T' : 'F') << std::endl;
+	std::wcout << "y == y :: " << (y == y ? 'T' : 'F') << std::endl;
+
 	// do_yyy();
 
 	return 0;

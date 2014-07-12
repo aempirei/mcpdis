@@ -216,11 +216,11 @@ namespace yyy {
 				return L"";
 			}
 
-			void clear() const {
-			}
-
 			constexpr bool operator==(const container&) const {
 				return true;
+			}
+
+			void clear() {
 			}
 		};
 
@@ -324,6 +324,10 @@ namespace yyy {
 					s[s.length() - 1] = L'\0';
 
 				return s;
+			}
+
+			bool operator==(const container& r) const {
+				return ( ( head and r.head and *head == *r.head ) or not ( head or r.head ) ) and ( tail == r.tail );
 			}
 		};
 
