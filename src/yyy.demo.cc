@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
 		std::wcout << std::endl;
 	}
 
-	using x_type = type::container<int,double,bool,char,void *>;
+	using x_type = type::container<int,double,bool,wchar_t,void *>;
 	using x2_type = type::concat<x_type,type::reverse<x_type>>;
 	using x4_type = type::concat<x2_type,x2_type>;
 	using reversed_type = type::reverse<x2_type>;
@@ -180,18 +180,19 @@ int main(int argc, char **argv) {
 
 	print_types<x_type,x2_type,x4_type,reversed_type,filtered_type,unique_type>();
 
-	unique_type y(66,M_PI,true,'a',nullptr);
+	unique_type y(66,M_PI,true,OP_COMPOSE,nullptr);
 	unique_type z;
 
-	z.set(M_PI);
+	z.set(false);
+	z.set(OP_PLUS);
 
 	typeprint<double,unique_type>(y);
 	typeprint<double,unique_type>(z);
 
-	typeprint<char,unique_type>(y);
-	typeprint<char,unique_type>(z);
+	typeprint<wchar_t,unique_type>(y);
+	typeprint<wchar_t,unique_type>(z);
 
-	typecheck<char,unique_type>();
+	typecheck<wchar_t,unique_type>();
 	typecheck<int,unique_type>();
 	typecheck<float,unique_type>();
 

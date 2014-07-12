@@ -21,6 +21,7 @@ namespace yyy {
 		{ std::type_index(typeid(unsigned long)), L'v' },
 		{ std::type_index(typeid(unsigned int)), L'u' },
 
+		{ std::type_index(typeid(operator_t)), OP_LAMBDA },
 		{ std::type_index(typeid(char)), L'c' },
 		{ std::type_index(typeid(unsigned char)), L'y' },
 
@@ -48,6 +49,7 @@ namespace yyy {
 		{ std::type_index(typeid(unsigned long)), ANSI_CLR },
 		{ std::type_index(typeid(unsigned int)), ANSI_CLR },
 
+		{ std::type_index(typeid(operator_t)), ANSI_CLR },
 		{ std::type_index(typeid(char)), ANSI_CLR },
 		{ std::type_index(typeid(unsigned char)), ANSI_CLR },
 
