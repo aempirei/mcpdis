@@ -236,7 +236,7 @@ namespace yyy {
 			container(const T& t, const Args&...args) : head(new T(t)), tail(args...) {
 			}
 
-			~container() {
+			void erase() {
 				if(head) {
 					delete head;
 					head = nullptr;
@@ -244,11 +244,12 @@ namespace yyy {
 			}
 
 			void clear() {
-				if(head) {
-					delete head;
-					head = nullptr;
-				}
+				erase();
 				tail.clear();
+			}
+
+			~container() {
+				erase();
 			}
 
 			container& operator=(const container& r) {
@@ -287,6 +288,14 @@ namespace yyy {
 				return contains<U>() and get<U>() == u;
 			}
 
+			template <typename U> void unset() {
+				static_assert(type::contains<U,container>::eval, "container::set<> called with unexpected type");
+				if(contains<U>()) {
+					auto ref = find_ref<U>();
+					delete *ref;
+					*ref = nullptr;
+				}
+			}
 
 			std::wstring str() const {
 

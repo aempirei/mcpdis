@@ -214,6 +214,9 @@ int main(int argc, char **argv) {
 	z.set(false);
 	z.set(OP_PLUS);
 
+	y.template unset<double>();
+	y.template unset<bool>();
+
 	typeprint('y', y, M_PI);
 	typeprint('y', y, OP_COMPOSE);
 	typeprint('y', y, (float)M_PI);
@@ -221,41 +224,7 @@ int main(int argc, char **argv) {
 	typeprint('z', z, M_PI);
 	typeprint('z', z, OP_COMPOSE);
 
-	/*
-	type::map::type x;
-
-	type::map::assign(x, std::wstring(L"what is going on"), bool(true), int(66));
-	if(type::map::contains_values(x, std::wstring(L"what is going on"), bool(true), int(66))) {
-		std::wcout << "contains first set of values" << std::endl;
-	}
-
-	if(type::map::contains_values(x, std::wstring(L"what is going on"), bool(false), int(66))) {
-		std::wcout << "contains second set of values" << std::endl;
-	}
-
-	if(type::map::contains_values(x, std::wstring(L"what is going on"), bool(true), int(66), char('a'))) {
-		std::wcout << "contains third set of values" << std::endl;
-	}
-
-	if(type::map::contains_values(x,true,true,true)) {
-		std::wcout << "contains fourth set of values" << std::endl;
-	}
-
-	auto t = type::map::get<int,bool,bool>(x);
-
-	std::wcout << typeid(std::wstring).name() << ": " << type::map::get<std::wstring>(x) << std::endl;
-	std::wcout << typeid(bool).name() << ": " << (type::map::get<bool>(x) ? "TRUE" : "FALSE") << std::endl;
-	std::wcout << typeid(int).name() << ": " << type::map::get<int>(x) << std::endl;
-
-	std::wcout << std::get<0>(t) << L' ' << std::get<1>(t) << std::endl;
-
-	type::map::unassign<int,bool,std::wstring>(x);
-
-	std::wcout << (x.empty() ? L"x is empty" : L"x is not empty") << std::endl;
-
-	do_yyy();
-
-	*/
+	// do_yyy();
 
 	return 0;
 }
