@@ -77,6 +77,7 @@ namespace yyy {
 namespace yyy {
 
 	using term = choice<symbol::var,literal_t>::type;
+	// using term = type::container<symbol::var,literal_t>;
 
 	namespace quick {
 
