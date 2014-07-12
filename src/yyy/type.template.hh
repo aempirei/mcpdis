@@ -19,6 +19,10 @@
 
 namespace yyy {
 
+	template <typename T> T *smart_copy(T *t) {
+		return t ? new T(*t) : nullptr;
+	}
+
 	namespace type {
 
 		template <typename T> std::type_index index() {
@@ -212,6 +216,10 @@ namespace yyy {
 				return nullptr;
 			}
 
+			template <typename...Xs> container<Xs...>& transfer(container<Xs...>& r) const {
+				return r;
+			}
+
 			constexpr const wchar_t *str() const {
 				return L"";
 			}
@@ -246,7 +254,7 @@ namespace yyy {
 			container(const T& t, const Args&...args) : head(new T(t)), tail(args...) {
 			}
 
-			container(const container& r) : head(r.head ? new T(*r.head) : nullptr), tail(r.tail) {
+			container(const container& r) : head(smart_copy(r.head)), tail(r.tail) {
 			}
 
 			void erase() {
@@ -269,7 +277,7 @@ namespace yyy {
 				if(this != &r) {
 					if(head)
 						delete head;
-					head = r.head ? new T(*r.head) : nullptr;
+					head = smart_copy(r.head);
 					tail = r.tail;
 				}
 				return *this;
@@ -298,16 +306,27 @@ namespace yyy {
 			}
 
 			template <typename U> bool contains(const U& u) const {
-				return contains<U>() and get<U>() == u;
+				auto ptr = find<U>();
+				return ptr and *ptr == u;
 			}
 
 			template <typename U> void unset() {
 				static_assert(type::contains<U,container>::eval, "container::set<> called with unexpected type");
-				if(contains<U>()) {
-					auto ref = find_ref<U>();
+				auto ref = find_ref<U>();
+				if(ref and *ref) {
 					delete *ref;
 					*ref = nullptr;
 				}
+			}
+
+			template <typename...Xs> container<Xs...>& transfer(container<Xs...>& r) const {
+				auto ref = r.find_ref<T>();
+				if(ref) {
+					if(*ref)
+						delete *ref;
+					*ref = smart_copy(head);
+				}
+				return tail.transfer(r);
 			}
 
 			std::wstring str() const {

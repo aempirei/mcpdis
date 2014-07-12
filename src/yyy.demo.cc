@@ -205,17 +205,20 @@ int main(int argc, char **argv) {
 	using reversed_type = type::reverse<x2_type>;
 	using filtered_type = type::filter<int,type::filter<bool,x2_type>>;
 	using unique_type = type::unique<x4_type>;
+	using mini_type = type::container<int,wchar_t,long long>;
 
 	print_types<x_type,x2_type,x4_type,reversed_type,filtered_type,unique_type>();
 
 	unique_type y(66,M_PI,true,OP_COMPOSE,nullptr);
 	unique_type z;
+	mini_type m;
 
 	z.set(false);
 	z.set(OP_PLUS);
 
-	y.template unset<double>();
 	y.template unset<bool>();
+
+	std::wcout << "transfer :: " << y.transfer(m).str() << std::endl;
 
 	typeprint('y', y, M_PI);
 	typeprint('y', y, OP_COMPOSE);

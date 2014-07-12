@@ -15,6 +15,7 @@ namespace yyy {
 		{ std::type_index(typeid(int)), L'i' },
 		{ std::type_index(typeid(long)), L'l' },
 		{ std::type_index(typeid(bool)), L'b' },
+		{ std::type_index(typeid(long long)), L'n' },
 
 		{ std::type_index(typeid(void *)), L'@' },
 
@@ -45,6 +46,7 @@ namespace yyy {
 		{ std::type_index(typeid(int)), ANSI_CLR },
 		{ std::type_index(typeid(long)), ANSI_CLR },
 		{ std::type_index(typeid(bool)), ANSI_CLR },
+		{ std::type_index(typeid(long long)), ANSI_CLR },
 
 		{ std::type_index(typeid(unsigned long)), ANSI_CLR },
 		{ std::type_index(typeid(unsigned int)), ANSI_CLR },
