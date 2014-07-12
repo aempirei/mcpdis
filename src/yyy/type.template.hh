@@ -246,6 +246,9 @@ namespace yyy {
 			container(const T& t, const Args&...args) : head(new T(t)), tail(args...) {
 			}
 
+			container(const container& r) : head(r.head ? new T(*r.head) : nullptr), tail(r.tail) {
+			}
+
 			void erase() {
 				if(head) {
 					delete head;
