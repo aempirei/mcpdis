@@ -119,7 +119,7 @@ namespace yyy {
 
 	template <typename T> std::wstring colorize(const T& t) {
 		std::wstringstream ss;
-		ss << type::index<T>(typecolor) << t << ANSI_CLR;
+		ss << typecolor[type::index<T>()] << t << ANSI_CLR;
 		return ss.str();
 	}
 }
