@@ -12,7 +12,7 @@ LIBHH = $(LIBCC:.cc=.hh)
 YYYCC = src/yyy/grammar.cc src/yyy/binding.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy.cc
 YYYHH = $(YYYCC:.cc=.hh)
 
-TPLHH = src/yyy/choice.template.hh src/yyy/symbol.template.hh
+TPLHH = src/yyy/choice.template.hh src/yyy/symbol.template.hh src/yyy/type.template.hh
 
 .PHONY: all clean test demo lib rebuild
 
@@ -23,8 +23,6 @@ clean:
 	rm -f src/*~ src/*.o src/yyy/*.o src/yyy/*~
 	rm -f test.dis
 	rm -rf bin lib
-
-rebuild: clean all
 
 test: all
 	./bin/dis -x le16 < test.bin > test.dis
@@ -38,7 +36,7 @@ test: all
 demo: bin/yyy.demo
 	./bin/yyy.demo 111
 
-src/yyy.demo.o: src/yyy.demo.cc
+src/yyy.demo.o: src/yyy.demo.cc $(TPLHH)
 
 bin/yyy.demo: lib/libyyy.a src/yyy.demo.o
 	mkdir -p bin
@@ -52,11 +50,11 @@ lib: lib/libyyy.a lib/libmcpdis.a
 
 lib/libmcpdis.a: $(LIBCC:.cc=.o)
 	mkdir -p lib
-	ar crfv $@ $^ 
+	ar crfv $@ $^
 
 lib/libyyy.a: $(YYYCC:.cc=.o)
 	mkdir -p lib
-	ar crfv $@ $^ 
+	ar crfv $@ $(YYYCC:.cc=.o)
 
 #######
 # dis #
