@@ -171,12 +171,14 @@ int main(int argc, char **argv) {
 		std::wcout << "contains fourth set of values" << std::endl;
 	}
 
-	using list3_type = type::list<int,bool,char,void>;
-	using list6_type = type::concat<list3_type,type::reverse<list3_type>>;
-	using reversed_type = type::reverse<list6_type>;
-	using filtered_type = type::filter<int,type::filter<bool,list6_type>>;
+	using list_type = type::list<int,bool,char,void>;
+	using listx2_type = type::concat<list_type,type::reverse<list_type>>;
+	using listx4_type = type::concat<listx2_type,listx2_type>;
+	using reversed_type = type::reverse<listx2_type>;
+	using filtered_type = type::filter<int,type::filter<bool,listx2_type>>;
+	using unique_type = type::unique<listx4_type>;
 
-	print_types<list3_type, list6_type,reversed_type,filtered_type>();
+	print_types<list_type,listx2_type,listx4_type,reversed_type,filtered_type,unique_type>();
 
 	auto t = type::map::get<int,bool,bool>(x);
 
