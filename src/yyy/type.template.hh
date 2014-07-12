@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #define template_recursive template <typename T,typename U,typename...Args>
 
 #define template_recursive_with_types(...) template_recursive __VA_ARGS__(value_type& x)
@@ -371,7 +373,8 @@ namespace yyy {
 				ss << typeoperator[index<T>()];
 
 				if(head)
-					ss << L':' << *head;
+					ss << L':' << (void *)head;
+					// ss << L':' << *head; // FIXME
 
 				ss << L' ' << tail.str();
 

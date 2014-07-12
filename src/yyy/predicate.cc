@@ -158,6 +158,8 @@ namespace yyy {
 
 		return ss.str();
 	}
+
+	/*
 	
 	template <typename T> bool predicate<T>::test(const argument<T>& x) {
 		switch(type) {
@@ -245,6 +247,7 @@ namespace yyy {
 
 		return test_return_type(false,binding<T>());
 	}
+	*/
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
 		return type == r.type and arg == r.arg and mods == r.mods and quantifier == r.quantifier;

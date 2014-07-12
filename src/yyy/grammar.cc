@@ -2,6 +2,8 @@
 
 namespace yyy {
 
+	/*
+
 	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
 		for(const rule<T> r : at(k)) {
@@ -36,6 +38,7 @@ namespace yyy {
 
 		return parse_return_type(true,ast);
 	}
+	*/
 
 	template struct grammar<term>;
 }

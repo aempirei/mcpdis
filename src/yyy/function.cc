@@ -29,13 +29,13 @@ namespace yyy {
 
 	template <typename T> function<T>& function<T>::operator<<(const value_type& value) {
 		argument<value_type> arg;
-		arg.assign(value);
+		arg.set(value);
 		return operator<<(arg);
 	}
 
 	template <typename T> function<T>& function<T>::operator<<(const function<value_type>& fn) {
 		argument<value_type> arg;
-		arg.assign(fn);
+		arg.set(fn);
 		return operator<<(arg);
 	}
 
