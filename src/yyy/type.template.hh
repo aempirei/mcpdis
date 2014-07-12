@@ -1,7 +1,5 @@
 #pragma once
 
-// comment
-
 #define template_recursive template <typename T,typename U,typename...Args>
 
 #define template_recursive_with_types(...) template_recursive __VA_ARGS__(value_type& x)
