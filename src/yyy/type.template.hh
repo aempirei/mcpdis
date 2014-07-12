@@ -136,7 +136,7 @@ namespace yyy {
 			_filter() = delete;
 		};
 
-		// list<...>
+		// list<>
 		//
 
 		template <> struct list<> {
@@ -155,6 +155,9 @@ namespace yyy {
 				return L"";
 			};
 		};
+
+		// list<...>
+		//
 
 		template <typename T, typename...Args> struct list<T,Args...> {
 
@@ -180,7 +183,7 @@ namespace yyy {
 			};
 		};
 
-		// container<...>
+		// container<>
 		//
 
 		template <> struct container<> {
@@ -193,11 +196,11 @@ namespace yyy {
 				return 0;
 			}
 
-			template <typename U> bool contains() const {
+			template <typename U> constexpr bool contains() const {
 				return false;
 			}
 
-			template <typename U> bool contains(const U&) const {
+			template <typename U> constexpr bool contains(const U&) const {
 				return false;
 			}
 
@@ -209,13 +212,20 @@ namespace yyy {
 				return nullptr;
 			}
 
-			const wchar_t *str() const {
+			constexpr const wchar_t *str() const {
 				return L"";
-			};
+			}
 
-			void clear() {
+			void clear() const {
+			}
+
+			constexpr bool operator==(const container&) const {
+				return true;
 			}
 		};
+
+		// container<...>
+		//
 
 		template <typename T, typename...Args> struct container<T,Args...> {
 
