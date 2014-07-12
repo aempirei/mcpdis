@@ -17,6 +17,8 @@ namespace yyy {
 	using RS = rules<term>;
 
 	template <typename T> grammar<T> define_grammar() {
+		return G();
+		/*
 		return G {
 			{ L"combo", {
 					    R(OP_THIS) << P(Sr(L"satan")).by_ref(),
@@ -27,6 +29,7 @@ namespace yyy {
 				{ L"satan", { R(OP_AND) << P(L(1337)) << P(Sv(L"eax")) } },
 				{ L"hello", { R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P(F(OP_AND)).by_op() << *P() << P().end() } }
 		};
+		*/
 	}
 }
 

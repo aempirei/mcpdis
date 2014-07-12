@@ -117,25 +117,22 @@ namespace yyy {
 		}
 
 		switch(type) {
-			case types::end      : ss << ANSI_HIBLACK << '$' << ANSI_CLR ; break ;
-			case types::any      : ss << ANSI_HIBLACK << '.' << ANSI_CLR ; break ;
-			case types::mem      : ss << ANSI_HIBLACK << '#' << ANSI_CLR ; break ;
-			case types::by_ref   : ss << arg.str()                       ; break ;
+			case types::end      : ss << ANSI_HIBLACK << '$' << ANSI_CLR           ; break ;
+			case types::any      : ss << ANSI_HIBLACK << '.' << ANSI_CLR           ; break ;
+			case types::mem      : ss << ANSI_HIBLACK << '#' << ANSI_CLR           ; break ;
+			case types::by_ref   : ss << colorize(arg.template get<symbol::ref>()) ; break ;
 
 			case types::by_type:
 
 					       ss << ANSI_LOMAGENTA << L'[' << ANSI_HIMAGENTA;
-
-					       for(const auto id : arg.get_types())
-						       ss << typeoperator[id];
-
+					       ss << arg.type_str();
 					       ss << ANSI_LOMAGENTA << L']' << ANSI_CLR;
 
 					       break;
 
 			case types::by_op:
 
-					       ss << typecolor[std::type_index(typeid(function<value_type>))];
+					       ss << typecolor[type::key<function<value_type>>()];
 					       ss << "F(" << arg.template get<function<value_type>>().op << ")";
 					       ss << ANSI_CLR;
 					       break;

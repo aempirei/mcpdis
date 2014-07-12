@@ -239,6 +239,10 @@ namespace yyy {
 				return L"";
 			}
 
+			constexpr const wchar_t *type_str() const {
+				return L"";
+			}
+
 			constexpr bool operator==(const container&) const {
 				return true;
 			}
@@ -316,6 +320,11 @@ namespace yyy {
 				*find_ref<U>() = new U(u);
 			}
 
+			template <typename U> container& operator=(const U& u) {
+				set(u);
+				return *this;
+			}
+
 			template <typename U> bool contains() const {
 				return find<U>();
 			}
@@ -372,6 +381,18 @@ namespace yyy {
 					s[s.length() - 1] = L'\0';
 
 				return s;
+			}
+
+			std::wstring type_str() const {
+
+				std::wstringstream ss;
+
+				if(head)
+					ss << typeoperator[index<T>()];
+
+				ss << tail.type_str();
+
+				return ss.str();
 			}
 
 			bool operator==(const container& r) const {

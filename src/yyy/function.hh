@@ -29,7 +29,7 @@ namespace yyy {
 
 	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& value) {
 		argument<value_type> arg;
-		arg.assign(value);
+		arg.set(value);
 		return operator<<(arg);
 	}
 }
