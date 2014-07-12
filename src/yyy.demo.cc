@@ -101,8 +101,6 @@ int main(int argc, char **argv) {
 
 	using F = function<term>;
 
-	maybe<literal_t> lit;
-
 	setlocale(LC_CTYPE, "");
 
 	std::wcout << std::endl << "running " << argv[0] << "..." << std::endl << std::endl;
