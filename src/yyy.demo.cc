@@ -113,6 +113,12 @@ template <typename T, typename U, typename...Args> void print_types() {
 	print_types<U,Args...>();
 }
 
+template <typename T,typename U> void typecheck() {
+	using namespace yyy;
+	std::wcout << typeoperator[type::index<T>()] << ' ' << OP_IN << ' ';
+	std::wcout << U::to_list::str() << " := ";
+	std::wcout << (type::contains<T,U>::eval ? 'T' : 'F') << std::endl; 
+}
 
 int main(int argc, char **argv) {
 
@@ -164,8 +170,8 @@ int main(int argc, char **argv) {
 	std::wcout << L"unique-type y := " << y.str() << std::endl;
 	std::wcout << L"unique-type z := " << z.str() << std::endl;
 
-	std::wcout << typeoperator[type::index<int>()] << ' ' << OP_IN << ' ' << unique_type::to_list::str() << " := ";
-	std::wcout << (unique_type::allows<int>::eval ? 'T' : 'F') << std::endl; 
+	typecheck<int,unique_type>();
+	typecheck<float,unique_type>();
 
 	/*
 	type::map::type x;
