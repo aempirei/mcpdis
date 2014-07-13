@@ -2,6 +2,9 @@
 
 namespace yyy {
 
+	// this should actually never accept T that are not container
+	// maybe static_assert
+
 	template <typename T> struct function {
 
 		using value_type = T;
@@ -16,8 +19,6 @@ namespace yyy {
 		function(operator_t, const arguments<value_type>&);
 
 		function& operator<<(const argument<value_type>&);
-		function& operator<<(const function<value_type>&);
-		function& operator<<(const value_type&);
 
 		template <typename U> function& operator<<(const U&);
 
@@ -29,9 +30,7 @@ namespace yyy {
 
 	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& value) {
 		argument<value_type> arg;
-		value_type x;
-		x.set(value);
-		arg.set(x);
+		arg.set(value);
 		return operator<<(arg);
 	}
 }

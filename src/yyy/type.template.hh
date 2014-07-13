@@ -41,7 +41,6 @@ namespace yyy {
 		template <typename,typename> struct _concat;
 		template <typename,typename> struct _filter;
 		template <typename,typename> struct _contains;
-		template <typename,typename> struct _append;
 
 		template <typename T> using to_list = typename _to_list<T>::type;
 		template <typename T> using reverse = typename _reverse<T>::type;
@@ -49,7 +48,6 @@ namespace yyy {
 
 		template <typename T, typename U> using concat = typename _concat<T,U>::type;
 		template <typename T, typename U> using filter = typename _filter<T,U>::type;
-		template <typename T, typename U> using append = typename _append<T,U>::type;
 		template <typename T, typename U> using contains = _contains<T,U>;
 
 		using empty_list = list<>;
@@ -106,14 +104,6 @@ namespace yyy {
 			using tail = unique<filtered>;
 			using type = concat<V<T>,tail>;
 			_unique() = delete;
-		};
-
-		// append<T,V<...>> -> V<...>
-		//
-
-		template <typename T, template <typename...> class V, typename...Args> struct _append<T,V<Args...>> {
-			using type = V<Args...,T>;
-			_append() = delete;
 		};
 
 		// _contains<T,V<...>> -> bool
@@ -207,6 +197,9 @@ namespace yyy {
 
 			using to_list = list<>;
 
+			template <typename T> using prepend = container<T>;
+			template <typename T> using append = container<T>;
+
 			static constexpr int dim = to_list::size;
 
 			constexpr int size() const {
@@ -259,6 +252,9 @@ namespace yyy {
 		template <typename T, typename...Args> struct container<T,Args...> {
 
 			using to_list = list<T,Args...>;
+
+			template <typename U> using prepend = container<U,Args...>;
+			template <typename U> using append = container<Args...,U>;
 
 			static constexpr int dim = to_list::size;
 

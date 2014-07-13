@@ -6,7 +6,7 @@ namespace yyy {
 
 		using value_type = T;
 
-		using argument_type = type::append<binding<value_type>,argument<value_type>>;
+		using argument_type = typename argument<value_type>::template append<binding<value_type>>;
 
 		predicate<value_type> clause;
 		std::list<argument_type> args;

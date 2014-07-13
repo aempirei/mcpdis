@@ -56,9 +56,9 @@ namespace yyy {
 	template <typename> struct grammar;
 	template <typename> struct parser;
 
-	template <typename T> using meta = type::container<T,symbol::ref>;
-	template <typename T> using argument = type::container<T,function<T>>;
-	template <typename T> using rule = function<predicate<T>>;
+	template <typename T> using meta = typename T::template append<symbol::ref>;
+	template <typename T> using argument = typename T::template append<function<T>>;
+	template <typename T> using rule = function<type::container<predicate<T>>>;
 
 	pluralize(argument);	// arguments
 	pluralize(rule);	// rules
@@ -99,11 +99,11 @@ namespace yyy {
 		constexpr L L8L (L x) { return (uint8_t )(x >> 0); }
 	}
 
-	extern template struct predicate <quick::quick_type>;
-	extern template struct function <quick::quick_type>;
-	extern template struct function <predicate <quick::quick_type> >;
-	extern template struct binding <quick::quick_type>;
-	extern template struct grammar <quick::quick_type>;
+	extern template struct predicate<quick::quick_type>;
+	extern template struct function<quick::quick_type>;
+	extern template struct function<type::container<predicate<quick::quick_type>>>;
+	extern template struct binding<quick::quick_type>;
+	extern template struct grammar<quick::quick_type>;
 
 	// inline function templates
 

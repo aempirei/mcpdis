@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
 
 	unique_type y(66,M_PI,true,OP_COMPOSE,nullptr);
 	unique_type z;
-	type::append<std::wstring,mini_type> m;
+	mini_type::append<std::wstring> m;
 	mini_type n;
 
 	n.set(666LL);

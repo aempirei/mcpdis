@@ -10,7 +10,7 @@ namespace yyy {
 	}
 	template <typename T> function<T>::function(operator_t my_op) : op(my_op) {
 	}
-	template <typename T> function<T>::function(operator_t my_op, const arguments<value_type>& args0) : op(my_op), args(args0) {
+	template <typename T> function<T>::function(operator_t my_op, const arguments<value_type>& my_args) : op(my_op), args(my_args) {
 	}
 	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
 	}
@@ -22,18 +22,6 @@ namespace yyy {
 	template <typename T> function<T>& function<T>::operator<<(const argument<value_type>& arg) {
 		args.push_back(arg);
 		return *this;
-	}
-
-	template <typename T> function<T>& function<T>::operator<<(const value_type& value) {
-		argument<value_type> arg;
-		arg.set(value);
-		return operator<<(arg);
-	}
-
-	template <typename T> function<T>& function<T>::operator<<(const function<value_type>& fn) {
-		argument<value_type> arg;
-		arg.set(fn);
-		return operator<<(arg);
 	}
 
 	//
@@ -58,5 +46,5 @@ namespace yyy {
 	}
 
 	template struct function<term>;
-	template struct function<predicate<term>>;
+	template struct function<type::container<predicate<term>>>;
 }
