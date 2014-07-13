@@ -35,6 +35,15 @@ namespace yyy {
 	extern std::unordered_map<std::type_index, const operator_t> typeoperator;
 	extern std::unordered_map<std::type_index, const std::wstring> typecolor;
 
+	//
+	// forward declarations
+	//
+
+	template <typename> struct predicate;
+	template <typename> struct function;
+	template <typename> struct binding;
+	template <typename> struct grammar;
+	template <typename> struct parser;
 }
 
 #include "yyy/operators.hh"
@@ -45,16 +54,6 @@ namespace yyy {
 #define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
 
 namespace yyy {
-
-	//
-	// forward declarations
-	//
-
-	template <typename> struct predicate;
-	template <typename> struct function;
-	template <typename> struct binding;
-	template <typename> struct grammar;
-	template <typename> struct parser;
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 	template <typename T> using argument = typename T::template append<function<T>>;

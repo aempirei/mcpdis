@@ -1,7 +1,5 @@
 #pragma once
 
-#include <type_traits>
-
 #define template_recursive template <typename T,typename U,typename...Args>
 
 #define template_recursive_with_types(...) template_recursive __VA_ARGS__(value_type& x)
@@ -170,7 +168,7 @@ namespace yyy {
 			using head = T;
 			using tail = list<Args...>;
 
-			static constexpr int size = tail::size + 1;
+			static constexpr int size = sizeof...(Args) + 1;
 			static constexpr bool empty = false;
 
 			template <template <typename...> class V> using bind = V<T,Args...>;
@@ -181,12 +179,31 @@ namespace yyy {
 
 			static std::wstring str() {
 				std::wstringstream ss;
-				ss << typeoperator[index<T>()] << L' ' << tail::str();
+				ss << typeoperator[index<T>()] << ' ' << tail::str();
 				std::wstring s = ss.str();
 				if(not s.empty())
 					s[s.length() - 1] = L'\0';
 				return s;
 			};
+		};
+
+		// display<T>
+		//
+
+		template <typename T> struct display {
+			using value_type = T;
+			static std::wstring to_str(const value_type& x) {
+				std::wstringstream ss;
+				ss << x;
+				return ss.str();
+			}
+		};
+
+		template <template <typename> class V, typename T> struct display<V<T>> {
+			using value_type = V<T>;
+			static std::wstring to_str(const value_type& x) {
+				return x.str();
+			}
 		};
 
 		// container<>
@@ -371,8 +388,7 @@ namespace yyy {
 				ss << typeoperator[index<T>()];
 
 				if(head)
-					ss << L':' << (void *)head;
-					// ss << L':' << *head; // FIXME
+					ss << ':' << display<head_type>::to_str(*head);
 
 				ss << L' ' << tail.str();
 
