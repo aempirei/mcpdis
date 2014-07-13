@@ -40,7 +40,7 @@ namespace yyy {
 
 		template <typename,typename> struct _concat;
 		template <typename,typename> struct _filter;
-		template <typename,typename> struct _contains;
+		template <typename,typename> struct contains;
 
 		template <typename T> using to_list = typename _to_list<T>::type;
 		template <typename T> using reverse = typename _reverse<T>::type;
@@ -48,7 +48,6 @@ namespace yyy {
 
 		template <typename T, typename U> using concat = typename _concat<T,U>::type;
 		template <typename T, typename U> using filter = typename _filter<T,U>::type;
-		template <typename T, typename U> using contains = _contains<T,U>;
 
 		using empty_list = list<>;
 
@@ -106,22 +105,22 @@ namespace yyy {
 			_unique() = delete;
 		};
 
-		// _contains<T,V<...>> -> bool
+		// contains<T,V<...>> -> bool
 		//
 
-		template <typename T, template <typename...> class V> struct _contains<T,V<>> {
+		template <template <typename...> class V, typename T> struct contains<T,V<>> {
 			static constexpr bool eval = false;
-			_contains() = delete;
+			contains() = delete;
 		};
 
-		template <typename T, template <typename...> class V, typename...Args> struct _contains<T,V<T,Args...>> {
+		template <template <typename...> class V, typename T, typename...Args> struct contains<T,V<T,Args...>> {
 			static constexpr bool eval = true;
-			_contains() = delete;
+			contains() = delete;
 		};
 
-		template <typename T, template <typename...> class V, typename U,typename...Args> struct _contains<T,V<U,Args...>> {
-			static constexpr bool eval = _contains<T,V<Args...>>::eval;
-			_contains() = delete;
+		template <template <typename...> class V, typename T, typename U, typename...Args> struct contains<T,V<U,Args...>> {
+			static constexpr bool eval = contains<T,V<Args...>>::eval;
+			contains() = delete;
 		};
 
 		// filter<T,V<...>> -> V<...>
@@ -175,8 +174,8 @@ namespace yyy {
 			static constexpr bool empty = false;
 
 			template <template <typename...> class V> using bind = V<T,Args...>;
-			template <typename U> using push_front = list<U,Args...>;
-			template <typename U> using push_back = list<Args...,U>;
+			template <typename U> using push_front = list<U,T,Args...>;
+			template <typename U> using push_back = list<T,Args...,U>;
 
 			list() = delete;
 
@@ -204,6 +203,10 @@ namespace yyy {
 
 			constexpr int size() const {
 				return 0;
+			}
+
+			template <typename U> static constexpr bool allows() {
+				return false;
 			}
 
 			template <typename U> constexpr bool contains() const {
@@ -253,8 +256,11 @@ namespace yyy {
 
 			using to_list = list<T,Args...>;
 
-			template <typename U> using prepend = container<U,Args...>;
-			template <typename U> using append = container<Args...,U>;
+			template <typename U> using prepend = container<U,T,Args...>;
+			template <typename U> using append = container<T,Args...,U>;
+
+			using head_type = T;
+			using tail_type = container<Args...>;
 
 			static constexpr int dim = to_list::size;
 
@@ -262,8 +268,8 @@ namespace yyy {
 				return head ? tail.size() + 1 : tail.size();
 			}
 
-			T* head;
-			container<Args...> tail;
+			head_type *head;
+			tail_type tail;
 
 			container() : head(nullptr) {
 			}
@@ -300,6 +306,10 @@ namespace yyy {
 				return *this;
 			}
 
+			template <typename U> static constexpr bool allows() {
+				return equals<T,U>::eval or tail_type::template allows<U>();
+			}
+
 			template <typename U> U *find() const {
 				return equals<T,U>::eval ? (U *)head : tail.find<U>();
 			}
@@ -309,12 +319,12 @@ namespace yyy {
 			}
 
 			template <typename U> U& get() const {
-				static_assert(type::contains<U,container>::eval, "container::get<> called with unexpected type");
+				static_assert(allows<U>(), "container::get<> called with unexpected type");
 				return *find<U>();
 			}
 
 			template <typename U> void set(const U& u) {
-				static_assert(type::contains<U,container>::eval, "container::set<> called with unexpected type");
+				static_assert(allows<U>(), "container::set<> called with unexpected type");
 				*find_ref<U>() = new U(u);
 			}
 
