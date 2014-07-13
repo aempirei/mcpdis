@@ -179,10 +179,10 @@ namespace yyy {
 
 			static std::wstring str() {
 				std::wstringstream ss;
-				ss << typeoperator[index<T>()] << ' ' << tail::str();
+				ss << typecolor[index<T>()] << typeoperator[index<T>()] << ANSI_CLR << ' ' << tail::str();
 				std::wstring s = ss.str();
 				if(not s.empty())
-					s[s.length() - 1] = L'\0';
+					s[s.length() - 1] = '\0';
 				return s;
 			};
 		};
@@ -194,7 +194,7 @@ namespace yyy {
 			using value_type = T;
 			static std::wstring to_str(const value_type& x) {
 				std::wstringstream ss;
-				ss << x;
+				ss << typecolor[index<value_type>()] << x << ANSI_CLR;
 				return ss.str();
 			}
 		};
@@ -214,52 +214,30 @@ namespace yyy {
 			using to_list = list<>;
 
 			template <typename T> using prepend = container<T>;
-			template <typename T> using append = container<T>;
+			template <typename T> using  append = container<T>;
 
 			static constexpr int dim = to_list::size;
 
-			constexpr int size() const {
-				return 0;
-			}
+			constexpr int size() const { return 0; }
 
-			template <typename U> constexpr bool contains() const {
-				return false;
-			}
+			constexpr bool empty() const { return true; }
 
-			template <typename U> constexpr bool contains(const U&) const {
-				return false;
-			}
+			template <typename U> constexpr bool contains(        ) const { return false; }
+			template <typename U> constexpr bool contains(const U&) const { return false; }
 
-			template <typename U> constexpr U *find() const {
-				return nullptr;
-			}
+			template <typename U> constexpr U  *find    () const { return nullptr; }
+			template <typename U> constexpr U **find_ref() const { return nullptr; }
 
-			template <typename U> constexpr U **find_ref() const {
-				return nullptr;
-			}
+			template <typename...Xs> container<Xs...>& project(container<Xs...>& r) const { return r; }
+			template <typename...Xs> container<Xs...>& overlay(container<Xs...>& r) const { return r; }
 
-			template <typename...Xs> container<Xs...>& project(container<Xs...>& r) const {
-				return r;
-			}
+			constexpr const wchar_t *     str() const { return L""; }
+			constexpr const wchar_t *full_str() const { return L""; }
+			constexpr const wchar_t *type_str() const { return L""; }
 
-			template <typename...Xs> container<Xs...>& overlay(container<Xs...>& r) const {
-				return r;
-			}
+			constexpr bool operator==(const container&) const { return true; }
 
-			constexpr const wchar_t *str() const {
-				return L"";
-			}
-
-			constexpr const wchar_t *type_str() const {
-				return L"";
-			}
-
-			constexpr bool operator==(const container&) const {
-				return true;
-			}
-
-			void clear() {
-			}
+			void clear() { }
 		};
 
 		// container<...>
@@ -279,6 +257,10 @@ namespace yyy {
 
 			constexpr int size() const {
 				return head ? tail.size() + 1 : tail.size();
+			}
+
+			constexpr bool empty() const {
+				return size() == 0;
 			}
 
 			head_type *head;
@@ -380,32 +362,36 @@ namespace yyy {
 				return tail.overlay(r);
 			}
 
-
 			std::wstring str() const {
 
 				std::wstringstream ss;
 
-				ss << typeoperator[index<T>()];
+				if(head) {
+					ss << typeoperator[index<T>()] << ':' << display<head_type>::to_str(*head);
+					if(not tail.empty())
+						ss << ',';
+				}
 
-				if(head)
-					ss << ':' << display<head_type>::to_str(*head);
+				if(not tail.empty())
+					ss << tail.str();
 
-				ss << L' ' << tail.str();
+				return ss.str();
+			}
 
-				std::wstring s = ss.str();
+			std::wstring full_str() const {
 
-				if(not s.empty())
-					s[s.length() - 1] = L'\0';
-
-				return s;
+				return str();
 			}
 
 			std::wstring type_str() const {
 
 				std::wstringstream ss;
 
-				if(head)
+				if(head) {
+					ss << typecolor[index<T>()];
 					ss << typeoperator[index<T>()];
+					ss << ANSI_CLR;
+				}
 
 				ss << tail.type_str();
 

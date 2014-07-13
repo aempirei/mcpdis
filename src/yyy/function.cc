@@ -30,10 +30,10 @@ namespace yyy {
 
 	template <typename T> std::wstring function<T>::str() const {
 		std::wstringstream ss;
-		ss << (operator_t)op << L"(";
+		ss << (operator_t)op << '(';
 		for(auto arg : args)
-			ss << L' ' << arg.str();
-		ss << L" )";
+			ss << ' ' << arg.str();
+		ss << " )";
 		return ss.str();
 	}
 

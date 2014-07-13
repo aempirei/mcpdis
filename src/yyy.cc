@@ -38,25 +38,25 @@ namespace yyy {
 		{ std::type_index(typeid(symbol::var)), ANSI_LOWHITE },
 		{ std::type_index(typeid(symbol::ref)), ANSI_LOGREEN },
 
-		{ std::type_index(typeid(void *)), ANSI_CLR },
+		{ std::type_index(typeid(void *)), ANSI_HIBLUE },
 
-		{ std::type_index(typeid(double)), ANSI_CLR },
-		{ std::type_index(typeid(float)), ANSI_CLR },
+		{ std::type_index(typeid(double)), ANSI_HIYELLOW },
+		{ std::type_index(typeid(float)), ANSI_LOYELLOW },
 
-		{ std::type_index(typeid(int)), ANSI_CLR },
-		{ std::type_index(typeid(long)), ANSI_CLR },
-		{ std::type_index(typeid(bool)), ANSI_CLR },
-		{ std::type_index(typeid(long long)), ANSI_CLR },
+		{ std::type_index(typeid(int)), ANSI_LOCYAN },
+		{ std::type_index(typeid(long)), ANSI_LOCYAN },
+		{ std::type_index(typeid(bool)), ANSI_HIGREEN },
+		{ std::type_index(typeid(long long)), ANSI_HICYAN },
 
 		{ std::type_index(typeid(unsigned long)), ANSI_CLR },
 		{ std::type_index(typeid(unsigned int)), ANSI_CLR },
 
-		{ std::type_index(typeid(operator_t)), ANSI_CLR },
+		{ std::type_index(typeid(operator_t)), ANSI_HIRED },
 		{ std::type_index(typeid(char)), ANSI_CLR },
 		{ std::type_index(typeid(unsigned char)), ANSI_CLR },
 
-		{ std::type_index(typeid(std::wstring)), ANSI_CLR },
-		{ std::type_index(typeid(std::string)), ANSI_CLR }
+		{ std::type_index(typeid(std::wstring)), ANSI_HICYAN },
+		{ std::type_index(typeid(std::string)), ANSI_LOCYAN }
 
 	};
 }

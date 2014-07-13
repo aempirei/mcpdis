@@ -71,7 +71,7 @@ template <typename T,typename U> struct getstr<true,T,U> {
 		ss << (u.template contains<T>() ? 'T' : 'F') << '/' << (u.contains(t) ? 'T' : 'F');
 
 		if(u.template contains<T>())
-			ss << ' ' << u.template get<T>();
+			ss << ' ' << yyy::colorize(u.template get<T>());
 
 		return ss.str();
 	}
@@ -91,7 +91,7 @@ template <typename T,typename U> void typeprint(wchar_t wx, const U& u, const T&
 	typecheck<T,U>();
 
 	std::wcout << typecheck<T,U>() << ' ' << wx << " (" << u.size() << ':' << u.dim << ") := ";
-	std::wcout << u.str() << " contains " << typeoperator[type::index<T>()] << ':' << t << " ? ";
+	std::wcout << u.str() << " contains " << typeoperator[type::index<T>()] << ':' << colorize(t) << " ? ";
 
 	using getstr_type = getstr<type::contains<T,U>::eval,T,U>;
 
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
 
 	std::wcout << "f := " << f.str() << std::endl;
 
-	for(int i = 0; i < argc; i++)
+	for(int i = 1; i < argc; i++)
 		f << L(atoi(argv[i]));
 
 	f << f;
