@@ -205,10 +205,6 @@ namespace yyy {
 				return 0;
 			}
 
-			template <typename U> static constexpr bool allows() {
-				return false;
-			}
-
 			template <typename U> constexpr bool contains() const {
 				return false;
 			}
@@ -306,10 +302,6 @@ namespace yyy {
 				return *this;
 			}
 
-			template <typename U> static constexpr bool allows() {
-				return equals<T,U>::eval or tail_type::template allows<U>();
-			}
-
 			template <typename U> U *find() const {
 				return equals<T,U>::eval ? (U *)head : tail.find<U>();
 			}
@@ -319,12 +311,12 @@ namespace yyy {
 			}
 
 			template <typename U> U& get() const {
-				static_assert(allows<U>(), "container::get<> called with unexpected type");
+				static_assert(type::contains<U,container>::eval, "container::get<> called with unexpected type");
 				return *find<U>();
 			}
 
 			template <typename U> void set(const U& u) {
-				static_assert(allows<U>(), "container::set<> called with unexpected type");
+				static_assert(type::contains<U,container>::eval, "container::set<> called with unexpected type");
 				*find_ref<U>() = new U(u);
 			}
 
