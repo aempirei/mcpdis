@@ -21,4 +21,6 @@
 
 #define OP_NULL		L'\u2205'
 #define OP_IN		L'\u2208'
+#define OP_NOT_IN	L'\u2209'
 #define OP_CONTAINS	L'\u220b'
+#define OP_NOT_CONTAINS	L'\u220c'

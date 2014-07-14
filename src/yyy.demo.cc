@@ -33,11 +33,10 @@ namespace yyy {
 	}
 }
 
+using namespace yyy;
+
 template <typename T> void print_type() {
-
-	using namespace yyy::type;
-
-	std::wcout << "type(" << to_list<T>::size << ") <" << to_list<T>::str() << "> : " << typeid(T).name() << std::endl;
+	std::wcout << "type(" << type::to_list<T>::size << ") <" << type::to_list<T>::str() << "> : " << typeid(T).name() << std::endl;
 }
 
 template <typename T> void print_types() {
@@ -51,56 +50,49 @@ template <typename T, typename U, typename...Args> void print_types() {
 
 template <typename T,typename U> std::wstring typecheck() {
 
-	using namespace yyy;
-
 	std::wstringstream ss;
 
-	ss << typeoperator[type::index<T>()] << ' ' << OP_IN << ' ';
-	ss << U::to_list::str() << " := ";
-	ss << (type::contains<T,U>::eval ? 'T' : 'F');
+	ss << type::to_str<T>() << ' ' << OP_IN << ' ';
+	ss << type::to_list<U>::str() << " := ";
+	ss << ( type::contains<T,U>::eval ? 'T' : 'F' );
 
 	return ss.str();
 }
 
-template <bool B,typename T,typename U> struct getstr;
+template <bool B,typename X,typename T> struct getstr;
 
-template <typename T,typename U> struct getstr<true,T,U> {
-	static std::wstring s(const T&t, const U&u) {
+template <typename X,typename T> struct getstr<true,X,T> {
+	static std::wstring s(const X&x, const T&t) {
 		std::wstringstream ss;
 
-		ss << (u.template contains<T>() ? 'T' : 'F') << '/' << (u.contains(t) ? 'T' : 'F');
-
-		if(u.template contains<T>())
-			ss << ' ' << yyy::colorize(u.template get<T>());
+		if(t.template contains<X>()) {
+			ss << ' ' << ( t.contains(x) ? OP_IN : OP_NOT_IN ) << " [" << t.type_str() << "]";
+		}
 
 		return ss.str();
 	}
 
 };
 
-template <typename T,typename U> struct getstr<false,T,U> {
-	static constexpr const wchar_t *s(const T&, const U&) {
+template <typename X,typename T> struct getstr<false,X,T> {
+	static constexpr const wchar_t *s(const X&, const T&) {
 		return L"~";
 	}
 };
 
-template <typename T,typename U> void typeprint(wchar_t wx, const U& u, const T& t) {
+template <typename X,typename T> void typeprint(wchar_t wx, const T& t, const X& x) {
 
-	using namespace yyy;
+	typecheck<X,T>();
 
-	typecheck<T,U>();
+	std::wcout << typecheck<X,T>() << ' ' << wx << " (" << t.size() << ':' << t.dim << ") := ";
+	std::wcout << t.str() << " contains? " << type::container<X>(x).str();
 
-	std::wcout << typecheck<T,U>() << ' ' << wx << " (" << u.size() << ':' << u.dim << ") := ";
-	std::wcout << u.str() << " contains " << typeoperator[type::index<T>()] << ':' << colorize(t) << " ? ";
+	using getstr_type = getstr<type::contains<X,T>::eval,X,T>;
 
-	using getstr_type = getstr<type::contains<T,U>::eval,T,U>;
-
-	std::wcout << getstr_type::s(t,u) << std::endl;
+	std::wcout << getstr_type::s(x,t) << std::endl;
 }
 
 int main(int argc, char **argv) {
-
-	using namespace yyy;
 
 	using F = function<term>;
 
