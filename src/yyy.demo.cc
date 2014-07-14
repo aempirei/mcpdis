@@ -59,37 +59,16 @@ template <typename T,typename U> std::wstring typecheck() {
 	return ss.str();
 }
 
-template <bool B,typename X,typename T> struct getstr;
-
-template <typename X,typename T> struct getstr<true,X,T> {
-	static std::wstring s(const X&x, const T&t) {
-		std::wstringstream ss;
-
-		if(t.template contains<X>()) {
-			ss << type::container<X>(x).str();
-			ss << ' ' << ( t.contains(x) ? OP_IN : OP_NOT_IN ) << ' ';
-			ss << "[" << t.type_str() << "]";
-		}
-
-		return ss.str();
-	}
-
-};
-
-template <typename X,typename T> struct getstr<false,X,T> {
-	static constexpr const wchar_t *s(const X&, const T&) {
-		return L"~";
-	}
-};
-
 template <typename X,typename T> void typeprint(wchar_t wx, const T& t, const X& x) {
-
-	using getstr_type = getstr<type::contains<X,T>::eval,X,T>;
 
 	typecheck<X,T>();
 
 	std::wcout << typecheck<X,T>() << ' ' << wx << " (" << t.size() << ':' << t.dim << ") := ";
-	std::wcout << t.str() << " contains? " << getstr_type::s(x,t) << std::endl;
+	std::wcout << t.str() << " contains? ";
+	std::wcout << type::container<X>(x).str();
+	std::wcout << ' ' << ( t.contains(x) ? OP_IN : OP_NOT_IN ) << ' ';
+	std::wcout << "[" << t.type_str() << "]";
+	std::wcout << std::endl;
 }
 
 int main(int argc, char **argv) {
