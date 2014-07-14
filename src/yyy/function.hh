@@ -5,11 +5,9 @@ namespace yyy {
 	// this should actually never accept T that are not container
 	// maybe static_assert
 
-	template <typename T> struct function {
+	template <typename...Args> struct function<type::container<Args...>> {
 
-		static_assert(type::is_container<T>::value, "function expects container<...> as template argument");
-
-		using value_type = T;
+		using value_type = type::container<Args...>;
 
 		operator_t op;
 		arguments<value_type> args;
@@ -30,7 +28,7 @@ namespace yyy {
 		explicit operator std::wstring() const;
 	};
 
-	template <typename T> template <typename U> function<T>& function<T>::operator<<(const U& value) {
+	template <typename...Args> template <typename U> function<type::container<Args...>>& function<type::container<Args...>>::operator<<(const U& value) {
 		argument<value_type> arg;
 		arg.set(value);
 		return operator<<(arg);

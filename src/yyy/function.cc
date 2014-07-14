@@ -6,20 +6,20 @@ namespace yyy {
 	// function
 	//
 
-	template <typename T> function<T>::function() : op(OP_ANY) {
+	template <typename...Args> function<type::container<Args...>>::function() : op(OP_ANY) {
 	}
-	template <typename T> function<T>::function(operator_t my_op) : op(my_op) {
+	template <typename...Args> function<type::container<Args...>>::function(operator_t my_op) : op(my_op) {
 	}
-	template <typename T> function<T>::function(operator_t my_op, const arguments<value_type>& my_args) : op(my_op), args(my_args) {
+	template <typename...Args> function<type::container<Args...>>::function(operator_t my_op, const arguments<value_type>& my_args) : op(my_op), args(my_args) {
 	}
-	template <typename T> function<T>::function(const function<value_type>& r) : function(r.op, r.args) {
+	template <typename...Args> function<type::container<Args...>>::function(const function<value_type>& r) : function(r.op, r.args) {
 	}
 
 	//
 	// function.operator<<
 	//
 
-	template <typename T> function<T>& function<T>::operator<<(const argument<value_type>& arg) {
+	template <typename...Args> function<type::container<Args...>>& function<type::container<Args...>>::operator<<(const argument<value_type>& arg) {
 		args.push_back(arg);
 		return *this;
 	}
@@ -28,7 +28,7 @@ namespace yyy {
 	// function.operator std::wstring ()
 	//
 
-	template <typename T> std::wstring function<T>::str() const {
+	template <typename...Args> std::wstring function<type::container<Args...>>::str() const {
 		std::wstringstream ss;
 		ss << (operator_t)op << '(';
 		for(auto arg : args)
@@ -37,11 +37,11 @@ namespace yyy {
 		return ss.str();
 	}
 
-	template <typename T> function<T>::operator std::wstring () const {
+	template <typename...Args> function<type::container<Args...>>::operator std::wstring () const {
 		return str();
 	}
 
-	template <typename T> bool function<T>::operator==(const function<T>& r) const {
+	template <typename...Args> bool function<type::container<Args...>>::operator==(const function<type::container<Args...>>& r) const {
 		return op == r.op and args == r.args;
 	}
 
