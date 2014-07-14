@@ -190,15 +190,15 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 	grammar<term> dga = {
 
-		{ L"nonsense" , { R(OP_THIS) << P() << Pfn.by_op() << P() << Pfn.by_type() << P() << Pfn << P() << P(L(7)) << P(S::var(L"r27")) << P().end()     } },
+		{ L"nonsense" , { R(OP_THIS) << Pfn.by_op() << Pfn.by_type() << P() << Pfn << P() << P(L(7)) << P(S::var(L"r27")) << P().end() } },
 
-		{ L"unary"    , { R(OP_THIS) << P() << P().end()     } },
+		{ L"unary"    , { R(OP_THIS) << P() << P().end()	} },
 
-		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()    } },
+		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
 
-		{ L"matchpair", { R(OP_THIS) << P() << P().mem()     } },
+		{ L"matchpair", { R(OP_THIS) << P() << P().mem()	} },
 
-		{ L"literals" , { R(OP_THIS) << pL.min(2) } }
+		{ L"literals" , { R(OP_THIS) << pL.min(2)		} }
 	};
 
 	for(const auto& r : dga)
@@ -219,7 +219,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		if(config.verbose) {
 
 			if(iter != rs.end())
-				std::wcout << type::color<decltype(ref)>() << ref << ANSI_CLR << L" := " << iter->str() << std::endl;
+				std::wcout << type::color<symbol::ref>() << ref << ANSI_CLR << L" := " << iter->str() << std::endl;
 
 			while(++iter != rs.end())
 				std::wcout << std::setw(ref.length()) << L"" << L" := " << iter->str() << std::endl;
@@ -229,7 +229,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(22) << std::left << type::color<decltype(ref)>() << ref << ANSI_CLR << L" := " << iter->str();
+				std::wcout << std::setw(22) << std::left << type::color<symbol::ref>() << ref << ANSI_CLR << L" := " << iter->str();
 
 			while(++iter != rs.end())
 				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
@@ -247,6 +247,8 @@ int main(int argc, char **argv) {
 	configuration config;
 	bitstream b(stdin);
 	int opt;
+
+	srand(time(NULL));
 
 	setlocale(LC_CTYPE, "");
 
@@ -508,7 +510,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				const auto name = type::container<symbol::var>(k.first).str();
+				const auto name = type::container<decltype(k.first)>(k.first).str();
 
 				if(k.second.contains<symbol::var>()) {
 

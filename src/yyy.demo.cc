@@ -61,6 +61,8 @@ template <typename X,typename T> void typeprint(wchar_t wx, const T& t, const X&
 
 int main(int argc, char **argv) {
 
+	srand(time(NULL));
+
 	setlocale(LC_CTYPE, "");
 
 	std::wcout << std::endl << "running " << argv[0] << "..." << std::endl << std::endl;

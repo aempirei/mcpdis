@@ -31,8 +31,10 @@ namespace yyy {
 			return typeoperator[index<T>()];
 		}
 
-		template <typename T> std::wstring color() {
 #ifdef USE_COLOR
+		template <typename T> std::wstring color() {
+
+			static int x = rand();
 
 			static std::unordered_map<std::type_index,std::wstring> data;
 
@@ -40,27 +42,22 @@ namespace yyy {
 
 				std::wstringstream ss;
 
-				const char *p = typeid(T).name();
+				int c = (x++ % 15) + 1;
+				int fg = 30 + (c % 8);
+				int bold = (c / 8);
 
-				int sum = 0;
-				int round = 1;
+				ss << "\033[" << bold << ';' << fg << 'm';
 
-				while(*p != '\0')
-					sum += *p++ * ++round;
-
-				sum %= 15;
-				sum += 1;
-
-				ss << "\x1b[" << int(sum > 8) << ';' << int(31 + (sum % 8)) << 'm';
-
-				data[index<T>()] =  ss.str();
+				data[index<T>()] = ss.str();
 			}
 
 			return data[index<T>()];
-#else
-			return L"";
-#endif				
 		}
+#else
+		template <typename T> std::wstring color() {
+			return L"";
+		}
+#endif				
 
 		template <typename T> std::wstring to_str() {
 			return std::wstring() + color<T>() + op<T>() + ANSI_CLR;
