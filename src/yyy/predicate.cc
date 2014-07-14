@@ -120,22 +120,20 @@ namespace yyy {
 
 			case types::by_type:
 
-					       ss << ANSI_LOMAGENTA << L'[' << ANSI_HIMAGENTA;
+					       ss << ANSI_LOMAGENTA << '[' << ANSI_HIMAGENTA;
 					       ss << arg.type_str();
-					       ss << ANSI_LOMAGENTA << L']' << ANSI_CLR;
+					       ss << ANSI_LOMAGENTA << ']' << ANSI_CLR;
 
 					       break;
 
 			case types::by_op:
 
-					       ss << typecolor[yyy::type::index<function<value_type>>()];
-					       // << "F(" << arg.template get<function<value_type>>().op << ")"; // FIXME
-					       ss << "F(" << arg.type_str() << ")";
+					       ss << type::to_str<function<value_type>>() << '(' << arg.template get<function<value_type>>().op << ")";
 					       ss << ANSI_CLR;
 					       break;
 
 			case types::by_value:
-					       ss << L'"' << arg.str() << L'"';
+					       ss << '"' << arg.str() << '"';
 					       break;
 
 		}

@@ -21,7 +21,8 @@ G define_grammar() {
 		{ L"combo", {
 				    R(OP_THIS) << P(S::ref(L"satan")),
 				    R(OP_OR) << P(S::ref(L"combo")),
-				    R(OP_ANY) << *P() << !P(S::var(L"noway")) << P().end()
+				    R(OP_ANY) << *P() << !P(S::var(L"noway")) << P().end(),
+				    R() << P() << ( R() << P() ) << P().end()
 			    } },
 		{ L"any"  , { R(OP_ANY) << *P() << P().end() } },
 		{ L"satan", { R(OP_AND) << P(L(1337)) << LSF << P(S::var(L"eax")) } },

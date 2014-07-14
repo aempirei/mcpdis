@@ -3,11 +3,17 @@
 namespace yyy {
 
 	std::unordered_map<std::type_index, const operator_t> typeoperator = {
+
 		{ std::type_index(typeid(void)), L'\u2205' },
 		{ std::type_index(typeid(literal_t)), L'L' },
-		{ std::type_index(typeid(function<term>)), L'F' },
+
 		{ std::type_index(typeid(symbol::var)), L'S' },
 		{ std::type_index(typeid(symbol::ref)), L'R' },
+
+		{ std::type_index(typeid(function<term>)), L'F' },
+		{ std::type_index(typeid(binding<term>)), L'B' },
+		{ std::type_index(typeid(predicate<term>)), L'P' },
+		{ std::type_index(typeid(rule<term>)), L'R' },
 
 		{ std::type_index(typeid(double)), L'd' },
 		{ std::type_index(typeid(float)), L'f' },
