@@ -70,8 +70,11 @@ namespace yyy {
 		predicate plus() const;
 		predicate qm() const;
 
+		// other stuff
+
 		std::wstring str() const;
-		explicit operator std::wstring() const;
+
+		operator const wchar_t * () const;
 
 		using test_return_type = std::pair<bool,binding<T>>;
 

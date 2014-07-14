@@ -34,6 +34,7 @@ test: all
 ########
 
 demo: bin/yyy.demo
+	./bin/yyy.demo 123
 
 src/yyy.demo.o: src/yyy.demo.cc $(TPLHH)
 
@@ -53,7 +54,7 @@ lib/libmcpdis.a: $(LIBCC:.cc=.o)
 
 lib/libyyy.a: $(YYYCC:.cc=.o)
 	mkdir -p lib
-	ar crfv $@ $(YYYCC:.cc=.o)
+	ar crfv $@ $^
 
 #######
 # dis #

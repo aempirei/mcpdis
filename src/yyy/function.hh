@@ -29,7 +29,7 @@ namespace yyy {
 
 		bool operator==(const function&) const;
 
-		explicit operator std::wstring() const;
+		operator const wchar_t * () const;
 
 		template <typename U> function& operator<<(const U&);
 

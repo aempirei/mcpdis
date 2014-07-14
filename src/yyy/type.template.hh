@@ -50,7 +50,7 @@ namespace yyy {
 				sum %= 15;
 				sum += 1;
 
-				ss << "\033[" << int(sum > 8) << ';' << int(31 + (sum % 8)) << 'm';
+				ss << "\x1b[" << int(sum > 8) << ';' << int(31 + (sum % 8)) << 'm';
 
 				data[index<T>()] =  ss.str();
 			}
@@ -218,28 +218,6 @@ namespace yyy {
 			}
 		};
 
-		// display<T>
-		//
-
-		template <typename T> struct display {
-			using value_type = T;
-			static std::wstring to_str(const value_type& x) {
-				std::wstringstream ss;
-				ss << x;
-				return ss.str();
-			}
-		};
-
-		// display<V<T>>
-		//
-
-		template <template <typename> class V, typename T> struct display<V<T>> {
-			using value_type = V<T>;
-			static std::wstring to_str(const value_type& x) {
-				return x.str();
-			}
-		};
-
 		// container<>
 		//
 
@@ -269,6 +247,8 @@ namespace yyy {
 			constexpr const wchar_t *type_str() const { return L""; }
 
 			constexpr bool operator==(const container&) const { return true; }
+
+			constexpr operator const wchar_t * () const { return L""; }
 
 			void clear() { }
 		};
@@ -404,7 +384,7 @@ namespace yyy {
 				std::wstringstream ss;
 
 				if(head) {
-					ss << to_str<T>() << ':' << display<head_type>::to_str(*head);
+					ss << to_str<T>() << ':' << *head;
 					if(not tail.empty())
 						ss << ',';
 				}
@@ -413,6 +393,10 @@ namespace yyy {
 					ss << tail.str();
 
 				return ss.str();
+			}
+
+			operator const wchar_t * () const {
+				return str().c_str();
 			}
 
 			std::wstring type_str() const {
