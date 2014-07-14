@@ -33,9 +33,9 @@ namespace yyy {
 	std::unordered_map<std::type_index, const std::wstring> typecolor = {
 		{ std::type_index(typeid(void)), ANSI_CLR },
 		{ std::type_index(typeid(literal_t)), ANSI_LOCYAN },
-		{ std::type_index(typeid(function<term>)), ANSI_LOWHITE },
+		{ std::type_index(typeid(function<term>)), ANSI_LORED },
 		{ std::type_index(typeid(rule<term>)), ANSI_HIBLACK },
-		{ std::type_index(typeid(symbol::var)), ANSI_LOWHITE },
+		{ std::type_index(typeid(symbol::var)), ANSI_HIWHITE },
 		{ std::type_index(typeid(symbol::ref)), ANSI_LOGREEN },
 
 		{ std::type_index(typeid(void *)), ANSI_HIBLUE },

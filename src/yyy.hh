@@ -73,7 +73,7 @@ namespace yyy {
 
 namespace yyy {
 
-	using term = type::container<symbol::var,literal_t>;
+	using term = type::container<literal_t,symbol::var>;
 
 	namespace quick {
 

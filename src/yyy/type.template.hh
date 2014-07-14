@@ -275,13 +275,17 @@ namespace yyy {
 			head_type *head;
 			tail_type tail;
 
-			container() : head(nullptr) {
+			container() : head(nullptr), tail() {
 			}
 
 			container(const T& t, const Args&...args) : head(new T(t)), tail(args...) {
 			}
 
 			container(const container& r) : head(smart_copy(r.head)), tail(r.tail) {
+			}
+			
+			template <typename U> container(const U& u) : container() {
+				set(u);
 			}
 
 			void erase() {

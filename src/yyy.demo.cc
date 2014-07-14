@@ -4,36 +4,30 @@
 
 #include <yyy.hh>
 
-namespace yyy {
+using namespace yyy::quick;
 
-	using L = literal_t;
-	using Sv = symbol::var;
-	using Sr = symbol::ref;
 
-	using F = function<term>;
-	using R = rule<term>;
-	using P = predicate<term>;
-	using G = grammar<term>;
-	using RS = rules<term>;
+G define_grammar() {
 
-	template <typename T> grammar<T> define_grammar() {
-		return G();
-		/*
-		return G {
-			{ L"combo", {
-					    R(OP_THIS) << P(Sr(L"satan")).by_ref(),
-						    R(OP_OR) << P(Sr(L"combo")).by_ref(),
-						    R(OP_ANY) << *P() << !P(Sv(L"noway")) << P().end()
-				    } },
-				{ L"any", { R(OP_ANY) << *P() << P().end() } },
-				{ L"satan", { R(OP_AND) << P(L(1337)) << P(Sv(L"eax")) } },
-				{ L"hello", { R(OP_ANY) << +P(L(666)).by_type() << P(Sr(L"satan")).qm() << P(F(OP_AND)).by_op() << *P() << P().end() } }
-		};
-		*/
-	}
+	M mLSF;
+
+	mLSF.set(literal_t());
+	mLSF.set(S::var());
+	mLSF.set(F());
+
+	const P LSF(P(mLSF).by_type());
+
+	return G {
+		{ L"combo", {
+				    R(OP_THIS) << P(S::ref(L"satan")),
+				    R(OP_OR) << P(S::ref(L"combo")),
+				    R(OP_ANY) << *P() << !P(S::var(L"noway")) << P().end()
+			    } },
+		{ L"any"  , { R(OP_ANY) << *P() << P().end() } },
+		{ L"satan", { R(OP_AND) << P(L(1337)) << LSF << P(S::var(L"eax")) } },
+		{ L"hello", { R(OP_ANY) << +P(L(666)).by_type() << P(S::ref(L"satan")).qm() << P(F(OP_AND)) << P(F(OP_AND)).by_op() << *P() << P().end() } }
+	};
 }
-
-using namespace yyy;
 
 template <typename T> void print_type() {
 	std::wcout << "type(" << type::to_list<T>::size << ") <" << type::to_list<T>::str() << "> : " << typeid(T).name() << std::endl;
@@ -79,7 +73,7 @@ int main(int argc, char **argv) {
 
 	std::wcout << std::endl << "running " << argv[0] << "..." << std::endl << std::endl;
 
-	F f = F(OP_THIS) << ( F(OP_OR) << Sv(L"what") ) << L(666);
+	F f = F(OP_THIS) << ( F(OP_OR) << S::var(L"what") ) << L(666);
 
 	std::wcout << "f := " << f.str() << std::endl;
 
@@ -92,16 +86,21 @@ int main(int argc, char **argv) {
 
 	std::wcout << "f := " << (std::wstring)f << std::endl;
 
-	auto g = define_grammar<term>();
+	auto g = define_grammar();
+
+	const int width = 10;
 
 	for(const auto& entry : g) {
 
 		const auto& name = entry.first;
+		const auto& rs = entry.second;
 
-		for(const auto& r : entry.second)
-			std::wcout << name << " := " << r.str() << std::endl;
+		auto iter = rs.begin();
 
-		std::wcout << std::endl;
+		std::wcout << std::setw(width) << std::setfill(L' ') << std::left << name << " := " << iter->str() << std::endl;
+
+		while(++iter != rs.end())
+			std::wcout << std::setw(width) << std::setfill(L' ') << std::left << "" << " := " << iter->str() << std::endl;
 	}
 
 	using x_type = type::container<int,double,bool,wchar_t,void *>;
