@@ -43,7 +43,7 @@ namespace yyy {
 				const char *p = typeid(T).name();
 
 				int sum = 0;
-				int round = 0;
+				int round = 1;
 
 				while(*p != '\0')
 					sum += *p++ * ++round;
@@ -357,6 +357,12 @@ namespace yyy {
 			}
 
 			template <typename U> container& operator=(const U& u) {
+				clear();
+				set(u);
+				return *this;
+			}
+
+			template <typename U> container& operator<<(const U& u) {
 				set(u);
 				return *this;
 			}
@@ -399,7 +405,7 @@ namespace yyy {
 				return tail.overlay(r);
 			}
 
-			std::wstring str() const {
+			std::wstring full_str() const {
 
 				std::wstringstream ss;
 
@@ -415,8 +421,28 @@ namespace yyy {
 				return ss.str();
 			}
 
+			std::wstring value_str() const {
+
+				std::wstringstream ss;
+
+				if(head) {
+					ss << color<T>() << value_to_str<T>::call(*head) << ANSI_CLR;
+					if(not tail.empty())
+						ss << ',';
+				}
+
+				if(not tail.empty())
+					ss << tail.str();
+
+				return ss.str();
+			}
+
 			std::wstring type_str() const {
 				return head ? ( to_str<T>() + tail.type_str() ) : tail.type_str();
+			}
+
+			std::wstring str() const {
+				return value_str();
 			}
 
 			bool operator==(const container& r) const {

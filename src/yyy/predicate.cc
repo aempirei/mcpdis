@@ -111,12 +111,12 @@ namespace yyy {
 			case types::any:
 			case types::mem:
 
-				ss << ANSI_HIRED << (operator_t)type << ANSI_CLR;
+				ss << (operator_t)type;
 				break;
 
 			case types::by_ref:
 
-				ss << arg.template get<symbol::ref>();
+				ss << type::color<symbol::ref>() << arg.template get<symbol::ref>() << ANSI_CLR;
 				break;
 
 			case types::by_type:
@@ -131,16 +131,16 @@ namespace yyy {
 
 			case types::by_value:
 
-				ss << '"' << arg.str() << '"';
+				ss << ANSI_CLR << '"' << arg.str() << '"';
 				break;
 		}
 
-		ss << ANSI_LOYELLOW;
+		ss << type::color<predicate<T>>();
 
 		/**/ if(quantifier == range(1,1))              { /* do nothing */ }
-		else if(quantifier == range(0,1))              ss << ANSI_HIRED << '?';
-		else if(quantifier == range(1,UINT_MAX))       ss << ANSI_HIRED << '+';
-		else if(quantifier == range(0,UINT_MAX))       ss << ANSI_HIRED << '*';
+		else if(quantifier == range(0,1))              ss <<  '?';
+		else if(quantifier == range(1,UINT_MAX))       ss <<  '+';
+		else if(quantifier == range(0,UINT_MAX))       ss <<  '*';
 		else if(quantifier.first == quantifier.second) ss << '{' << quantifier.first << '}';
 		else if(quantifier.first == 0)                 ss << "{," << quantifier.second << '}';
 		else if(quantifier.second == UINT_MAX)         ss << '{' << quantifier.first << ",}";

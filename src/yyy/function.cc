@@ -29,10 +29,10 @@ namespace yyy {
 
 	template <typename...Args> std::wstring function<TCA>::str() const {
 		std::wstringstream ss;
-		ss << (operator_t)op << '(';
+		ss << type::color<function<TCA>>() << (operator_t)op << '(' << ANSI_CLR;
 		for(auto arg : args)
 			ss << ' ' << arg.str();
-		ss << " )";
+		ss << type::color<function<TCA>>() << " )" << ANSI_CLR;
 		return ss.str();
 	}
 

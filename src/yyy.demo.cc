@@ -6,16 +6,9 @@
 
 using namespace yyy::quick;
 
-
 G define_grammar() {
 
-	M mLSF;
-
-	mLSF.set(literal_t());
-	mLSF.set(S::var());
-	mLSF.set(F());
-
-	const P LSF(P(mLSF).by_type());
+	const P LSF( P( M() << L() << S::var() << F() ).by_type() );
 
 	return G {
 		{ L"combo", {

@@ -219,7 +219,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		if(config.verbose) {
 
 			if(iter != rs.end())
-				std::wcout << yyy::colorize(ref) << L" := " << iter->str() << std::endl;
+				std::wcout << type::color<decltype(ref)>() << ref << ANSI_CLR << L" := " << iter->str() << std::endl;
 
 			while(++iter != rs.end())
 				std::wcout << std::setw(ref.length()) << L"" << L" := " << iter->str() << std::endl;
@@ -229,7 +229,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(22) << std::left << colorize(ref) << L" := " << iter->str();
+				std::wcout << std::setw(22) << std::left << type::color<decltype(ref)>() << ref << ANSI_CLR << L" := " << iter->str();
 
 			while(++iter != rs.end())
 				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();
@@ -508,20 +508,20 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 
 			for(const auto& k : state) {
 
-				if(k.second.contains_type<symbol::var>()) {
+				const auto name = type::container<symbol::var>(k.first).str();
 
-					if(not k.second.contains_value(k.first))
-					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" $= " << k.second.str() << std::endl;
+				if(k.second.contains<symbol::var>()) {
 
-				} else if(k.second.contains_type<literal_t>()) {
+					if(not k.second.contains(k.first))
+						std::wcout << std::setw(20) << std::setfill(L' ') << name << L" $= " << k.second.str() << std::endl;
 
-					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" #= " << k.second.str() << std::endl;
+				} else if(k.second.contains<literal_t>()) {
 
-				} else if(k.second.contains_type<F>()) {
+					std::wcout << std::setw(20) << std::setfill(L' ') << name << L" #= " << k.second.str() << std::endl;
 
-					std::wcout << std::setw(20) << std::setfill(L' ') << colorize(k.first) << L" := " << k.second.str() << std::endl;
+				} else if(k.second.contains<function<term>>()) {
 
-					auto result = config.g.parse(L"OR", k.second.get<F>());
+					std::wcout << std::setw(20) << std::setfill(L' ') << name << L" := " << k.second.str() << std::endl;
 				}
 			}
 
