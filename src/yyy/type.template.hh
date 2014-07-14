@@ -32,6 +32,7 @@ namespace yyy {
 		}
 
 		template <typename T> std::wstring color() {
+#ifdef USE_COLOR
 
 			static std::unordered_map<std::type_index,std::wstring> data;
 
@@ -56,6 +57,9 @@ namespace yyy {
 			}
 
 			return data[index<T>()];
+#else
+			return L"";
+#endif				
 		}
 
 		template <typename T> std::wstring to_str() {

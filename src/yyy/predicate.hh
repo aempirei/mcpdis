@@ -10,8 +10,24 @@ namespace yyy {
 
 		using range = std::pair<size_t,size_t>;
 
-		enum struct types { end, any, mem, by_ref, by_type, by_op, by_value };
-		enum struct modifiers { push, pop, lift, drop, bind, reject };
+		enum struct types : operator_t {
+			end      = '$',
+			any      = '.',
+			mem      = '#',
+			by_ref   = '@',
+			by_type  = 't',
+			by_op    = 'o',
+			by_value = 'v'
+		};
+
+		enum struct modifiers : operator_t {
+			bind   = '=',
+			push   = '>',
+			pop    = '<',
+			lift   = '~',
+			drop   = '-',
+			reject = '!'
+		};
 
 		// properties
 

@@ -114,10 +114,4 @@ namespace yyy {
 	template <typename S, typename X, typename...Xs> bool contains(const S& s, const X& x, Xs...xs) {
 		return contains(s,x) and contains(s,xs...);
 	}
-
-	template <typename T> std::wstring colorize(const T& t) {
-		std::wstringstream ss;
-		ss << typecolor[type::index<T>()] << t << ANSI_CLR;
-		return ss.str();
-	}
 }

@@ -101,49 +101,46 @@ namespace yyy {
 		std::wstringstream ss;
 
 		for(auto modifier : mods) {
-			switch(modifier) {
-				case modifiers::push   : ss << '>';       break ;
-				case modifiers::pop    : ss << '<';       break ;
-				case modifiers::lift   : ss << '~';       break ;
-				case modifiers::drop   : ss << '-';       break ;
-				case modifiers::reject : ss << '!';       break ;
-				case modifiers::bind   : /* do nothing */ break ;
-
-			}
+			if(modifier != modifiers::bind)
+				ss << (operator_t)modifier;
 		}
 
 		switch(type) {
-			case types::end      : ss << ANSI_HIBLACK << '$' << ANSI_CLR           ; break ;
-			case types::any      : ss << ANSI_HIBLACK << '.' << ANSI_CLR           ; break ;
-			case types::mem      : ss << ANSI_HIBLACK << '#' << ANSI_CLR           ; break ;
-			case types::by_ref   : ss << colorize(arg.template get<symbol::ref>()) ; break ;
+
+			case types::end:
+			case types::any:
+			case types::mem:
+
+				ss << ANSI_HIRED << (operator_t)type << ANSI_CLR;
+				break;
+
+			case types::by_ref:
+
+				ss << arg.template get<symbol::ref>();
+				break;
 
 			case types::by_type:
 
-					       ss << ANSI_LOMAGENTA << '[' << ANSI_HIMAGENTA;
-					       ss << arg.type_str();
-					       ss << ANSI_LOMAGENTA << ']' << ANSI_CLR;
-
-					       break;
+				ss << arg.type_str();
+				break;
 
 			case types::by_op:
 
-					       ss << type::to_str<function<value_type>>() << '(' << arg.template get<function<value_type>>().op << ")";
-					       ss << ANSI_CLR;
-					       break;
+				ss << arg.type_str() << ':' << arg.template get<function<value_type>>().op;
+				break;
 
 			case types::by_value:
-					       ss << '"' << arg.str() << '"';
-					       break;
 
+				ss << '"' << arg.str() << '"';
+				break;
 		}
 
 		ss << ANSI_LOYELLOW;
 
 		/**/ if(quantifier == range(1,1))              { /* do nothing */ }
-		else if(quantifier == range(0,1))              ss << ANSI_HIYELLOW << '?';
-		else if(quantifier == range(1,UINT_MAX))       ss << ANSI_HIYELLOW << '+';
-		else if(quantifier == range(0,UINT_MAX))       ss << ANSI_HIYELLOW << '*';
+		else if(quantifier == range(0,1))              ss << ANSI_HIRED << '?';
+		else if(quantifier == range(1,UINT_MAX))       ss << ANSI_HIRED << '+';
+		else if(quantifier == range(0,UINT_MAX))       ss << ANSI_HIRED << '*';
 		else if(quantifier.first == quantifier.second) ss << '{' << quantifier.first << '}';
 		else if(quantifier.first == 0)                 ss << "{," << quantifier.second << '}';
 		else if(quantifier.second == UINT_MAX)         ss << '{' << quantifier.first << ",}";
