@@ -1,34 +1,33 @@
 #include <yyy.hh>
 
+#define TCA type::container<Args...>
+
 namespace yyy {
 
-	//
-	// function
-	//
-
-	template <typename...Args> function<type::container<Args...>>::function() : op(OP_ANY) {
-	}
-	template <typename...Args> function<type::container<Args...>>::function(operator_t my_op) : op(my_op) {
-	}
-	template <typename...Args> function<type::container<Args...>>::function(operator_t my_op, const arguments<value_type>& my_args) : op(my_op), args(my_args) {
-	}
-	template <typename...Args> function<type::container<Args...>>::function(const function<value_type>& r) : function(r.op, r.args) {
-	}
-
-	//
-	// function.operator<<
+	// function<type::container<...>>
 	//
 
-	template <typename...Args> function<type::container<Args...>>& function<type::container<Args...>>::operator<<(const argument<value_type>& arg) {
+	template <typename...Args> function<TCA>::function() : op(OP_ANY) {
+	}
+	template <typename...Args> function<TCA>::function(operator_t my_op) : op(my_op) {
+	}
+	template <typename...Args> function<TCA>::function(operator_t my_op, const arguments<value_type>& my_args) : op(my_op), args(my_args) {
+	}
+	template <typename...Args> function<TCA>::function(const function<value_type>& r) : function(r.op, r.args) {
+	}
+
+	// function<type::container<...>>.operator<<
+	//
+
+	template <typename...Args> function<TCA>& function<TCA>::operator<<(const argument<value_type>& arg) {
 		args.push_back(arg);
 		return *this;
 	}
 
-	//
-	// function.operator std::wstring ()
+	// function<type::container<...>>.str()
 	//
 
-	template <typename...Args> std::wstring function<type::container<Args...>>::str() const {
+	template <typename...Args> std::wstring function<TCA>::str() const {
 		std::wstringstream ss;
 		ss << (operator_t)op << '(';
 		for(auto arg : args)
@@ -37,13 +36,30 @@ namespace yyy {
 		return ss.str();
 	}
 
-	template <typename...Args> function<type::container<Args...>>::operator std::wstring () const {
+	// function<type::container<...>>.operator std::wstring ()
+	//
+
+	template <typename...Args> function<TCA>::operator std::wstring () const {
 		return str();
 	}
 
-	template <typename...Args> bool function<type::container<Args...>>::operator==(const function<type::container<Args...>>& r) const {
+	// function<type::container<...>>.operator==
+	//
+
+	template <typename...Args> bool function<TCA>::operator==(const function<TCA>& r) const {
 		return op == r.op and args == r.args;
 	}
+
+	template <typename...Args> function<TCA>& function<TCA>::operator=(const function<TCA>& r) {
+		if(&r != this) {
+			op = r.op;
+			args = r.args;
+		}
+		return *this;
+	}
+
+	// build these specifically
+	//
 
 	template struct function<term>;
 	template struct function<type::container<predicate<term>>>;

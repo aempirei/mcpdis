@@ -103,7 +103,7 @@ namespace yyy {
 	template <typename T> std::wstring predicate<T>::str() const {
 
 		std::wstringstream ss;
-		
+
 		for(auto modifier : mods) {
 			switch(modifier) {
 				case modifiers::push   : ss << '>';       break ;
@@ -161,7 +161,7 @@ namespace yyy {
 	}
 
 	/*
-	
+
 	template <typename T> bool predicate<T>::test(const argument<T>& x) {
 		switch(type) {
 			case types::end:

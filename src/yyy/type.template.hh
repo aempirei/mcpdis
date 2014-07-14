@@ -284,7 +284,7 @@ namespace yyy {
 
 			container(const container& r) : head(smart_copy(r.head)), tail(r.tail) {
 			}
-			
+
 			template <typename U> container(const U& u) : container() {
 				set(u);
 			}

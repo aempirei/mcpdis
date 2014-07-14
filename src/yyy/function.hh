@@ -1,16 +1,21 @@
 #pragma once
 
+#define TCA type::container<Args...>
+
 namespace yyy {
 
-	// this should actually never accept T that are not container
-	// maybe static_assert
+	template <typename...Args> struct function<TCA> {
 
-	template <typename...Args> struct function<type::container<Args...>> {
+		// types
 
 		using value_type = type::container<Args...>;
 
+		// variables
+
 		operator_t op;
 		arguments<value_type> args;
+
+		// constructors
 
 		function();
 
@@ -18,19 +23,28 @@ namespace yyy {
 		function(const function&);
 		function(operator_t, const arguments<value_type>&);
 
-		function& operator<<(const argument<value_type>&);
+		// operators
 
-		template <typename U> function& operator<<(const U&);
+		function& operator<<(const argument<value_type>&);
 
 		bool operator==(const function&) const;
 
-		std::wstring str() const;
 		explicit operator std::wstring() const;
+
+		template <typename U> function& operator<<(const U&);
+
+		function& operator=(const function&);
+
+		// functions
+
+		std::wstring str() const;
 	};
 
-	template <typename...Args> template <typename U> function<type::container<Args...>>& function<type::container<Args...>>::operator<<(const U& value) {
+	template <typename...Args> template <typename U> function<TCA>& function<TCA>::operator<<(const U& value) {
 		argument<value_type> arg;
 		arg.set(value);
 		return operator<<(arg);
 	}
 }
+
+#undef TCA

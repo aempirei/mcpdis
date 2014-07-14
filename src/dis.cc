@@ -184,7 +184,7 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 	// auxiliary rules
 	//
-	// 
+	//
 
 	P Pfn( F(OP_AND) << L(1) );
 

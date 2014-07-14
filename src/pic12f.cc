@@ -54,13 +54,13 @@ namespace dis {
 		GN(RETFIE) { RETURN(o,c);  SET_BIT(INTCON, instruction::flags::GIE); }
 
 		FN(SLEEP)  { /* put microcontroller to sleep */ }
-		FN(CLRWDT) { /* clear watchdog timer */         } 
+		FN(CLRWDT) { /* clear watchdog timer */         }
 		FN(NOP)    { /* no operation */                 }
 
 		GN(MOVWF)  {
 
 			USE_W;
-			USE_F; 
+			USE_F;
 
 			c[f] = A( touch(c,W) );
 		}
@@ -110,7 +110,7 @@ namespace dis {
 		GN(SWAPF)  { USE_D; USE_F; c[d] = F(OP_SWAP) << touch(c,f); }
 
 		GN(BCF)    { USE_F; USE_B; c[f] = F(OP_AND) << L8(~b) << touch(c,f); }
-		GN(BSF)    { USE_F; USE_B; c[f] = F(OP_OR ) << L8( b) << touch(c,f); } 
+		GN(BSF)    { USE_F; USE_B; c[f] = F(OP_OR ) << L8( b) << touch(c,f); }
 
 		FN(DECFSZ) { throw std::runtime_error(std::string("DECFSZ performs conditional program counter modification")); }
 		FN(INCFSZ) { throw std::runtime_error(std::string("INCFSZ performs conditional program counter modification")); }

@@ -55,8 +55,6 @@ namespace yyy {
 
 namespace yyy {
 
-	template <typename...Args> struct function<type::container<Args...>>;
-
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 	template <typename T> using argument = typename T::template append<function<T>>;
 	template <typename T> using rule = function<type::container<predicate<T>>>;
@@ -92,6 +90,7 @@ namespace yyy {
 		using G = grammar<quick_type>;
 		using L = literal_t;
 		using S = symbol;
+		using O = operator_t;
 
 		constexpr L L8  (L x) { return (uint8_t )x; }
 		constexpr L L16 (L x) { return (uint16_t)x; }
