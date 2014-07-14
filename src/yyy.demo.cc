@@ -67,7 +67,8 @@ template <typename X,typename T> void typeprint(wchar_t wx, const T& t, const X&
 
 int main(int argc, char **argv) {
 
-	using F = function<term>;
+	function<term> ft;
+	function<std::list<int>> fint;
 
 	setlocale(LC_CTYPE, "");
 

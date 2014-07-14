@@ -7,6 +7,8 @@ namespace yyy {
 
 	template <typename T> struct function {
 
+		static_assert(type::is_container<T>::value, "function expects container<...> as template argument");
+
 		using value_type = T;
 
 		operator_t op;

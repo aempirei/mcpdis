@@ -23,9 +23,7 @@ namespace yyy {
 		// constructors
 
 		predicate();
-
 		predicate(const predicate&);
-
 		predicate(const meta<argument<value_type>>&);
 
 		// operators

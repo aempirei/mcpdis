@@ -39,10 +39,11 @@ namespace yyy {
 			return std::wstring() + color<T>() + op<T>() + ANSI_CLR;
 		}
 
+		template <typename> struct is_container;
+		template <typename,typename> struct equals;
+
 		template <typename...> struct list;
 		template <typename...> struct container;
-
-		template <typename,typename> struct equals;
 
 		template <typename> struct _to_list;
 		template <typename> struct _reverse;
@@ -398,6 +399,17 @@ namespace yyy {
 			bool operator==(const container& r) const {
 				return ( ( head and r.head and *head == *r.head ) or not ( head or r.head ) ) and ( tail == r.tail );
 			}
+		};
+
+		// is_container<>
+		//
+
+		template <typename T> struct is_container {
+			static constexpr bool value = false;
+		};
+
+		template <typename...Args> struct is_container<container<Args...>> {
+			static constexpr bool value = true;
 		};
 
 		// equals<T,T> -> bool
