@@ -34,7 +34,5 @@ namespace yyy {
 		//
 
 		std::wstring str() const;
-
-		operator const wchar_t * () const;
 	};
 }

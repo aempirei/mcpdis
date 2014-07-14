@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
 	f << f;
 
-	std::wcout << "f := " << f << std::endl;
+	std::wcout << "f := " << f.str() << std::endl;
 
 	auto g = define_grammar();
 

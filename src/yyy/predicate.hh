@@ -74,8 +74,6 @@ namespace yyy {
 
 		std::wstring str() const;
 
-		operator const wchar_t * () const;
-
 		using test_return_type = std::pair<bool,binding<T>>;
 
 		test_return_type test(const grammar<T>&, const function<T>&);

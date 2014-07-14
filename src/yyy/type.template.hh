@@ -62,6 +62,22 @@ namespace yyy {
 			return std::wstring() + color<T>() + op<T>() + ANSI_CLR;
 		}
 
+		template <typename T> struct value_to_str {
+			using value_type = T;
+			static std::wstring call(const value_type& x) {
+				std::wstringstream ss;
+				ss << x;
+				return ss.str();
+			}
+		};
+
+		template <template <typename> class V, typename T> struct value_to_str<V<T>> {
+			using value_type = V<T>;
+			static std::wstring call(const value_type& x) {
+				return x.str();
+			}
+		};
+
 		template <typename> struct is_container;
 		template <typename,typename> struct equals;
 
@@ -384,7 +400,7 @@ namespace yyy {
 				std::wstringstream ss;
 
 				if(head) {
-					ss << to_str<T>() << ':' << *head;
+					ss << to_str<T>() << ':' << value_to_str<T>::call(*head);
 					if(not tail.empty())
 						ss << ',';
 				}
@@ -393,10 +409,6 @@ namespace yyy {
 					ss << tail.str();
 
 				return ss.str();
-			}
-
-			operator const wchar_t * () const {
-				return str().c_str();
 			}
 
 			std::wstring type_str() const {

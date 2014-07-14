@@ -36,13 +36,6 @@ namespace yyy {
 		return ss.str();
 	}
 
-	// function<type::container<...>>.operator std::wstring ()
-	//
-
-	template <typename...Args> function<TCA>::operator const wchar_t * () const {
-		return str().c_str();
-	}
-
 	// function<type::container<...>>.operator==
 	//
 

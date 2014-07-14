@@ -22,10 +22,6 @@ namespace yyy {
 		return *this;
 	}
 
-	template <typename T> binding<T>::operator const wchar_t * () const {
-		return str().c_str();
-	}
-
 	template <typename T> std::wstring binding<T>::str() const {
 
 		std::wstringstream ss;

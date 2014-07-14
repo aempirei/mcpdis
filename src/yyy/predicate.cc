@@ -96,10 +96,6 @@ namespace yyy {
 	// operator std::wstring
 	//
 
-	template <typename T> predicate<T>::operator const wchar_t * () const {
-		return str().c_str();
-	}
-
 	template <typename T> std::wstring predicate<T>::str() const {
 
 		std::wstringstream ss;

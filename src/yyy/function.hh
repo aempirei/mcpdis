@@ -29,8 +29,6 @@ namespace yyy {
 
 		bool operator==(const function&) const;
 
-		operator const wchar_t * () const;
-
 		template <typename U> function& operator<<(const U&);
 
 		function& operator=(const function&);
