@@ -524,6 +524,12 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 				} else if(k.second.contains<function<term>>()) {
 
 					std::wcout << std::setw(20) << std::setfill(L' ') << name << L" := " << k.second.str() << std::endl;
+
+					//
+					// test the parsing on every formula
+					//
+
+					config.g.parse(L"OR", k.second.get<function<term>>());
 				}
 			}
 
