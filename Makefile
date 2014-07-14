@@ -34,7 +34,6 @@ test: all
 ########
 
 demo: bin/yyy.demo
-	./bin/yyy.demo 111
 
 src/yyy.demo.o: src/yyy.demo.cc $(TPLHH)
 

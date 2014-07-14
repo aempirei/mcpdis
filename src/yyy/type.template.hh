@@ -27,6 +27,18 @@ namespace yyy {
 			return std::type_index(typeid(T));
 		}
 
+		template <typename T> wchar_t op() {
+			return typeoperator[index<T>()];
+		}
+
+		template <typename T> const std::wstring& color() {
+			return typecolor[index<T>()];
+		}
+
+		template <typename T> std::wstring to_str() {
+			return std::wstring() + color<T>() + op<T>() + ANSI_CLR;
+		}
+
 		template <typename...> struct list;
 		template <typename...> struct container;
 
@@ -178,13 +190,8 @@ namespace yyy {
 			list() = delete;
 
 			static std::wstring str() {
-				std::wstringstream ss;
-				ss << typecolor[index<T>()] << typeoperator[index<T>()] << ANSI_CLR << ' ' << tail::str();
-				std::wstring s = ss.str();
-				if(not s.empty())
-					s[s.length() - 1] = '\0';
-				return s;
-			};
+				return tail::empty ? to_str<T>() : ( to_str<T>() + L" " + tail::str() );
+			}
 		};
 
 		// display<T>
@@ -194,10 +201,13 @@ namespace yyy {
 			using value_type = T;
 			static std::wstring to_str(const value_type& x) {
 				std::wstringstream ss;
-				ss << typecolor[index<value_type>()] << x << ANSI_CLR;
+				ss << x;
 				return ss.str();
 			}
 		};
+
+		// display<V<T>>
+		//
 
 		template <template <typename> class V, typename T> struct display<V<T>> {
 			using value_type = V<T>;
@@ -232,7 +242,6 @@ namespace yyy {
 			template <typename...Xs> container<Xs...>& overlay(container<Xs...>& r) const { return r; }
 
 			constexpr const wchar_t *     str() const { return L""; }
-			constexpr const wchar_t *full_str() const { return L""; }
 			constexpr const wchar_t *type_str() const { return L""; }
 
 			constexpr bool operator==(const container&) const { return true; }
@@ -367,7 +376,7 @@ namespace yyy {
 				std::wstringstream ss;
 
 				if(head) {
-					ss << typeoperator[index<T>()] << ':' << display<head_type>::to_str(*head);
+					ss << to_str<T>() << ':' << display<head_type>::to_str(*head);
 					if(not tail.empty())
 						ss << ',';
 				}
@@ -378,24 +387,8 @@ namespace yyy {
 				return ss.str();
 			}
 
-			std::wstring full_str() const {
-
-				return str();
-			}
-
 			std::wstring type_str() const {
-
-				std::wstringstream ss;
-
-				if(head) {
-					ss << typecolor[index<T>()];
-					ss << typeoperator[index<T>()];
-					ss << ANSI_CLR;
-				}
-
-				ss << tail.type_str();
-
-				return ss.str();
+				return head ? ( to_str<T>() + tail.type_str() ) : tail.type_str();
 			}
 
 			bool operator==(const container& r) const {
