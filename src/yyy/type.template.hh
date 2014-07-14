@@ -50,7 +50,7 @@ namespace yyy {
 				sum %= 15;
 				sum += 1;
 
-				ss << "\033[" << (sum > 8 ? "1;" : "0;") << int(31 + (sum % 8)) << 'm';
+				ss << "\033[" << int(sum > 8) << ';' << int(31 + (sum % 8)) << 'm';
 
 				data[index<T>()] =  ss.str();
 			}
