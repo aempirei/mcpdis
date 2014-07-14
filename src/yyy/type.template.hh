@@ -31,8 +31,31 @@ namespace yyy {
 			return typeoperator[index<T>()];
 		}
 
-		template <typename T> const std::wstring& color() {
-			return typecolor[index<T>()];
+		template <typename T> std::wstring color() {
+
+			static std::unordered_map<std::type_index,std::wstring> data;
+
+			if(data.find(index<T>()) == data.end()) {
+
+				std::wstringstream ss;
+
+				const char *p = typeid(T).name();
+
+				int sum = 0;
+				int round = 1;
+
+				while(*p != '\0')
+					sum += *p++ * round++;
+
+				sum %= 15;
+				sum += 1;
+
+				ss << "\033[" << (sum > 8 ? "1;" : "0;") << int(31 + (sum % 8)) << 'm';
+
+				data[index<T>()] =  ss.str();
+			}
+
+			return data[index<T>()];
 		}
 
 		template <typename T> std::wstring to_str() {
