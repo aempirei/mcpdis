@@ -42,10 +42,10 @@ namespace yyy {
 				const char *p = typeid(T).name();
 
 				int sum = 0;
-				int round = 1;
+				int round = 0;
 
 				while(*p != '\0')
-					sum += *p++ * round++;
+					sum += *p++ * ++round;
 
 				sum %= 15;
 				sum += 1;
