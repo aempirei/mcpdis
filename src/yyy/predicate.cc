@@ -1,4 +1,5 @@
 #include <yyy.hh>
+#include <iostream>
 
 namespace yyy {
 
@@ -163,8 +164,8 @@ namespace yyy {
 		   case types::by_ref:
 		   throw std::runtime_error("test by_ref called on plain argument");
 		   case types::by_op:
-		   return arg.template contains_type<function<T>>()
-		   and x.template contains_type<function<T>>()
+		   return arg.template contains<function<T>>()
+		   and x.template contains<function<T>>()
 		   and (x.template get<function<T>>().op == x.template get<function<T>>().op);
 		   case types::by_value:
 		   return arg.contains_any_value(x);
@@ -179,7 +180,6 @@ namespace yyy {
 
 		binding<T> b(*this);
 
-		/*
 
 		switch(type) {
 
@@ -195,7 +195,7 @@ namespace yyy {
 
 			case types::by_ref:
 
-				if(not arg.template contains_type<symbol::ref>()) {
+				if(not arg.template contains<symbol::ref>()) {
 					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
 				} else {
 					auto dast = g.parse(arg.template get<symbol::ref>(), f);
@@ -216,13 +216,13 @@ namespace yyy {
 
 			case types::by_op:
 
-				if(type == types::by_op and not arg.template contains_type<function<value_type>>())
+				if(type == types::by_op and not arg.template contains<function<value_type>>())
 					throw std::runtime_error("by_op predicate expected function argument but did not contain one");
 
 			case types::by_type:
 			case types::by_value:
 
-				if(arg.template contains_type<symbol::ref>())
+				if(arg.template contains<symbol::ref>())
 					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
 
 				for(const auto& x : f.args) {
@@ -233,12 +233,15 @@ namespace yyy {
 					}
 				}
 
-				if(b.args.size() < quantifier.first)
+				if(b.args.size() < quantifier.first) {
+					std::wcout << L"failed parse at quantifier" << std::endl;
 					return test_return_type(false, binding<T>());
+				}
+
+				std::wcout << "successful parse for predicate: " << str() << std::endl;
 
 				return test_return_type(true,b);
 		}
-		*/
 
 		return test_return_type(false,binding<T>());
 	}
