@@ -151,33 +151,35 @@ namespace yyy {
 		return ss.str();
 	}
 
-	/*
-
 	template <typename T> bool predicate<T>::test(const argument<T>& x) {
-		switch(type) {
-			case types::end:
-				return false;
-			case types::any:
-				return true;
-			case types::mem:
-				throw std::runtime_error("mem predicate not implemented");
-			case types::by_ref:
-				throw std::runtime_error("test by_ref called on plain argument");
-			case types::by_op:
-				return arg.template contains_type<function<T>>()
-					and x.template contains_type<function<T>>()
-					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
-			case types::by_value:
-				return arg.contains_any_value(x);
-			case types::by_type:
-				return arg.contains_any_type(x);
-		}
+		/*
+		   switch(type) {
+		   case types::end:
+		   return false;
+		   case types::any:
+		   return true;
+		   case types::mem:
+		   throw std::runtime_error("mem predicate not implemented");
+		   case types::by_ref:
+		   throw std::runtime_error("test by_ref called on plain argument");
+		   case types::by_op:
+		   return arg.template contains_type<function<T>>()
+		   and x.template contains_type<function<T>>()
+		   and (x.template get<function<T>>().op == x.template get<function<T>>().op);
+		   case types::by_value:
+		   return arg.contains_any_value(x);
+		   case types::by_type:
+		   return arg.contains_any_type(x);
+		   }
+		 */
 		return false;
 	}
 
 	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
 		binding<T> b(*this);
+
+		/*
 
 		switch(type) {
 
@@ -236,10 +238,10 @@ namespace yyy {
 
 				return test_return_type(true,b);
 		}
+		*/
 
 		return test_return_type(false,binding<T>());
 	}
-	*/
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
 		return type == r.type and arg == r.arg and mods == r.mods and quantifier == r.quantifier;

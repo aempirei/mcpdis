@@ -1,17 +1,18 @@
 #include <yyy.hh>
+#include <iostream>
 
 namespace yyy {
 
 
 	template <typename T> typename grammar<T>::parse_return_type grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
-		/*
-		   for(const rule<T> r : at(k)) {
-		   auto result = parse(r,f);
-		   if(result.first)
-		   return result;
-		   }
-		 */
+		std::wcout << "parse: apply " << k << " to " << f.str() << std::endl;
+
+		for(const rule<T>& r : at(k)) {
+			auto result = parse(r,f);
+			if(result.first)
+				return result;
+		}
 
 		return parse_return_type(false,{});
 	}
@@ -20,25 +21,31 @@ namespace yyy {
 
 		bindings<T> ast;
 
-		/*
-		   for(const auto& argp : r.args) {
+		for(const auto& arg : r.args) {
 
-		   if(argp.template contains_type<predicate<T>>()) {
+			if(arg.template contains<predicate<T>>()) {
 
-		   auto p = argp.template get<predicate<T>>();
-		   auto result = p.test(*this, f);
+				auto p = arg.template get<predicate<T>>();
 
-		   if(!result.first)
-		   return parse_return_type(false,{});
+				std::wcout << '\t' << "testing predicate: " << arg.str() << std::endl;
 
-		   ast.push_back(result.second);
+				auto result = p.test(*this, f);
 
-		   } else {
-		   throw std::runtime_error("rule contains nested predicates");
-		   }
-		   }
-		 */
+				if(!result.first) {
+					std::wcout << '\t' << "test failed" << std::endl;
+					return parse_return_type(false,{});
+				}
 
+				ast.push_back(result.second);
+
+			} else {
+				std::stringstream ss;
+				ss << "rule contains non-predicate arugments: " << r.str().c_str();
+				throw std::runtime_error(ss.str());
+			}
+		}
+
+		std::wcout << '\t' << "successful parse" << std::endl;
 		return parse_return_type(true,ast);
 	}
 
