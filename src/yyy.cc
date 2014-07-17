@@ -10,7 +10,6 @@ namespace yyy {
 		{ std::type_index(typeid(symbol::var)), L'S' },
 
 		{ std::type_index(typeid(function<term>)), L'F' },
-		{ std::type_index(typeid(binding<term>)), L'B' },
 		{ std::type_index(typeid(predicate<term>)), L'P' },
 		{ std::type_index(typeid(rule<term>)), L'R' },
 

@@ -229,7 +229,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 		} else {
 
 			if(iter != rs.end())
-				std::wcout << std::setw(22) << std::left << type::color<symbol::ref>() << ref << ANSI_CLR << L" := " << iter->str();
+				std::wcout << type::color<symbol::ref>() << std::setw(10) << std::left << ref << ANSI_CLR << L" := " << iter->str();
 
 			while(++iter != rs.end())
 				std::wcout << ANSI_HIRED << L" / " << ANSI_CLR << iter->str();

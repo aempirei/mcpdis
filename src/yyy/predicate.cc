@@ -176,9 +176,7 @@ namespace yyy {
 		return false;
 	}
 
-	template <typename T> typename predicate<T>::test_return_type predicate<T>::test(const grammar<T>& g, const function<T>& f) {
-
-		binding<T> b(*this);
+	template <typename T> resultant<arguments<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
 		/*
 
@@ -246,7 +244,7 @@ namespace yyy {
 
 		*/
 
-		return test_return_type(false,binding<T>());
+		return resultant<arguments<T>>(false,{});
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {

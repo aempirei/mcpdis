@@ -41,7 +41,6 @@ namespace yyy {
 
 	template <typename> struct predicate;
 	template <typename> struct function;
-	template <typename> struct binding;
 	template <typename> struct grammar;
 	template <typename> struct parser;
 }
@@ -55,21 +54,22 @@ namespace yyy {
 
 namespace yyy {
 
-	template <typename T> using meta = typename T::template append<symbol::ref>;
-	template <typename T> using argument = typename T::template append<function<T>>;
-	template <typename T> using closure = typename argument<T>::template append<binding<T>>;
-	template <typename T> using rule = function<type::container<predicate<T>>>;
+	template <typename T> using resultant = std::pair<bool,T>;
 
-	pluralize(argument);	// arguments
+	template <typename T> using meta = typename T::template append<symbol::ref>;
+	template <typename T> using rule = function<type::container<predicate<T>>>;
 	pluralize(rule);	// rules
-	pluralize(binding);	// bindings
+	template <typename T> using argument = typename T::template append<function<T>>;
+	pluralize(argument);	// arguments
+	template <typename T> using closure = std::pair<predicate<T>,arguments<T>>;
+	pluralize(closure);	// closures
+	template <typename T> using binding = std::pair<symbol::ref,closures<T>>;
 }
 
 #undef pluralize
 
 #include "yyy/predicate.hh"
 #include "yyy/function.hh"
-#include "yyy/binding.hh"
 #include "yyy/grammar.hh"
 
 namespace yyy {
@@ -87,7 +87,6 @@ namespace yyy {
 		using R = rule<quick_type>;
 		using A = argument<quick_type>;
 		using M = meta<argument<quick_type>>;
-		using B = binding<quick_type>;
 		using G = grammar<quick_type>;
 		using L = literal_t;
 		using S = symbol;
@@ -103,7 +102,6 @@ namespace yyy {
 	extern template struct predicate<quick::quick_type>;
 	extern template struct function<quick::quick_type>;
 	extern template struct function<type::container<predicate<quick::quick_type>>>;
-	extern template struct binding<quick::quick_type>;
 	extern template struct grammar<quick::quick_type>;
 
 	// inline function templates
