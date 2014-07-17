@@ -22,12 +22,19 @@ namespace yyy {
 
 		closures<T> ast;
 
+		//
 		// verifiy that f has the same type of operator as r, keeping in mind the special cases of OP_THIS and OP_ANY
+		//
 
 		if(r.op != OP_ANY and r.op != OP_THIS and r.op != f.op) {
 			std::wcout << '\t' << "rule op doesn't match function op -- " << r.op << " ~ " << f.op << std::endl;
 			return resultant<closures<T>>(false,{});
 		}
+
+		// just match each predicate against what remains of the function
+		//
+
+		function<T> df = f;
 
 		for(const auto& rule_argument : r.args) {
 
@@ -37,7 +44,7 @@ namespace yyy {
 
 				std::wcout << '\t' << "testing predicate: " << rule_argument.str() << std::endl;
 
-				auto predicate_test_result = rule_argument_predicate.test(*this, f);
+				auto predicate_test_result = rule_argument_predicate.test(*this, df);
 
 				if(not predicate_test_result.first) {
 					std::wcout << '\t' << "test failed" << std::endl;

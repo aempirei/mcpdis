@@ -176,11 +176,15 @@ namespace yyy {
 		return false;
 	}
 
-	template <typename T> resultant<arguments<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) {
+	template <typename T> resultant<arguments<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
 
-		/*
+		// FIXME:
+		// FIXME: change this function to be resultant<functions<T>> test(const grammar<T>&,const function<T>&)
+		// FIXME: 
 
 		switch(type) {
+
+		/*
 
 			case types::end:
 
@@ -240,11 +244,10 @@ namespace yyy {
 				std::wcout << "successful parse for predicate: " << str() << std::endl;
 
 				return test_return_type(true,b);
+		*/
 		}
 
-		*/
-
-		return resultant<arguments<T>>(false,{});
+		return resultant<arguments<T>>(false, {});
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
