@@ -176,7 +176,12 @@ namespace yyy {
 		return false;
 	}
 
-	template <typename T> resultant<arguments<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
+	template <typename T> resultant<closure<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
+
+		resultant<closure<T>> result(true, closure<T>(*this, {}));
+
+		closure<T>& ref_closure = result.second;
+		arguments<T>& matches = ref_closure.second;
 
 		// FIXME:
 		// FIXME: change this function to be resultant<functions<T>> test(const grammar<T>&,const function<T>&)
@@ -184,32 +189,38 @@ namespace yyy {
 
 		switch(type) {
 
-		/*
-
 			case types::end:
 
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
 
 				if(f.args.empty())
-					return test_return_type(true, b);
+					return result;
 
 				break;
 
 			case types::by_ref:
 
-				if(not arg.template contains<symbol::ref>()) {
-					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
-				} else {
-					auto dast = g.parse(arg.template get<symbol::ref>(), f);
-					if(dast.first) {
-						for(const auto& x : dast.second)
-							b.args.push_back(x);
+				if(arg.template contains<symbol::ref>()) {
+
+					const symbol::ref& binding_ref = arg.template get<symbol::ref>();
+
+					resultant<closures<T>> parse_result = g.parse(binding_ref, f);
+
+					if(parse_result.first) {
+
+						binding<T> b( binding_ref, parse_result.second );
+
 						return test_return_type(true, b);
 					}
+
+				} else {
+					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
 				}
 
 				break;
+		
+				/*
 
 			case types::any:
 			case types::mem:
@@ -243,11 +254,11 @@ namespace yyy {
 
 				std::wcout << "successful parse for predicate: " << str() << std::endl;
 
-				return test_return_type(true,b);
+				eturn test_return_type(true,b);
 		*/
 		}
 
-		return resultant<arguments<T>>(false, {});
+		return resultant<arguments<T>>(false,{});
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {

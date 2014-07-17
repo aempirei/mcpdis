@@ -58,12 +58,14 @@ namespace yyy {
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 	template <typename T> using rule = function<type::container<predicate<T>>>;
-	pluralize(rule);	// rules
+	pluralize(rule); // rules
 	template <typename T> using argument = typename T::template append<function<T>>;
-	pluralize(argument);	// arguments
+	pluralize(argument); // arguments
 	template <typename T> using closure = std::pair<predicate<T>,arguments<T>>;
-	pluralize(closure);	// closures
+	pluralize(closure); // closures
 	template <typename T> using binding = std::pair<symbol::ref,closures<T>>;
+
+	// FIXME: template <typename T> using closure = std::pair<predicate<T>,arguments<T> OR binding<T>>;
 }
 
 #undef pluralize

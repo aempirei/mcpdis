@@ -7,6 +7,7 @@
 #endif
 
 #define ANSI_BOLD	ANSI_COLOR(L"1m")
+#define ANSI_REV	ANSI_COLOR(L"0;7m")
 #define ANSI_CLR	ANSI_COLOR(L"0m")
 
 #define ANSI_BLACK	ANSI_COLOR(L"30m")
