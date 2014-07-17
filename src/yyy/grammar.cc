@@ -1,5 +1,6 @@
-#include <yyy.hh>
 #include <iostream>
+
+#include <yyy.hh>
 
 namespace yyy {
 
@@ -46,6 +47,7 @@ namespace yyy {
 		}
 
 		std::wcout << '\t' << "successful parse" << std::endl;
+
 		return parse_return_type(true,ast);
 	}
 

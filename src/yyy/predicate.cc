@@ -180,6 +180,7 @@ namespace yyy {
 
 		binding<T> b(*this);
 
+		/*
 
 		switch(type) {
 
@@ -242,6 +243,8 @@ namespace yyy {
 
 				return test_return_type(true,b);
 		}
+
+		*/
 
 		return test_return_type(false,binding<T>());
 	}

@@ -57,7 +57,7 @@ namespace yyy {
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 	template <typename T> using argument = typename T::template append<function<T>>;
-	template <typename T> using closure = typename T::template append<binding<T>>;
+	template <typename T> using closure = typename argument<T>::template append<binding<T>>;
 	template <typename T> using rule = function<type::container<predicate<T>>>;
 
 	pluralize(argument);	// arguments

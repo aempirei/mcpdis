@@ -1,7 +1,7 @@
 CXX = g++
 
 CPPFLAGS = -Isrc
-CXXFLAGS = -W -DUSE_COLOR -pedantic -std=gnu++11 -O2
+CXXFLAGS = -W -DUSE_COLOR -pedantic -std=gnu++11 -O0
 LIBFLAGS = -Llib -lmcpdis -lyyy
 
 TARGETS = lib/libmcpdis.a lib/libyyy.a bin/dis bin/yyy.demo
@@ -9,7 +9,7 @@ TARGETS = lib/libmcpdis.a lib/libyyy.a bin/dis bin/yyy.demo
 LIBCC = src/mcpdis.cc src/pic12f.cc
 LIBHH = $(LIBCC:.cc=.hh)
 
-YYYCC = src/yyy/grammar.cc src/yyy/binding.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy.cc
+YYYCC = src/yyy.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy/binding.cc src/yyy/grammar.cc
 YYYHH = $(YYYCC:.cc=.hh)
 
 TPLHH = src/yyy/symbol.template.hh src/yyy/type.template.hh
