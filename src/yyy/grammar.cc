@@ -1,5 +1,6 @@
-#include <yyy.hh>
 #include <iostream>
+
+#include <yyy.hh>
 
 namespace yyy {
 
@@ -22,32 +23,33 @@ namespace yyy {
 		bindings<T> ast;
 
 		for(const auto& arg : r.args) {
+
 			/*
+			   if(arg.template contains<predicate<T>>()) {
 
-			if(arg.template contains<predicate<T>>()) {
+			   auto p = arg.template get<predicate<T>>();
 
-				auto p = arg.template get<predicate<T>>();
+			   std::wcout << '\t' << "testing predicate: " << arg.str() << std::endl;
 
-				std::wcout << '\t' << "testing predicate: " << arg.str() << std::endl;
+			   auto result = p.test(*this, f);
 
-				auto result = p.test(*this, f);
+			   if(!result.first) {
+			   std::wcout << '\t' << "test failed" << std::endl;
+			   return parse_return_type(false,{});
+			   }
 
-				if(!result.first) {
-					std::wcout << '\t' << "test failed" << std::endl;
-					return parse_return_type(false,{});
-				}
+			   ast.push_back(result.second);
 
-				ast.push_back(result.second);
-
-			} else {
-				std::stringstream ss;
-				ss << "rule contains non-predicate arugments: " << r.str().c_str();
-				throw std::runtime_error(ss.str());
-			}
-			*/
+			   } else {
+			   std::stringstream ss;
+			   ss << "rule contains non-predicate arugments: " << r.str().c_str();
+			   throw std::runtime_error(ss.str());
+			   }
+			 */
 		}
 
 		// std::wcout << '\t' << "successful parse" << std::endl;
+
 		return parse_return_type(true,ast);
 	}
 
