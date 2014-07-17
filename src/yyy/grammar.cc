@@ -22,6 +22,7 @@ namespace yyy {
 		bindings<T> ast;
 
 		for(const auto& arg : r.args) {
+			/*
 
 			if(arg.template contains<predicate<T>>()) {
 
@@ -43,9 +44,10 @@ namespace yyy {
 				ss << "rule contains non-predicate arugments: " << r.str().c_str();
 				throw std::runtime_error(ss.str());
 			}
+			*/
 		}
 
-		std::wcout << '\t' << "successful parse" << std::endl;
+		// std::wcout << '\t' << "successful parse" << std::endl;
 		return parse_return_type(true,ast);
 	}
 
