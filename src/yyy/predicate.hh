@@ -90,7 +90,7 @@ namespace yyy {
 
 		std::wstring str() const;
 
-		std::pair<bool,arguments<T>> test(const grammar<T>&, const function<T>&);
+		resultant<arguments<T>> test(const grammar<T>&, const function<T>&);
 		bool test(const argument<T>&);
 
 		bool operator==(const predicate&) const;

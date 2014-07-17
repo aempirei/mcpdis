@@ -14,9 +14,7 @@ namespace yyy {
 		using mapped_type = typename _grammar<T>::mapped_type;
 		using key_type = typename _grammar<T>::key_type;
 
-		using f = resultant<closures<T>>;
-
-		f parse(const key_type&, const function<T>&) const;
-		f parse(const rule<T>&, const function<T>&) const;
+		resultant<closures<T>> parse(const key_type&, const function<T>&) const;
+		resultant<closures<T>> parse(const rule<T>&, const function<T>&) const;
 	};
 }

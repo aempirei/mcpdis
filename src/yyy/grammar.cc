@@ -33,7 +33,7 @@ namespace yyy {
 
 			if(rule_argument.template contains<predicate<T>>()) {
 
-				const auto& rule_argument_predicate = rule_argument.template get<predicate<T>>();
+				auto rule_argument_predicate = rule_argument.template get<predicate<T>>();
 
 				std::wcout << '\t' << "testing predicate: " << rule_argument.str() << std::endl;
 
