@@ -5,7 +5,7 @@
 namespace yyy {
 
 
-	template <typename T> std::pair<bool,closures<T>> grammar<T>::parse(const key_type& k, const function<T>& f) const {
+	template <typename T> resultant<closures<T>> grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
 		std::wcout << "parse: apply " << k << " to " << f.str() << std::endl;
 
@@ -18,7 +18,7 @@ namespace yyy {
 		return resultant<closures<T>>(false,{});
 	}
 
-	template <typename T> std::pair<bool,closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
+	template <typename T> resultant<closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
 
 		closures<T> ast;
 
