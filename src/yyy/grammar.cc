@@ -5,30 +5,29 @@
 namespace yyy {
 
 
-	template <typename T> resultant<closures<T>> grammar<T>::parse(const key_type& k, const function<T>& f) const {
+	template <typename T> resultant<closure<T>> grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
 		std::wcout << ANSI_REV << "parse: apply '" << k << "' to " ANSI_CLR << f.str() << std::endl;
 
 		for(const rule<T>& r : at(k)) {
 			auto result = parse(r,f);
 			if(result.first)
-				return result;
+				return resultant<closure<T>>(true, closure<T>(predicate<T>(k), result.second));
 		}
 
-		return resultant<closures<T>>(false,{});
+		return resultant<closure<T>>();
 	}
 
 	template <typename T> resultant<closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
 
-		resultant<closures<T>> result(true, {});
-
+		//
 		// verifiy that f has the same type of operator as r, keeping in mind the special cases of OP_THIS and OP_ANY
 		//
 		//
 
 		if(r.op != OP_ANY and r.op != OP_THIS and r.op != f.op) {
 			std::wcout << '\t' << ANSI_REV << "rule op doesn't match function op -- " << r.op << " ~ " << f.op << ANSI_CLR << std::endl;
-			return resultant<closures<T>>(false,{});
+			return resultant<closures<T>>();
 		}
 
 		// just match each predicate against what remains of the function with iterative comutation of df = df - (predicate ~ df)

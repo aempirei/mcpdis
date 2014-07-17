@@ -43,29 +43,37 @@ namespace yyy {
 	template <typename> struct function;
 	template <typename> struct grammar;
 	template <typename> struct parser;
+	template <typename,typename> struct expr;
+	template <typename> closure;
+	pluralize(closure); // closure
 }
 
 #include "yyy/operators.hh"
 
 #include "yyy/symbol.template.hh"
 #include "yyy/type.template.hh"
-
-#define pluralize(noun) template <typename T> using noun##s = std::list<noun<T>>
+#include "yyy/expr.template.hh"
 
 namespace yyy {
 
 	template <typename T> using resultant = std::pair<bool,T>;
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
+
+	// rule := expression<operator,predicate<T>>
 	template <typename T> using rule = function<type::container<predicate<T>>>;
 	pluralize(rule); // rules
+
 	template <typename T> using argument = typename T::template append<function<T>>;
 	pluralize(argument); // arguments
-	template <typename T> using closure = std::pair<predicate<T>,arguments<T>>;
-	pluralize(closure); // closures
-	template <typename T> using binding = std::pair<symbol::ref,closures<T>>;
 
-	// FIXME: template <typename T> using closure = std::pair<predicate<T>,arguments<T> OR binding<T>>;
+	template <typename T> using cluster = type::container<arguments<T>,closures<T>>;
+
+	template <typename T> using _closure = std::pair<predicate<T>,cluster<T>>;
+
+	template <typename T> struct closure : _closure<T> {
+		using _closure::_closure;
+	};
 }
 
 #undef pluralize
