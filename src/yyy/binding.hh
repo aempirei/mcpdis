@@ -9,7 +9,7 @@ namespace yyy {
 
 		using value_type = T;
 
-		using argument_type = typename argument<value_type>::template append<binding<value_type>>;
+		using argument_type = closure<argument<value_type>>;
 
 		// variables
 		//
