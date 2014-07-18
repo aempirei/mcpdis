@@ -18,9 +18,9 @@ namespace yyy {
 		return resultant<closure<T>>();
 	}
 
-	template <typename T> resultant<closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
+	template <typename T> resultant<bindings<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
 
-		resultant<closures<T>> result(true, {});
+		resultant<bindings<T>> result(true, {});
 
 		//
 		// verifiy that f has the same type of operator as r, keeping in mind the special cases of OP_THIS and OP_ANY
@@ -29,7 +29,7 @@ namespace yyy {
 
 		if(r.op != OP_ANY and r.op != OP_THIS and r.op != f.op) {
 			std::wcout << '\t' << ANSI_REV << "rule op doesn't match function op -- " << r.op << " ~ " << f.op << ANSI_CLR << std::endl;
-			return resultant<closures<T>>();
+			return resultant<bindings<T>>();
 		}
 
 		// just match each predicate against what remains of the function with iterative comutation of df = df - (predicate ~ df)
@@ -50,7 +50,7 @@ namespace yyy {
 
 				if(not result_closure.first) {
 					std::wcout << ANSI_REV << "test failed" << ANSI_CLR << std::endl;
-					return resultant<closures<T>>();
+					return resultant<bindings<T>>();
 				}
 
 				result.second.push_back(result_closure.second);

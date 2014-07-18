@@ -15,6 +15,6 @@ namespace yyy {
 		using key_type = typename _grammar<T>::key_type;
 
 		resultant<closure<T>> parse(const key_type&, const function<T>&) const;
-		resultant<closures<T>> parse(const rule<T>&, const function<T>&) const;
+		resultant<bindings<T>> parse(const rule<T>&, const function<T>&) const;
 	};
 }
