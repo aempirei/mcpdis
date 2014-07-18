@@ -268,6 +268,10 @@ namespace yyy {
 			constexpr operator const wchar_t * () const { return L""; }
 
 			void clear() { }
+
+			std::set<std::type_index> type_set() const {
+				return std::set<std::type_index>();
+			}
 		};
 
 		// container<...>
@@ -444,6 +448,13 @@ namespace yyy {
 
 			bool operator==(const container& r) const {
 				return ( ( head and r.head and *head == *r.head ) or not ( head or r.head ) ) and ( tail == r.tail );
+			}
+
+			std::set<std::type_index> type_set() const {
+				auto s = tail.type_set();
+				if(head)
+					s.insert(std::type_index(typeid(head_type)));
+				return s;
 			}
 		};
 

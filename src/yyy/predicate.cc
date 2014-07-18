@@ -167,9 +167,13 @@ namespace yyy {
 					and x.template contains<function<T>>()
 					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
 			case types::by_value:
-				return arg.contains_any_value(x);
+				return false; // FIXME
 			case types::by_type:
-				return arg.contains_any_type(x);
+				auto a = arg.type_set();
+				auto b = x.type_set();
+				std::list<std::type_index> ab;
+				std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), ab.end());
+				return not ab.empty();
 		}
 		return false;
 	}

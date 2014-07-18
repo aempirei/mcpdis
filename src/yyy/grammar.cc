@@ -12,10 +12,10 @@ namespace yyy {
 		for(const rule<T>& r : at(k)) {
 			auto result = parse(r,f);
 			if(result.first)
-				return resultant<closure<T>>(true, closure<T>(predicate<T>(k), result.second));
+				return resultant<closure<T>> { true, { predicate<T>(key_type(k)), result.second } };
 		}
 
-		return resultant<closure<T>>(false, closure<T>());
+		return resultant<closure<T>>();
 	}
 
 	template <typename T> resultant<closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
