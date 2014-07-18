@@ -25,8 +25,7 @@ namespace yyy {
 
 			ss << type::color<expr>() << type::value_to_str<operator_type>::call(this->first) << '(' << ANSI_CLR;
 
-			/* FIXME: for(const auto& arg : this->second) */
-			for(auto& arg : this->second)
+			for(const auto& arg : this->second)
 				ss << ' ' << type::value_to_str<argument_type>::call(arg);
 
 			ss << type::color<expr>() << " )" << ANSI_CLR;
