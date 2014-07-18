@@ -159,7 +159,7 @@ namespace yyy {
 			case types::any:
 				return true;
 			case types::mem:
-				throw std::runtime_error("mem predicate not implemented");
+				throw std::runtime_error("mem predicate test not implemented");
 			case types::by_ref:
 				throw std::runtime_error("test by_ref called on plain argument");
 			case types::by_op:
@@ -167,7 +167,7 @@ namespace yyy {
 					and x.template contains<function<T>>()
 					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
 			case types::by_value:
-				return false; // FIXME
+				throw std::runtime_error("by_value predicate test not implemented"); // FIXME
 			case types::by_type:
 				auto a = arg.type_set();
 				auto b = x.type_set();
