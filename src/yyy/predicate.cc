@@ -154,27 +154,38 @@ namespace yyy {
 
 	template <typename T> bool predicate<T>::test(const argument<T>& x) {
 		switch(type) {
-			case types::end:
-				return false;
+
+			case types::end      : throw std::runtime_error("end predicate test called on plain argument");
+			case types::by_ref   : throw std::runtime_error("by_ref predicate test called on plain argument");
+			case types::mem      : throw std::runtime_error("mem predicate test test not implemented"); // FIXME
+			case types::by_value : throw std::runtime_error("by_value predicate test not implemented"); // FIXME
+
 			case types::any:
+
 				return true;
-			case types::mem:
-				throw std::runtime_error("mem predicate test not implemented");
-			case types::by_ref:
-				throw std::runtime_error("test by_ref called on plain argument");
+
 			case types::by_op:
+
 				return arg.template contains<function<T>>()
 					and x.template contains<function<T>>()
 					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
-			case types::by_value:
-				throw std::runtime_error("by_value predicate test not implemented"); // FIXME
+
 			case types::by_type:
-				auto a = arg.type_set();
-				auto b = x.type_set();
-				std::list<std::type_index> ab;
-				std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), ab.end());
-				return not ab.empty();
+
+				{
+
+					auto a = arg.type_set();
+					auto b = x.type_set();
+
+					std::list<std::type_index> ab;
+
+					std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), ab.end());
+
+					return not ab.empty();
+				}
+				break;
 		}
+
 		return false;
 	}
 
