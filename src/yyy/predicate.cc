@@ -153,44 +153,44 @@ namespace yyy {
 	}
 
 	template <typename T> bool predicate<T>::test(const argument<T>& x) {
-		/*
-		   switch(type) {
-		   case types::end:
-		   return false;
-		   case types::any:
-		   return true;
-		   case types::mem:
-		   throw std::runtime_error("mem predicate not implemented");
-		   case types::by_ref:
-		   throw std::runtime_error("test by_ref called on plain argument");
-		   case types::by_op:
-		   return arg.template contains<function<T>>()
-		   and x.template contains<function<T>>()
-		   and (x.template get<function<T>>().op == x.template get<function<T>>().op);
-		   case types::by_value:
-		   return arg.contains_any_value(x);
-		   case types::by_type:
-		   return arg.contains_any_type(x);
-		   }
-		 */
+		switch(type) {
+			case types::end:
+				return false;
+			case types::any:
+				return true;
+			case types::mem:
+				throw std::runtime_error("mem predicate not implemented");
+			case types::by_ref:
+				throw std::runtime_error("test by_ref called on plain argument");
+			case types::by_op:
+				return arg.template contains<function<T>>()
+					and x.template contains<function<T>>()
+					and (x.template get<function<T>>().op == x.template get<function<T>>().op);
+			case types::by_value:
+				return arg.contains_any_value(x);
+			case types::by_type:
+				return arg.contains_any_type(x);
+		}
 		return false;
 	}
 
 	template <typename T> resultant<closure<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
 
-		//
-		// FIXME: add quantifiers for all and handle multiplicity of the quantifier
-		//
+		function<T> f_left(f);
+		bindings<T> b;
 
 		switch(type) {
 
 			case types::end:
 
+				if(quantifier != range(1,1))
+					throw std::runtime_error("end predicate contained unexpected quantifier");
+
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
 
-				if(f.args.empty())
-					return resultant<closure<T>>(true, closure<T>(*this, cluster<T>()));
+				if(f_left.args.empty())
+					return resultant<closure<T>> { true, { *this, {} } };
 
 				break;
 
@@ -198,21 +198,23 @@ namespace yyy {
 
 				if(arg.template contains<symbol::ref>()) {
 
-					const symbol::ref& key = arg.template get<symbol::ref>();
+					const auto& key = arg.template get<symbol::ref>();
 
-					resultant<closure<T>> parse_result = g.parse(key, f);
-
-					if(parse_result.first)
-						return parse_result;
+					while(b.size() < quantifier.second) {
+						auto result_closure = g.parse(key, f_left);
+						if(not result_closure.first)
+							break;
+						b.push_back(result_closure.second);
+					}
 
 				} else {
-					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
+					throw std::runtime_error("by_ref predicate contained non-symbol::ref argument");
 				}
 
 				break;
 		
-			case types::any:
 			case types::mem:
+			case types::any:
 
 				if(not arg.empty())
 					throw std::runtime_error("predicate contained unexpected non-empty argument");
@@ -220,35 +222,39 @@ namespace yyy {
 			case types::by_op:
 
 				if(type == types::by_op and not arg.template contains<function<value_type>>())
-					throw std::runtime_error("by_op predicate expected function argument but did not contain one");
+					throw std::runtime_error("by_op predicate contained unexpected non-function argument");
 
 			case types::by_type:
 			case types::by_value:
 
-				if(arg.template contains<symbol::ref>())
+				if(arg.template contains<symbol::ref>()) {
 					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
+				} else {
 
-				/*
-				   for(const auto& x : f.args) {
-				   if(test(x)) {
-				   b.args.push_back(x);
-				   if(quantifier.second != UINT_MAX and b.args.size() == quantifier.second)
-				   break;
-				   }
-				   }
+					auto iter = f_left.args.begin();
 
-				   if(b.args.size() < quantifier.first) {
-				   std::wcout << L"failed parse at quantifier" << std::endl;
-				   return test_return_type(false, binding<T>());
-				   }
+					while(b.size() < quantifier.second and iter != f_left.args.end()) {
 
-				   std::wcout << "successful parse for predicate: " << str() << std::endl;
+						auto jter = next(iter);
 
-				   return test_return_type(true,b);
-				 */
+						if(test(*iter)) {
+							b.push_back(*iter);
+							f_left.args.erase(iter);
+						}
+
+						iter = jter;
+					}
+				}
+
+				break;
 		}
 
-		return resultant<closure<T>>();
+		if(b.size() >= quantifier.first and b.size() <= quantifier.second) {
+			f = f_left;
+			return resultant<closure<T>> { true, { *this, b } };
+		} else {
+			return resultant<closure<T>>();
+		}
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {

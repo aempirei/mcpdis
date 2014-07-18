@@ -67,9 +67,10 @@ namespace yyy {
 	template <typename T> using argument = typename T::template append<function<T>>;
 	pluralize(argument); // arguments
 
-	template <typename T> using cluster = type::container<arguments<T>,closures<T>>;
+	template <typename T> using binding = type::container<argument<T>,closure<T>>;
+	pluralize(binding); // bindings
 
-	template <typename T> using _closure = std::pair<predicate<T>,cluster<T>>;
+	template <typename T> using _closure = std::pair<predicate<T>,bindings<T>>;
 
 	template <typename T> struct closure : _closure<T> {
 		using _closure<T>::_closure;
