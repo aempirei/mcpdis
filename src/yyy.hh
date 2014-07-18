@@ -39,13 +39,13 @@ namespace yyy {
 	// forward declarations
 	//
 
+	template <typename,typename> struct expr;
 	template <typename> struct predicate;
 	template <typename> struct function;
 	template <typename> struct grammar;
 	template <typename> struct parser;
-	template <typename,typename> struct expr;
-	template <typename> closure;
-	pluralize(closure); // closure
+	template <typename> struct closure;
+	pluralize(closure); // closures
 }
 
 #include "yyy/operators.hh"
@@ -72,7 +72,7 @@ namespace yyy {
 	template <typename T> using _closure = std::pair<predicate<T>,cluster<T>>;
 
 	template <typename T> struct closure : _closure<T> {
-		using _closure::_closure;
+		using _closure<T>::_closure;
 	};
 }
 

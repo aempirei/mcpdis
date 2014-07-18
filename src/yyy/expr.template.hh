@@ -10,24 +10,24 @@ namespace yyy {
 		using argument_type = U;
 		using arguments_type = std::list<argument_type>;
 
-		using _expr::_expr;
+		using _expr<T,U>::_expr;
 
 		expr(const operator_type& op) : expr(op, {}) {
 		}
 
 		expr& operator<<(const argument_type& arg) {
-			second.push_back(arg);
+			this->second.push_back(arg);
 		}
 
 		std::wstring str() const {
 
 			std::wstringstream ss;
 
-			ss << type::color<expr>() << type::value_to_str(first) << '(' << ANSI_CLR;
+			ss << type::color<expr>() << type::value_to_str<operator_type>::call(this->first) << '(' << ANSI_CLR;
 
-			/* FIXME: for(const auto& arg : second) */
-			for(auto& arg : second)
-				ss << ' ' << type::value_to_str(arg);
+			/* FIXME: for(const auto& arg : this->second) */
+			for(auto& arg : this->second)
+				ss << ' ' << type::value_to_str<argument_type>::call(arg);
 
 			ss << type::color<expr>() << " )" << ANSI_CLR;
 

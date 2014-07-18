@@ -178,14 +178,9 @@ namespace yyy {
 
 	template <typename T> resultant<closure<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
 
-		resultant<closure<T>> result(true, closure<T>(*this, {}));
-
-		closure<T>& ref_closure = result.second;
-		arguments<T>& matches = ref_closure.second;
-
-		// FIXME:
-		// FIXME: change this function to be resultant<functions<T>> test(const grammar<T>&,const function<T>&)
-		// FIXME: 
+		//
+		// FIXME: add quantifiers for all and handle multiplicity of the quantifier
+		//
 
 		switch(type) {
 
@@ -195,7 +190,7 @@ namespace yyy {
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
 
 				if(f.args.empty())
-					return result;
+					return resultant<closure<T>>(true, closure<T>(*this, cluster<T>()));
 
 				break;
 
@@ -203,16 +198,12 @@ namespace yyy {
 
 				if(arg.template contains<symbol::ref>()) {
 
-					const symbol::ref& binding_ref = arg.template get<symbol::ref>();
+					const symbol::ref& key = arg.template get<symbol::ref>();
 
-					resultant<closures<T>> parse_result = g.parse(binding_ref, f);
+					resultant<closure<T>> parse_result = g.parse(key, f);
 
-					if(parse_result.first) {
-
-						binding<T> b( binding_ref, parse_result.second );
-
-						return test_return_type(true, b);
-					}
+					if(parse_result.first)
+						return parse_result;
 
 				} else {
 					throw std::runtime_error("by_ref predicate does not contain expected symbol::ref argument");
@@ -258,7 +249,7 @@ namespace yyy {
 		*/
 		}
 
-		return resultant<arguments<T>>(false,{});
+		return resultant<closure<T>>(false, closure<T>());
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {

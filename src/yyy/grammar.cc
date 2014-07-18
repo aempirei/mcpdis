@@ -15,10 +15,12 @@ namespace yyy {
 				return resultant<closure<T>>(true, closure<T>(predicate<T>(k), result.second));
 		}
 
-		return resultant<closure<T>>();
+		return resultant<closure<T>>(false, closure<T>());
 	}
 
 	template <typename T> resultant<closures<T>> grammar<T>::parse(const rule<T>& r, const function<T>& f) const {
+
+		resultant<closures<T>> result(true, {});
 
 		//
 		// verifiy that f has the same type of operator as r, keeping in mind the special cases of OP_THIS and OP_ANY
@@ -44,14 +46,14 @@ namespace yyy {
 
 				std::wcout << '\t' << ANSI_REV << "testing predicate: " << rule_argument.str() << " -- " << ANSI_CLR;
 
-				auto rap_test_result = ra_predicate.test(*this, df);
+				auto result_closure = ra_predicate.test(*this, df);
 
-				if(not rap_test_result.first) {
+				if(not result_closure.first) {
 					std::wcout << ANSI_REV << "test failed" << ANSI_CLR << std::endl;
-					return resultant<closures<T>>(false,{});
+					return resultant<closures<T>>();
 				}
 
-				result.second.push_back(closure<T>(ra_predicate, rap_test_result.second));
+				result.second.push_back(result_closure.second);
 
 			} else {
 
