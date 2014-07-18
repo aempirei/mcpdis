@@ -211,8 +211,6 @@ namespace yyy {
 
 				break;
 		
-				/*
-
 			case types::any:
 			case types::mem:
 
@@ -230,26 +228,27 @@ namespace yyy {
 				if(arg.template contains<symbol::ref>())
 					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
 
-				for(const auto& x : f.args) {
-					if(test(x)) {
-						b.args.push_back(x);
-						if(quantifier.second != UINT_MAX and b.args.size() == quantifier.second)
-							break;
-					}
-				}
+				/*
+				   for(const auto& x : f.args) {
+				   if(test(x)) {
+				   b.args.push_back(x);
+				   if(quantifier.second != UINT_MAX and b.args.size() == quantifier.second)
+				   break;
+				   }
+				   }
 
-				if(b.args.size() < quantifier.first) {
-					std::wcout << L"failed parse at quantifier" << std::endl;
-					return test_return_type(false, binding<T>());
-				}
+				   if(b.args.size() < quantifier.first) {
+				   std::wcout << L"failed parse at quantifier" << std::endl;
+				   return test_return_type(false, binding<T>());
+				   }
 
-				std::wcout << "successful parse for predicate: " << str() << std::endl;
+				   std::wcout << "successful parse for predicate: " << str() << std::endl;
 
-				eturn test_return_type(true,b);
-		*/
+				   return test_return_type(true,b);
+				 */
 		}
 
-		return resultant<closure<T>>(false, closure<T>());
+		return resultant<closure<T>>();
 	}
 
 	template <typename T> bool predicate<T>::operator==(const predicate& r) const {
