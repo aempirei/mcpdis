@@ -99,7 +99,7 @@ namespace yyy {
 					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ')';
 				} else {
 					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ") {" << std::endl;
-					for(auto b : x.second) {
+					for(auto& b : x.second) {
 						if(b.template contains<closure<T>>()) {
 							ss << rcall(b.template get<closure<T>>(),n+1) << std::endl;
 						} else {
@@ -111,8 +111,6 @@ namespace yyy {
 				return ss.str();
 			}
 		};
-
-
 
 		template <typename> struct is_container;
 		template <typename,typename> struct equals;

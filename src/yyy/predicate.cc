@@ -189,10 +189,12 @@ namespace yyy {
 		return false;
 	}
 
-	template <typename T> resultant<closure<T>> predicate<T>::test(const grammar<T>& g, function<T>& f) {
+	template <typename T> resultant<matching<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) {
 
-		function<T> f_left(f);
-		bindings<T> b;
+		resultant<matching<T>> result = { true, { { *this, {} }, f } };
+
+		bindings<T>& b = result.second.first.second;
+		function<T>& df = result.second.second;
 
 		switch(type) {
 
@@ -204,8 +206,8 @@ namespace yyy {
 				if(not arg.empty())
 					throw std::runtime_error("end predicate contained unexpected non-empty argument");
 
-				if(f_left.args.empty())
-					return resultant<closure<T>> { true, { *this, {} } };
+				if(df.args.empty())
+					return result;
 
 				break;
 
@@ -216,10 +218,11 @@ namespace yyy {
 					const auto& key = arg.template get<symbol::ref>();
 
 					while(b.size() < quantifier.second) {
-						auto result_closure = g.parse(key, f_left);
-						if(not result_closure.first)
+						auto result_match = g.parse(key, df);
+						if(not result_match.first)
 							break;
-						b.push_back(result_closure.second);
+						b.push_back(result_match.second.first);
+						df = result_match.second.second;
 					}
 
 				} else {
@@ -246,15 +249,15 @@ namespace yyy {
 					throw std::runtime_error("predicate contains unexpected symbol::ref argument");
 				} else {
 
-					auto iter = f_left.args.begin();
+					auto iter = df.args.begin();
 
-					while(b.size() < quantifier.second and iter != f_left.args.end()) {
+					while(b.size() < quantifier.second and iter != df.args.end()) {
 
 						auto jter = next(iter);
 
 						if(test(*iter)) {
 							b.push_back(*iter);
-							f_left.args.erase(iter);
+							df.args.erase(iter);
 						}
 
 						iter = jter;
@@ -265,10 +268,9 @@ namespace yyy {
 		}
 
 		if(b.size() >= quantifier.first and b.size() <= quantifier.second) {
-			f = f_left;
-			return resultant<closure<T>> { true, { *this, b } };
+			return result;
 		} else {
-			return resultant<closure<T>>();
+			return resultant<matching<T>>();
 		}
 	}
 

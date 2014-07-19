@@ -194,7 +194,11 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 		{ L"unary"    , { R(OP_THIS) << P() << P().end()	} },
 
-		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
+		// { L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
+
+		{ L"n-ary"    , { R(OP_THIS) << +Pr(L"one") << P().end() } },
+
+		{ L"one"    , { R(OP_THIS) << P() } },
 
 		{ L"matchpair", { R(OP_THIS) << P() << P().mem()	} },
 
@@ -530,8 +534,12 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					//
 
 					auto result = config.g.parse(L"OR", k.second.get<function<term>>());
-					if(result.first)
-						std::wcout << std::endl << type::value_to_str<decltype(result.second)>::call(result.second) << std::endl << std::endl;
+
+					if(result.first) {
+						std::wcout << "matched: " << type::value_to_str<decltype(result.second.first)>::call(result.second.first);
+						std::wcout << std::endl << std::endl;
+						std::wcout << "unmatched: " << result.second.second.str() << std::endl << std::endl;
+					}
 				}
 			}
 

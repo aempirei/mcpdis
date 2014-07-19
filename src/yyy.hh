@@ -57,6 +57,9 @@ namespace yyy {
 
 namespace yyy {
 
+	// function<T> := std::pair<operator_t,std::list<type::container<Args...>>>
+	// containers<Args...> := std::list<type::container<Args..>>
+
 	template <typename T> using resultant = std::pair<bool,T>;
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
@@ -75,6 +78,8 @@ namespace yyy {
 	template <typename T> struct closure : _closure<T> {
 		using _closure<T>::_closure;
 	};
+
+	template <typename T> using matching = std::pair<closure<T>,function<T>>;
 }
 
 #undef pluralize
