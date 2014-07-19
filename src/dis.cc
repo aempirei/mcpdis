@@ -529,7 +529,9 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					// test the parsing on every formula
 					//
 
-					config.g.parse(L"OR", k.second.get<function<term>>());
+					auto result = config.g.parse(L"OR", k.second.get<function<term>>());
+					if(result.first)
+						std::wcout << std::endl << type::value_to_str<decltype(result.second)>::call(result.second) << std::endl << std::endl;
 				}
 			}
 

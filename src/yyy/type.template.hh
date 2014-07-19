@@ -72,12 +72,47 @@ namespace yyy {
 			}
 		};
 
-		template <template <typename> class V, typename T> struct value_to_str<V<T>> {
-			using value_type = V<T>;
+		template <typename...Args> struct value_to_str<std::basic_string<Args...>> {
+			using value_type = std::basic_string<Args...>;
+			static std::wstring call(const value_type& x) {
+				std::wstringstream ss;
+				ss << x;
+				return ss.str();
+			}
+		};
+
+		template <template <typename...> class V, typename...Args> struct value_to_str<V<Args...>> {
+			using value_type = V<Args...>;
 			static std::wstring call(const value_type& x) {
 				return x.str();
 			}
 		};
+
+		template <typename T> struct value_to_str<closure<T>> {
+			using value_type = closure<T>;
+			static std::wstring call(const value_type& x) {
+				return rcall(x,0);
+			}
+			static std::wstring rcall(const value_type& x, size_t n) {
+				std::wstringstream ss;
+				if(x.second.empty()) {
+					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ')';
+				} else {
+					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ") {" << std::endl;
+					for(auto b : x.second) {
+						if(b.template contains<closure<T>>()) {
+							ss << rcall(b.template get<closure<T>>(),n+1) << std::endl;
+						} else {
+							ss << std::setw((n+1)*2) << "" << b.str() << std::endl;
+						}
+					}
+					ss << std::setw(n*2) << "" << '}';
+				}
+				return ss.str();
+			}
+		};
+
+
 
 		template <typename> struct is_container;
 		template <typename,typename> struct equals;
