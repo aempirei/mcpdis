@@ -12,6 +12,9 @@ namespace yyy {
 
 		using _expr<T,U>::_expr;
 
+		operator_type& op = this->first;
+		arguments_type& args = this->second;
+
 		expr(const operator_type& op) : expr(op, {}) {
 		}
 

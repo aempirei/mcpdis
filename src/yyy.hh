@@ -45,7 +45,6 @@ namespace yyy {
 	template <typename> struct predicate;
 	template <typename> struct function;
 	template <typename> struct grammar;
-	template <typename> struct parser;
 	template <typename> struct closure;
 	pluralize(closure); // closures
 }
@@ -62,7 +61,6 @@ namespace yyy {
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 
-	// rule := expression<operator,predicate<T>>
 	template <typename T> using rule = function<type::container<predicate<T>>>;
 	pluralize(rule); // rules
 
