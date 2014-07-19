@@ -196,7 +196,7 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 		// { L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
 
-		{ L"n-ary"    , { R(OP_THIS) << +Pr(L"one") << P().end() } },
+		{ L"n-ary"    , { R(OP_THIS) << Pr(L"one")  } },
 
 		{ L"one"    , { R(OP_THIS) << P() } },
 
