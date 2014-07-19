@@ -10,7 +10,7 @@ namespace yyy {
 		for(const rule<T>& r : at(k)) {
 			auto result = parse(r,f);
 			if(result.first) {
-				result.second.first.first = (predicate<T>(k)); // FIXME: remove key_type() cast
+				result.second.first.first = predicate<T>(k);
 				return result;
 			}
 		}
@@ -40,7 +40,7 @@ namespace yyy {
 
 			if(rule_argument.template contains<predicate<T>>()) {
 
-				auto& ra_predicate = rule_argument.template get<predicate<T>>(); // FIXME: make const
+				const auto& ra_predicate = rule_argument.template get<predicate<T>>();
 
 				auto result_match = ra_predicate.test(*this, result.second.second);
 

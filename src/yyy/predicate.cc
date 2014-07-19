@@ -152,7 +152,7 @@ namespace yyy {
 		return ss.str();
 	}
 
-	template <typename T> bool predicate<T>::test(const argument<T>& x) {
+	template <typename T> bool predicate<T>::test(const argument<T>& x) const {
 		switch(type) {
 
 			case types::end      : throw std::runtime_error("end predicate test called on plain argument");
@@ -189,7 +189,7 @@ namespace yyy {
 		return false;
 	}
 
-	template <typename T> resultant<matching<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) {
+	template <typename T> resultant<matching<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) const {
 
 		resultant<matching<T>> result = { true, { { *this, {} }, f } };
 

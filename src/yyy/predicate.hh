@@ -90,8 +90,8 @@ namespace yyy {
 
 		std::wstring str() const;
 
-		resultant<matching<T>> test(const grammar<T>&, const function<T>&);
-		bool test(const argument<T>&);
+		resultant<matching<T>> test(const grammar<T>&, const function<T>&) const;
+		bool test(const argument<T>&) const;
 
 		bool operator==(const predicate&) const;
 	};
