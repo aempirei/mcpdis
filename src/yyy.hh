@@ -43,7 +43,6 @@ namespace yyy {
 
 	template <typename,typename> struct expr;
 	template <typename> struct predicate;
-	template <typename> struct function;
 	template <typename> struct grammar;
 	template <typename> struct closure;
 	pluralize(closure); // closures
@@ -57,8 +56,7 @@ namespace yyy {
 
 namespace yyy {
 
-	// function<T> := std::pair<operator_t,std::list<type::container<Args...>>>
-	// containers<Args...> := std::list<type::container<Args..>>
+	template <typename T> using function = expr<operator_t,T>;
 
 	template <typename T> using resultant = std::pair<bool,T>;
 
@@ -85,7 +83,6 @@ namespace yyy {
 #undef pluralize
 
 #include "yyy/predicate.hh"
-#include "yyy/function.hh"
 #include "yyy/grammar.hh"
 
 namespace yyy {
@@ -116,8 +113,6 @@ namespace yyy {
 	}
 
 	extern template struct predicate<quick::quick_type>;
-	extern template struct function<quick::quick_type>;
-	extern template struct function<type::container<predicate<quick::quick_type>>>;
 	extern template struct grammar<quick::quick_type>;
 
 	// inline function templates

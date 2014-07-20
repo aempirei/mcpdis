@@ -9,7 +9,7 @@ TARGETS = lib/libmcpdis.a lib/libyyy.a bin/dis bin/yyy.demo
 LIBCC = src/mcpdis.cc src/pic12f.cc
 LIBHH = $(LIBCC:.cc=.hh)
 
-YYYCC = src/yyy.cc src/yyy/function.cc src/yyy/predicate.cc src/yyy/grammar.cc
+YYYCC = src/yyy.cc src/yyy/predicate.cc src/yyy/grammar.cc
 YYYHH = $(YYYCC:.cc=.hh)
 
 TPLHH = src/yyy/symbol.template.hh src/yyy/type.template.hh

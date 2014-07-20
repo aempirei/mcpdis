@@ -58,9 +58,9 @@ namespace yyy {
 
 			std::wstringstream ss;
 
-			ss << "( " << type::value_to_str<head_type>::call(this->first) << " ~ ";
+			ss << "( " << type::value_to_str<head_type>::call(op) << " ~ ";
 
-			for(const auto& arg : this->second)
+			for(const auto& arg : args)
 				ss << type::value_to_str<argument_type>::call(arg) << ' ';
 
 			ss << ')';
