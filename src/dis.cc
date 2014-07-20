@@ -531,10 +531,9 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					const auto& m = result.second;
 
 					if(result.first) {
-						std::wcout << "matched: " << type::value_to_str<decltype(m.first)>::call(m.first);
-						std::wcout << std::endl << std::endl;
-						std::wcout << "unmatched: " << type::value_to_str<decltype(m.second)>::call(m.second);
-						std::wcout << std::endl << std::endl;
+						std::wcout << std::endl << type::value_to_str<decltype(m.first)>::call(m.first) << std::endl;
+						std::wcout << std::endl << type::value_to_str<decltype(m.second)>::call(m.second) << std::endl;
+						std::wcout << std::endl;
 					}
 				}
 			}

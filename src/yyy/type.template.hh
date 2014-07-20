@@ -112,32 +112,6 @@ namespace yyy {
 			}
 		};
 
-		/*
-		template <typename T> struct value_to_str<function<T>> {
-			using value_type = function<T>;
-			static std::wstring call(const value_type& x) {
-				return rcall(x,0);
-			}
-			static std::wstring rcall(const value_type& x, size_t n) {
-				std::wstringstream ss;
-				if(x.args.empty()) {
-					ss << std::setw(n*2) << "" << x.op << " =~ (" << x.args.size() << ')';
-				} else {
-					ss << std::setw(n*2) << "" << x.op << " =~ (" << x.args.size() << ") {" << std::endl;
-					for(auto& arg : x.args) {
-						if(arg.template contains<function<T>>()) {
-							ss << rcall(arg.template get<function<T>>(),n+1) << std::endl;
-						} else {
-							ss << std::setw((n+1)*2) << "" << arg.str() << std::endl;
-						}
-					}
-					ss << std::setw(n*2) << "" << '}';
-				}
-				return ss.str();
-			}
-		};
-		*/
-
 		template <typename> struct is_container;
 		template <typename,typename> struct equals;
 
