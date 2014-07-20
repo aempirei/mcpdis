@@ -10,7 +10,7 @@ namespace yyy {
 		for(const rule<T>& r : at(k)) {
 			auto result = parse(r,f);
 			if(result.first) {
-				result.second.first.first = predicate<T>(k);
+				result.second.first.op = predicate<T>(k);
 				return result;
 			}
 		}
@@ -31,10 +31,11 @@ namespace yyy {
 		//
 		//
 
-		resultant<matching<T>> result;
+		resultant<matching<T>> result = { true, { closure<T>(), f } };
 
-		result.first = true;
-		result.second.second = f;
+		matching<T>& m = result.second;
+		closure<T>& c = m.first;
+		function<T>& df = m.second;
 
 		for(const auto& rule_argument : r.args) {
 
@@ -42,13 +43,18 @@ namespace yyy {
 
 				const auto& ra_predicate = rule_argument.template get<predicate<T>>();
 
-				auto result_match = ra_predicate.test(*this, result.second.second);
+				auto result_match = ra_predicate.test(*this, df);
+
+				matching<T>& sub_m = result_match.second;
+				closure<T>& sub_c = sub_m.first;
+				function<T>& sub_f = sub_m.second;
 
 				if(not result_match.first)
 					return resultant<matching<T>>();
 
-				result.second.second = result_match.second.second;
-				result.second.first.second.push_back(result_match.second.first);
+				c << sub_c;
+
+				df = result_match.second.second;
 
 			} else {
 

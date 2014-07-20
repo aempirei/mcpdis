@@ -44,8 +44,22 @@ namespace yyy {
 	template <typename,typename> struct expr;
 	template <typename> struct predicate;
 	template <typename> struct grammar;
-	template <typename> struct closure;
+
+	template <typename T> using function = expr<operator_t,T>;
+	pluralize(function); // functions
+
+	namespace type {
+		template <typename...> struct container;
+	}
+
+	template <typename T> using argument = typename T::template append<function<T>>;
+	pluralize(argument); // arguments
+
+	template <typename T> using closure = expr<predicate<T>,type::container<argument<T>>>;
 	pluralize(closure); // closures
+
+	template <typename T> using binding = typename closure<T>::argument_type;
+	pluralize(binding); // bindings
 }
 
 #include "yyy/operators.hh"
@@ -56,26 +70,12 @@ namespace yyy {
 
 namespace yyy {
 
-	template <typename T> using function = expr<operator_t,T>;
-
 	template <typename T> using resultant = std::pair<bool,T>;
 
 	template <typename T> using meta = typename T::template append<symbol::ref>;
 
 	template <typename T> using rule = function<type::container<predicate<T>>>;
 	pluralize(rule); // rules
-
-	template <typename T> using argument = typename T::template append<function<T>>;
-	pluralize(argument); // arguments
-
-	template <typename T> using binding = type::container<argument<T>,closure<T>>;
-	pluralize(binding); // bindings
-
-	template <typename T> using _closure = std::pair<predicate<T>,bindings<T>>;
-
-	template <typename T> struct closure : _closure<T> {
-		using _closure<T>::_closure;
-	};
 
 	template <typename T> using matching = std::pair<closure<T>,function<T>>;
 }

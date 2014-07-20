@@ -95,15 +95,15 @@ namespace yyy {
 			}
 			static std::wstring rcall(const value_type& x, size_t n) {
 				std::wstringstream ss;
-				if(x.second.empty()) {
-					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ')';
+				if(x.args.empty()) {
+					ss << std::setw(n*2) << "" << x.op.str() << " =~ (" << x.args.size() << ')';
 				} else {
-					ss << std::setw(n*2) << "" << x.first.str() << " =~ (" << x.second.size() << ") {" << std::endl;
-					for(auto& b : x.second) {
-						if(b.template contains<closure<T>>()) {
-							ss << rcall(b.template get<closure<T>>(),n+1) << std::endl;
+					ss << std::setw(n*2) << "" << x.op.str() << " =~ (" << x.args.size() << ") {" << std::endl;
+					for(auto& arg : x.args) {
+						if(arg.template contains<closure<T>>()) {
+							ss << rcall(arg.template get<closure<T>>(),n+1) << std::endl;
 						} else {
-							ss << std::setw((n+1)*2) << "" << b.str() << std::endl;
+							ss << std::setw((n+1)*2) << "" << arg.str() << std::endl;
 						}
 					}
 					ss << std::setw(n*2) << "" << '}';

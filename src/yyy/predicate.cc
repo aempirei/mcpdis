@@ -191,10 +191,11 @@ namespace yyy {
 
 	template <typename T> resultant<matching<T>> predicate<T>::test(const grammar<T>& g, const function<T>& f) const {
 
-		resultant<matching<T>> result = { true, { { *this, {} }, f } };
+		resultant<matching<T>> result = { true, { closure<T>(*this), f } };
 
-		bindings<T>& b = result.second.first.second;
-		function<T>& df = result.second.second;
+		matching<T>& m = result.second;
+		closure<T>& c = m.first;
+		function<T>& df = m.second;
 
 		switch(type) {
 
@@ -217,12 +218,19 @@ namespace yyy {
 
 					const auto& key = arg.template get<symbol::ref>();
 
-					while(b.size() < quantifier.second) {
+					while(c.args.size() < quantifier.second) {
+
 						auto result_match = g.parse(key, df);
+
+						matching<T>& sub_m = result_match.second;
+						closure<T>& sub_c = sub_m.first;
+						function<T>& sub_f = sub_m.second;
+
 						if(not result_match.first)
 							break;
-						b.push_back(result_match.second.first);
-						df = result_match.second.second;
+
+						c << sub_c;
+						df = sub_f;
 					}
 
 				} else {
@@ -251,12 +259,13 @@ namespace yyy {
 
 					auto iter = df.args.begin();
 
-					while(b.size() < quantifier.second and iter != df.args.end()) {
+					while(c.args.size() < quantifier.second and iter != df.args.end()) {
 
 						auto jter = next(iter);
 
 						if(test(*iter)) {
-							b.push_back(*iter);
+
+							c << *iter;
 							df.args.erase(iter);
 						}
 
@@ -267,7 +276,7 @@ namespace yyy {
 				break;
 		}
 
-		if(b.size() >= quantifier.first and b.size() <= quantifier.second) {
+		if(c.args.size() >= quantifier.first and c.args.size() <= quantifier.second) {
 			return result;
 		} else {
 			return resultant<matching<T>>();
