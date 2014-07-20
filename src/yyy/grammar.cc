@@ -53,8 +53,7 @@ namespace yyy {
 					return resultant<matching<T>>();
 
 				c << sub_c;
-
-				df = result_match.second.second;
+				df = sub_f;
 
 			} else {
 

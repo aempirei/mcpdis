@@ -190,15 +190,9 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 	grammar<term> dga = {
 
-		{ L"nonsense" , { R(OP_THIS) << Pfn.by_op() << Pfn.by_type() << P() << Pfn << P() << P(L(7)) << P(S::var(L"r27")) << P().end() } },
-
 		{ L"unary"    , { R(OP_THIS) << P() << P().end()	} },
 
-		// { L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
-
-		{ L"n-ary"    , { R(OP_THIS) << Pr(L"one")  } },
-
-		{ L"one"    , { R(OP_THIS) << P() } },
+		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
 
 		{ L"matchpair", { R(OP_THIS) << P() << P().mem()	} },
 
