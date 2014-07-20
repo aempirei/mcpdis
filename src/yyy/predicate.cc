@@ -277,6 +277,18 @@ namespace yyy {
 		}
 
 		if(c.args.size() >= quantifier.first and c.args.size() <= quantifier.second) {
+
+			if(
+					c.args.size() == 1
+					and c.args.front().template contains<closure<T>>()
+					and c.args.front().template get<closure<T>>().op == c.op
+			  )
+			{
+				closure<T> ac = c.args.front().template get<closure<T>>();
+				c = ac;
+			}
+
+
 			return result;
 		} else {
 			return resultant<matching<T>>();

@@ -528,11 +528,13 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					//
 
 					auto result = config.g.parse(L"OR", k.second.get<function<term>>());
+					const auto& m = result.second;
 
 					if(result.first) {
-						std::wcout << "matched: " << type::value_to_str<decltype(result.second.first)>::call(result.second.first);
+						std::wcout << "matched: " << type::value_to_str<decltype(m.first)>::call(m.first);
 						std::wcout << std::endl << std::endl;
-						std::wcout << "unmatched: " << result.second.second.str() << std::endl << std::endl;
+						std::wcout << "unmatched: " << type::value_to_str<decltype(m.second)>::call(m.second);
+						std::wcout << std::endl << std::endl;
 					}
 				}
 			}
