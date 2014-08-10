@@ -2,7 +2,11 @@
 
 namespace yyy {
 
-	template <typename T> using _grammar = std::map<symbol::ref,rules<T>>;
+	template <typename T> using transformation_function_type = function<T> (*)(const matching<T>&);
+
+	template <typename T> using grammar_value_type = std::pair<rules<T>,transformation_function_type<T>>;
+
+	template <typename T> using _grammar = std::map<symbol::ref,grammar_value_type<T>>;
 
 	template <typename T> struct grammar : _grammar<T> {
 
@@ -16,5 +20,13 @@ namespace yyy {
 
 		resultant<matching<T>> parse(const key_type&, const function<T>&) const;
 		resultant<matching<T>> parse(const rule<T>&, const function<T>&) const;
+
+		static function<T> identity_transformation(const matching<T>&) {
+			return function<T>();
+		};
+
+		static function<T> null_transformation(const matching<T>&) {
+			return function<T>();
+		}
 	};
 }

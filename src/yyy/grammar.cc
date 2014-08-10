@@ -7,7 +7,7 @@ namespace yyy {
 
 	template <typename T> resultant<matching<T>> grammar<T>::parse(const key_type& k, const function<T>& f) const {
 
-		for(const rule<T>& r : at(k)) {
+		for(const rule<T>& r : at(k).first) {
 			auto result = parse(r,f);
 			if(result.first) {
 				result.second.first.op = predicate<T>(k);

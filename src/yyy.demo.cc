@@ -11,15 +11,22 @@ G define_grammar() {
 	const P LSF( P( M() << L() << S::var() << F() ).by_type() );
 
 	return G {
-		{ L"combo", {
+		{ L"combo", { {
 				    R(OP_THIS) << P(S::ref(L"satan")),
 				    R(OP_OR) << P(S::ref(L"combo")),
 				    R(OP_ANY) << *P() << !P(S::var(L"noway")) << P().end(),
 				    R() << P() << ( R() << P() ) << P().end()
-			    } },
-		{ L"any"  , { R(OP_ANY) << *P() << P().end() } },
-		{ L"satan", { R(OP_AND) << P(L(1337)) << LSF << P(S::var(L"eax")) } },
-		{ L"hello", { R(OP_ANY) << +P(L(666)).by_type() << P(S::ref(L"satan")).qm() << P(F(OP_AND)) << P(F(OP_AND)).by_op() << *P() << P().end() } }
+			    },
+			[](const matching<term>&) -> function<term> { return function<term>(); } } },
+
+		{ L"any"  , { { R(OP_ANY) << *P() << P().end() },
+			[](const matching<term>&) -> function<term> { return function<term>(); } } },
+
+		{ L"satan", { { R(OP_AND) << P(L(1337)) << LSF << P(S::var(L"eax")) },
+			[](const matching<term>&) -> function<term> { return function<term>(); } } },
+
+		{ L"hello", { { R(OP_ANY) << +P(L(666)).by_type() << P(S::ref(L"satan")).qm() << P(F(OP_AND)) << P(F(OP_AND)).by_op() << *P() << P().end() },
+			[](const matching<term>&) -> function<term> { return function<term>(); } } }
 	};
 }
 
@@ -87,7 +94,7 @@ int main(int argc, char **argv) {
 	for(const auto& entry : g) {
 
 		const auto& name = entry.first;
-		const auto& rs = entry.second;
+		const auto& rs = entry.second.first;
 
 		auto iter = rs.begin();
 

@@ -84,18 +84,18 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 	G dgs = {
 
-		{ L"AND"    , { R(OP_AND    ) << Pr(L"n-ary") } },
-		{ L"OR"     , { R(OP_OR     ) << Pr(L"n-ary") } },
-		{ L"XOR"    , { R(OP_XOR    ) << Pr(L"n-ary") } },
-		{ L"PLUS"   , { R(OP_PLUS   ) << Pr(L"n-ary") } },
-		{ L"MINUS"  , { R(OP_MINUS  ) << Pr(L"n-ary") } },
-		{ L"COMPOSE", { R(OP_COMPOSE) << Pr(L"n-ary") } },
-		{ L"LIST"   , { R(OP_LIST   ) << Pr(L"n-ary") } },
+		{ L"AND"    , { { R(OP_AND    ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"OR"     , { { R(OP_OR     ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"XOR"    , { { R(OP_XOR    ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"PLUS"   , { { R(OP_PLUS   ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"MINUS"  , { { R(OP_MINUS  ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"COMPOSE", { { R(OP_COMPOSE) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"LIST"   , { { R(OP_LIST   ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
 
-		{ L"SWAP"   , { R(OP_SWAP) << Pr(L"unary") } },
-		{ L"NOT"    , { R(OP_NOT ) << Pr(L"unary") } },
-		{ L"ROTL"   , { R(OP_ROTL) << Pr(L"unary") } },
-		{ L"ROTR"   , { R(OP_ROTR) << Pr(L"unary") } },
+		{ L"SWAP"   , { { R(OP_SWAP) << Pr(L"unary") }, grammar<term>::identity_transformation } },
+		{ L"NOT"    , { { R(OP_NOT ) << Pr(L"unary") }, grammar<term>::identity_transformation } },
+		{ L"ROTL"   , { { R(OP_ROTL) << Pr(L"unary") }, grammar<term>::identity_transformation } },
+		{ L"ROTR"   , { { R(OP_ROTR) << Pr(L"unary") }, grammar<term>::identity_transformation } }
 
 	};
 
@@ -108,64 +108,69 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 	//
 	//
 
+#define PF(__op__) (P(M() << F(__op__)).by_op())
+
 	G dgz = {
 
-		{ L"lift",
+		{ L"lift", {
 			{
+				R(OP_PLUS) << ~PF(OP_PLUS) << Pr(L"tail")
+				/*
 				R(OP_AND    ) << Pr(L"AND"),
 				R(OP_OR     ) << Pr(L"OR"),
 				R(OP_XOR    ) << Pr(L"XOR"),
 				R(OP_PLUS   ) << Pr(L"PLUS"),
 				R(OP_COMPOSE) << Pr(L"COMPOSE"),
 				R(OP_LIST   ) << Pr(L"LIST")
-			} },
+				*/
+			}, grammar<term>::identity_transformation } },
 
-		{ L"aggregate",
+		{ L"aggregate", {
 			{
 				R(OP_AND ) << Pr(L"literals"),
 				R(OP_OR  ) << Pr(L"literals"),
 				R(OP_XOR ) << Pr(L"literals"),
 				R(OP_PLUS) << Pr(L"literals")
-			} },
-
-		{ L"compute",
+			}, grammar<term>::identity_transformation } },
+ 
+		{ L"compute", {
 			{
 				R(OP_SWAP) << pL,
 				R(OP_NOT ) << pL,
 				R(OP_ROTL) << pL,
 				R(OP_ROTR) << pL,
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"distribute",
+		{ L"distribute", {
 			{
 				R(OP_AND) << P() << Pr(L"OR"),
 				R(OP_OR) << P() << Pr(L"AND")
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"idempotent",
+		{ L"idempotent", {
 			{
 				R(OP_AND) << Pr(L"matchpair"),
 				R(OP_OR ) << Pr(L"matchpair")
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"nilpotent",
+		{ L"nilpotent", {
 			{
 				R(OP_XOR) << Pr(L"matchpair")
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"involution",
+		{ L"involution", {
 			{
 				R(OP_NOT ) << Pr(L"NOT"),
 				R(OP_SWAP) << Pr(L"SWAP")
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"inverse",
-			{
+		{ L"inverse", {
+			{ 
 				R(OP_ROTL) << Pr(L"ROTR"),
 				R(OP_ROTR) << Pr(L"ROTL")
-			} },
+			}, grammar<term>::identity_transformation } },
 
-		{ L"nop",
+		{ L"nop", {
 			{
 				R(OP_AND    ) << Pr(L"unary"),
 				R(OP_OR     ) << Pr(L"unary"),
@@ -174,7 +179,7 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 				R(OP_MINUS  ) << Pr(L"unary"),
 				R(OP_COMPOSE) << Pr(L"unary"),
 				R(OP_LIST   ) << Pr(L"unary")
-			} }
+			}, grammar<term>::identity_transformation } },
 	};
 
 	for(const auto& r : dgz)
@@ -186,17 +191,13 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 	//
 	//
 
-	P Pfn( F(OP_AND) << L(1) );
-
 	grammar<term> dga = {
 
-		{ L"unary"    , { R(OP_THIS) << P() << P().end()	} },
-
-		{ L"n-ary"    , { R(OP_THIS) << +P() << P().end()	} },
-
-		{ L"matchpair", { R(OP_THIS) << P() << P().mem()	} },
-
-		{ L"literals" , { R(OP_THIS) << pL.min(2)		} }
+		{ L"unary"	,{ { R(OP_THIS) << P() << P().end()	}, grammar<term>::identity_transformation } },
+		{ L"n-ary"	,{ { R(OP_THIS) << +P() << P().end()	}, grammar<term>::identity_transformation } },
+		{ L"matchpair"	,{ { R(OP_THIS) << P() << P().mem()	}, grammar<term>::identity_transformation } },
+		{ L"literals"	,{ { R(OP_THIS) << pL.min(2)		}, grammar<term>::identity_transformation } },
+		{ L"tail"	,{ { R(OP_THIS) << *P() << P().end()	}, grammar<term>::identity_transformation } },
 	};
 
 	for(const auto& r : dga)
@@ -211,7 +212,7 @@ void print_rules(const configuration& config, const std::wstring& name, const st
 
 	for(const auto& ref : refs) {
 
-		const auto& rs = g[ref];
+		const auto& rs = g[ref].first;
 		auto iter = rs.begin();
 
 		if(config.verbose) {
@@ -527,7 +528,7 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					// test the parsing on every formula
 					//
 
-					auto result = config.g.parse(L"OR", k.second.get<function<term>>());
+					auto result = config.g.parse(L"lift", k.second.get<function<term>>());
 					const auto& m = result.second;
 
 					if(result.first) {
