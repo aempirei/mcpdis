@@ -84,7 +84,7 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 
 	G dgs = {
 
-		{ L"AND"    , { { R(OP_AND    ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
+		{ L"AND"    , { { R(OP_AND    ) << Pr(L"n-ary") }, grammar<term>::null_transformation } },
 		{ L"OR"     , { { R(OP_OR     ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
 		{ L"XOR"    , { { R(OP_XOR    ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
 		{ L"PLUS"   , { { R(OP_PLUS   ) << Pr(L"n-ary") }, grammar<term>::identity_transformation } },
