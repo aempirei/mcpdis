@@ -126,7 +126,7 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 						   // }, grammar<term>::identity_transformation } },
 				},
 	  			[](const matching<term>& m) -> function<term> {
-					function<term> f = m.second;
+					auto f = m.second;
 					const auto& df = m.first.args.front().template get<closure<term>>().args.front().template get<argument<term>>().template get<function<term>>();
 					f.args.insert(f.args.end(), df.args.begin(), df.args.end());
 					return f;
