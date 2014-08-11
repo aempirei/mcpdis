@@ -57,9 +57,6 @@ namespace yyy {
 
 	template <typename T> using closure = expr<predicate<T>,type::container<argument<T>>>;
 	pluralize(closure); // closures
-
-	template <typename T> using binding = typename closure<T>::argument_type;
-	pluralize(binding); // bindings
 }
 
 #include "yyy/operators.hh"

@@ -113,17 +113,25 @@ void initialize_grammar(std::list<S::ref>& s, std::list<S::ref>& z, std::list<S:
 	G dgz = {
 
 		{ L"lift", {
-			{
-				R(OP_PLUS) << ~PF(OP_PLUS) << Pr(L"tail")
-				/*
-				R(OP_AND    ) << Pr(L"AND"),
-				R(OP_OR     ) << Pr(L"OR"),
-				R(OP_XOR    ) << Pr(L"XOR"),
-				R(OP_PLUS   ) << Pr(L"PLUS"),
-				R(OP_COMPOSE) << Pr(L"COMPOSE"),
-				R(OP_LIST   ) << Pr(L"LIST")
-				*/
-			}, grammar<term>::identity_transformation } },
+				{
+					R(OP_PLUS) << ~PF(OP_PLUS)
+						   /*
+						      R(OP_AND    ) << Pr(L"AND"),
+						      R(OP_OR     ) << Pr(L"OR"),
+						      R(OP_XOR    ) << Pr(L"XOR"),
+						      R(OP_PLUS   ) << Pr(L"PLUS"),
+						      R(OP_COMPOSE) << Pr(L"COMPOSE"),
+						      R(OP_LIST   ) << Pr(L"LIST")
+						    */
+						   // }, grammar<term>::identity_transformation } },
+				},
+	  			[](const matching<term>& m) -> function<term> {
+					function<term> f = m.second;
+					const auto& df = m.first.args.front().template get<closure<term>>().args.front().template get<argument<term>>().template get<function<term>>();
+					f.args.insert(f.args.end(), df.args.begin(), df.args.end());
+					return f;
+				}
+		} },
 
 		{ L"aggregate", {
 			{
@@ -529,11 +537,13 @@ void handler(const configuration& config, bitstream& b, const instruction_set& c
 					//
 
 					auto result = config.g.parse(L"lift", k.second.get<function<term>>());
-					const auto& m = result.second;
 
 					if(result.first) {
+						const auto& m = result.second;
+						auto tf = config.g.at(L"lift").second(m);
 						std::wcout << std::endl << type::value_to_str<decltype(m.first)>::call(m.first) << std::endl;
 						std::wcout << std::endl << type::value_to_str<decltype(m.second)>::call(m.second) << std::endl;
+						std::wcout << std::endl << "transformation: " << type::value_to_str<decltype(tf)>::call(tf) << std::endl;
 						std::wcout << std::endl;
 					}
 				}
