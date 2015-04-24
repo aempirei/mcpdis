@@ -1,12 +1,12 @@
 mcpdis : PICmicro Mid-Range MCU Advanced Disassembler and Upward Translator
-Copyright(c) 2014 by Christopher Abad | 20 GOTO 10 | 256 LLC
+Copyright(c) 2014-2015 by Christopher Abad | 20 GOTO 10 | 256 LLC
 
 This is mostly kinda messy right now.
 Just moved it from a private git to github.
 Maybe I'll work on it some.
 
+git: https://github.com/aempirei/mcpdis.git
 email: aempirei@gmail.com aempirei@256.bz
-http://www.256.bz/ http://www.twentygoto10.com/
-aim: ambientempire
+http://www.256.bz/
 skype: aempirei
-git: git@aws.256.bz:mcpdis.git
+aim: ambientempire
